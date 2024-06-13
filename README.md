@@ -45,17 +45,17 @@ First we will setup a WordPress site on top of which we will setup CiviCRM. For 
 
 1. Install WordPress and create admin
    ```sh
-   wp core install --url=civicrm.test --title="CiviCRM" --admin_user=admin --admin_password=admin --admin_email=admin@example.com
+   wp core install --url=goonj-civicrm.test --title="CiviCRM" --admin_user=admin --admin_password=admin --admin_email=admin@example.com
    ```
 
 1. Create a virtual host
    ```sh
-   valet link civicrm
+   valet link goonj-civicrm
    ```
 
 1. Secure the virtual host
    ```sh
-   valet secure civicrm
+   valet secure goonj-civicrm
    ```
 
 #### Setup CiviCRM
@@ -65,7 +65,7 @@ First we will setup a WordPress site on top of which we will setup CiviCRM. For 
    wp plugin activate civicrm
    ```
 
-2. Go to `https://civicrm.test/wp-admin` and configure CiviCRM.
+2. Go to `https://goonj-civicrm.test/wp-admin` and configure CiviCRM.
    1. Check all the Components
    2. And click on `Install CiviCRM`
 
@@ -109,20 +109,20 @@ First we will setup a WordPress site on top of which we will setup CiviCRM. For 
 
 1. Install WordPress and create admin
    ```sh
-   wp core install --url=civicrm.test --title="CiviCRM" --admin_user=admin --admin_password=admin --admin_email=admin@example.com
+   wp core install --url=goonj-civicrm.test --title="CiviCRM" --admin_user=admin --admin_password=admin --admin_email=admin@example.com
    ```
 
 1. Create a virtual host
    ```sh
-   valet link civicrm
+   valet link goonj-civicrm
    ```
 
 1. Secure the virtual host
    ```sh
-   valet secure civicrm
+   valet secure goonj-civicrm
    ```
 
-1. Go to `https://civicrm.test/wp-admin` and login using the admin credentials step 7.
+1. Go to `https://goonj-civicrm.test/wp-admin` and login using the admin credentials step 7.
 
 #### Setup CiviCRM
 
@@ -136,6 +136,6 @@ First we will setup a WordPress site on top of which we will setup CiviCRM. For 
    wp plugin activate civicrm
    ```
 
-1. Go to `https://civicrm.test/wp-admin` and configure CiviCRM.
+1. Go to `https://goonj-civicrm.test/wp-admin` and configure CiviCRM.
    1. Check all the Components
    2. And click on `Install CiviCRM`
