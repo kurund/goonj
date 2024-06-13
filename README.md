@@ -24,7 +24,7 @@ First we will setup a WordPress site on top of which we will setup CiviCRM. For 
 
 1. From the MySQL terminal, create a database
    ```sql
-   create database civicrm;
+   create database goonj_crm;
    exit
    ```
 
@@ -40,12 +40,12 @@ First we will setup a WordPress site on top of which we will setup CiviCRM. For 
 
 1. Create the WordPress config file (**specify the correct database credentials**)
    ```sh
-   wp config create --dbname=civicrm --dbuser=root --dbpass=
+   wp config create --dbname=goonj_crm --dbuser=root --dbpass=
    ```
 
 1. Install WordPress and create admin
    ```sh
-   wp core install --url=goonj-civicrm.test --title="CiviCRM" --admin_user=admin --admin_password=admin --admin_email=admin@example.com
+   wp core install --url=goonj-civicrm.test --title="Goonj-CiviCRM" --admin_user=admin --admin_password=admin --admin_email=admin@example.com
    ```
 
 1. Create a virtual host
@@ -83,7 +83,7 @@ First we will setup a WordPress site on top of which we will setup CiviCRM. For 
 
 1. From the MySQL terminal, create a database
    ```sql
-   create database civicrm;
+   create database goonj_crm;
    exit
    ```
 
@@ -104,12 +104,12 @@ First we will setup a WordPress site on top of which we will setup CiviCRM. For 
 
 1. Create the WordPress config file (**specify the correct database credentials**)
    ```sh
-   wp config create --dbname=civicrm --dbuser=root --dbpass=
+   wp config create --dbname=goonj_crm --dbuser=root --dbpass=
    ```
 
 1. Install WordPress and create admin
    ```sh
-   wp core install --url=goonj-civicrm.test --title="CiviCRM" --admin_user=admin --admin_password=admin --admin_email=admin@example.com
+   wp core install --url=goonj-civicrm.test --title="Goonj-CiviCRM" --admin_user=admin --admin_password=admin --admin_email=admin@example.com
    ```
 
 1. Create a virtual host
