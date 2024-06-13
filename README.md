@@ -71,7 +71,7 @@ First we will setup a WordPress site on top of which we will setup CiviCRM. For 
 
 ### Steps (from scratch)
 
-> _You probably don't need to do it. @pokhiii has already done these and pushed it in this repository._
+> _You probably don't need to do it. These steps has already done these and pushed it in this repository._
 #### WordPress site setup
 
 First we will setup a WordPress site on top of which we will setup CiviCRM. For creating the WordPress site we will require a database.
