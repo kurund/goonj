@@ -128,7 +128,7 @@ First we will setup a WordPress site on top of which we will setup CiviCRM. For 
 
 1. In the project directory, run the following command to download the CiviCRM plugin
    ```sh
-   wp plugin install https://download.civicrm.org/civicrm-5.73.2-wordpress.zip
+   wp plugin install https://download.civicrm.org/civicrm-5.74.1-wordpress.zip
    ```
 
 1. Activate the plugin
