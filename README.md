@@ -30,7 +30,7 @@ First we will setup a WordPress site on top of which we will setup CiviCRM. For 
 
 1. Clone this repository
    ```sh
-   git clone https://github.com/coloredcow/civicrm.git
+   git clone https://github.com/ColoredCow/goonj-crm.git
    ```
 
 1. Change to project root directory
