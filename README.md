@@ -9,9 +9,10 @@
    1. [Installing via Homebrew](https://make.wordpress.org/cli/handbook/guides/installing/#installing-via-homebrew) would be the easiest option for macOS users.
    2. If not, all other installation options can be found in the same page.
 3. MySQL 5.7.5+ or MariaDB 10.2+
+4. cv - command is a utility for interacting with a CiviCRM installation
+   1. Download - https://github.com/civicrm/cv?tab=readme-ov-file#download
 
-
-### Steps (from this repository)
+### Steps
 
 #### WordPress site setup
 
@@ -73,11 +74,19 @@ First we will setup a WordPress site on top of which we will setup CiviCRM. For 
    1. Check all the Components
    2. And click on `Install CiviCRM`
 
-3. Change CiviCRM extensions directory path:
-   1. In your text editor open, `wp-content/uploads/civicrm/civicrm.settings.php`
-   2. Search for `Override the extensions directory` comment
-   3. We are going to keep all the extensions in `wp-content/civi-extensions` directory:
-      ```php
-      // Replace with your actual path to goonj-crm below!
-      $civicrm_setting['domain']['extensionsDir'] = '/path/to/goonj-crm/wp-content/civi-extensions';
-      ```
+##### Change CiviCRM extensions directory path
+
+1. In your text editor open, `wp-content/uploads/civicrm/civicrm.settings.php`
+2. Search for `Override the extensions directory` comment
+3. We are going to keep all the extensions in `wp-content/civi-extensions` directory:
+   ```php
+   // Replace with your actual path to goonj-crm below!
+   $civicrm_setting['domain']['extensionsDir'] = '/path/to/goonj-crm/wp-content/civi-extensions';
+   ```
+
+##### Extensions
+
+1. Activate required extensions
+   ```sh
+   cv ext:enable afform afform_admin civirules emailapi
+   ```
