@@ -48,6 +48,11 @@ First we will setup a WordPress site on top of which we will setup CiviCRM. For 
    wp core install --url=goonj-civicrm.test --title="Goonj-CiviCRM" --admin_user=admin --admin_password=admin --admin_email=admin@example.com
    ```
 
+1. Set the WordPress permalink structure to "postname"
+   ```sh
+   wp rewrite structure '/%postname%/'
+   ```
+
 1. Create a virtual host
    ```sh
    valet link goonj-civicrm
@@ -57,7 +62,6 @@ First we will setup a WordPress site on top of which we will setup CiviCRM. For 
    ```sh
    valet secure goonj-civicrm
    ```
-
 #### Setup CiviCRM
 
 1. Activate the plugin
