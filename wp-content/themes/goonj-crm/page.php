@@ -29,7 +29,7 @@ the_post();
 					'</span>'
 				);
 			?>
-		</div><!-- /#post-<?php the_ID(); ?> -->
+		</div>
 		<?php
 			// If comments are open or we have at least one comment, load up the comment template.
 			if ( comments_open() || get_comments_number() ) {
@@ -37,9 +37,6 @@ the_post();
 			}
 		?>
 	</div><!-- /.col -->
-	<?php
-		get_sidebar();
-	?>
 </div><!-- /.row -->
 <?php
 get_footer();

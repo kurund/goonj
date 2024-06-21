@@ -80,7 +80,7 @@
       {crmRegion name="event-page-eventinfo-actionlinks-top"}
         {if $allowRegistration}
           <div class="action-link section register_link-section register_link-top">
-            <a href="{$registerURL}" title="{$registerText|escape:'html'}" class="button crm-register-button"><span>{$registerText}</span></a>
+            <a href="{$registerURL}" title="{$registerText|escape:'html'}" class="btn btn-primary text-white"><span>{$registerText}</span></a>
           </div>
         {/if}
       {/crmRegion}
@@ -88,13 +88,13 @@
   {/if}
 
   {if array_key_exists('summary', $event) && $event.summary}
-      <div class="crm-section event_summary-section">
+      <div class="border">
         {$event.summary|purify}
       </div>
   {/if}
 
   {if array_key_exists('description', $event) && $event.description}
-      <div class="crm-section event_description-section summary">
+      <div class="d-flex flex-column">
           {$event.description|purify}
       </div>
   {/if}
@@ -224,7 +224,7 @@
       {crmRegion name="event-page-eventinfo-actionlinks-bottom"}
         {if $allowRegistration}
           <div class="action-link section register_link-section register_link-bottom">
-            <a href="{$registerURL}" title="{$registerText|escape:'html'}" class="button crm-register-button"><span>{$registerText}</span></a>
+            <a href="{$registerURL}" title="{$registerText|escape:'html'}" class="btn btn-primary text-white"><span>{$registerText}</span></a>
           </div>
         {/if}
       {/crmRegion}
