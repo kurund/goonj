@@ -25,13 +25,13 @@ First we will setup a WordPress site on top of which we will setup CiviCRM. For 
 
 1. From the MySQL terminal, create a database
    ```sql
-   create database goonj_crm;
+   create database goonj;
    exit
    ```
 
 1. Clone this repository
    ```sh
-   git clone https://github.com/ColoredCow/goonj-crm.git
+   git clone https://github.com/ColoredCow/goonj.git
    ```
 
 1. Change to project root directory
@@ -41,12 +41,12 @@ First we will setup a WordPress site on top of which we will setup CiviCRM. For 
 
 1. Create the WordPress config file (**specify the correct database credentials**)
    ```sh
-   wp config create --dbname=goonj_crm --dbuser=root --dbpass=
+   wp config create --dbname=goonj --dbuser=root --dbpass=
    ```
 
 1. Install WordPress and create admin
    ```sh
-   wp core install --url=goonj-civicrm.test --title="Goonj-CiviCRM" --admin_user=admin --admin_password=admin --admin_email=admin@example.com
+   wp core install --url=goonj.test --title="Goonj" --admin_user=admin --admin_password=admin --admin_email=admin@example.com
    ```
 
 1. Set the WordPress permalink structure to "postname"
@@ -56,12 +56,12 @@ First we will setup a WordPress site on top of which we will setup CiviCRM. For 
 
 1. Create a virtual host
    ```sh
-   valet link goonj-civicrm
+   valet link goonj
    ```
 
 1. Secure the virtual host
    ```sh
-   valet secure goonj-civicrm
+   valet secure goonj
    ```
 #### Setup CiviCRM
 
@@ -70,7 +70,7 @@ First we will setup a WordPress site on top of which we will setup CiviCRM. For 
    wp plugin activate civicrm
    ```
 
-2. Go to `https://goonj-civicrm.test/wp-admin` and configure CiviCRM.
+2. Go to `https://goonj.test/wp-admin` and configure CiviCRM.
    1. Check all the Components
    2. And click on `Install CiviCRM`
 
