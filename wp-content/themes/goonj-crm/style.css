@@ -1,46 +1,4 @@
-.crm-container {
-  padding-left: 15px;
-  padding-right: 15px;
-}
-.crm-container .crm-profile {
-  border: none;
-  padding: 10px 0;
-  margin: 30px 0;
-  display: flex;
-  flex-wrap: wrap;
-}
-.crm-container .form-item {
-  margin-bottom: 15px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-.crm-container .form-item label {
-  font-size: 14px;
-}
-.crm-container .form-item label span.crm-marker {
-  color: red;
-}
-.crm-container .content {
-  display: flex;
-}
-.crm-container input {
-  flex: 1;
-  padding: 8px 12px;
-  border-radius: 4px;
-  border: 1px solid #DDD;
-  font-size: 16px;
-}
-
-@media (min-width: 768px) {
-  .crm-container {
-    padding: 0;
-  }
-  .crm-container .form-item {
-    margin-right: 15px;
-  }
-}
-/*
+.crm-container{padding-left:15px;padding-right:15px}.crm-container .crm-profile{border:none;padding:10px 0;margin:30px 0;display:flex;flex-wrap:wrap}.crm-container .form-item{margin-bottom:15px;flex:1;display:flex;flex-direction:column}.crm-container .form-item label{font-size:14px}.crm-container .form-item label span.crm-marker{color:red}.crm-container .content{display:flex}.crm-container input{flex:1;padding:8px 12px;border-radius:4px;border:1px solid #ddd;font-size:16px}@media(min-width: 768px){.crm-container{padding:0}.crm-container .form-item{margin-right:15px}}/*!
 Theme Name: Goonj CRM
 Theme URI: https://coloredcow.com
 Author: coloredcow
@@ -54,6 +12,4 @@ License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: goonj-crm
 Tags: non-profit, crm, coloredcow
-*/
-
-/*# sourceMappingURL=style.css.map */
+*//*# sourceMappingURL=style.css.map */
