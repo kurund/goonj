@@ -33,11 +33,11 @@ Custom styling is handled within the `goonj-crm` theme directory. The CSS is str
 Run the following command to compile the changes and generate the stylesheet:
 ```sh
 cd path/to/theme
-sass style.scss style.css --style compressed
+sass style.scss style.css --style compressed --no-source-map
 ```
 
 To watch the changes and have live compilation, run:
 ```sh
 cd path/to/theme
-sass style.scss style.css --style compressed --watch
+sass style.scss style.css --style compressed --no-source-map --watch
 ```
