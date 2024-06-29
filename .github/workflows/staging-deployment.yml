@@ -25,4 +25,3 @@ jobs:
             git checkout -f main
             git pull origin main
             wp theme activate goonj-crm
-            
