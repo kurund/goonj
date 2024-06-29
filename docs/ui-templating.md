@@ -1,4 +1,4 @@
-# UI Templating
+# UI Templating (Outdated)
 
 CiviCRM default templates can be customized by editing the files inside `civicrm-templates/CRM` directory that is present in the theme's folder.
 
