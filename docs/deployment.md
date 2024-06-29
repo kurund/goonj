@@ -1,10 +1,10 @@
-## Deployment Guidelines :mag_right:
+## Deployment Guidelines
 
 Staging deployment is automated using Github action - Checkout the workflow for your deployment status - [workflow run - staging-deployment](https://github.com/ColoredCow/goonj/actions/workflows/staging-deployment.yml)
 
 Checkout detailed deployment configurations - [staging-deployment.yml](../.github/workflows/staging-deployment.yml).
 
-### Staging Deployment steps
+### Staging Deployment Steps
 1. Raise the PR against the `main` branch.
 2. Get the PR reviewed and merged into the `main` branch.
 3. Go to [Staging Deployment GitHub action](https://github.com/ColoredCow/goonj/actions/workflows/staging-deployment.yml)
