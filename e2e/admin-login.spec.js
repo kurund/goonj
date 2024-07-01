@@ -7,6 +7,7 @@ test('has title', async ({ page }) => {
   const password = process.env.PASSWORD;
   // @ts-ignore
   await page.goto(process.env.BASE_URL_ADMIN_SITE);
+  await page.waitForURL('**/wp-login/**');
   await expect(page).toHaveURL('/wp-login');
 
   // Use environment variables for username and password
@@ -25,6 +26,7 @@ test('has title', async ({ page }) => {
   await page.fill('#user_pass', password); 
   // Click the login button
   await page.click('#wp-submit'); 
+  await page.waitForURL('**/wp-admin/**');
   await expect(page).toHaveURL('/wp-admin');
 
 });
