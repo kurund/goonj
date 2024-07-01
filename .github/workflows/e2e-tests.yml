@@ -21,6 +21,10 @@ jobs:
       run: npx playwright install --with-deps
     - name: Run Playwright tests
       run: npx playwright test
+      env:
+          BASE_URL: ${{ secrets.GOONJ_STAGING_SITE_WPADMIN_URL }}
+          USERNAME: ${{ secrets.PLAYWRIGHT_TEST_ADMIN }}
+          PASSWORD: ${{ secrets.PLAYWRIGHT_TEST_ADMIN_PASSWORD }}
     - name: Upload Playwright Report if Tests Fail
       if: failure()
       uses: actions/upload-artifact@v4
