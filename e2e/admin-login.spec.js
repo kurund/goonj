@@ -7,7 +7,7 @@ test('Login into admin site ', async ({ page }) => {
   const username = process.env.USERNAME;
   const password = process.env.PASSWORD;
   // @ts-ignore
-  await page.goto(baseURL);
+  await page.goto('/');
 
   // Use environment variables for username and password
   const usernameField = page.locator('#user_login');
