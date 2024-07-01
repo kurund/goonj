@@ -3,10 +3,11 @@ const { test, expect } = require('@playwright/test');
 
 test('has title', async ({ page }) => {
   // @ts-ignore
+  const baseURL = process.env.BASE_URL_ADMIN_SITE
   const username = process.env.USERNAME;
   const password = process.env.PASSWORD;
   // @ts-ignore
-  await page.goto(process.env.BASE_URL_ADMIN_SITE);
+  await page.goto(baseURL);
   await page.waitForURL('**/wp-login/**');
   await expect(page).toHaveURL('/wp-login');
 
