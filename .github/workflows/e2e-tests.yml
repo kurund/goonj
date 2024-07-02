@@ -32,12 +32,11 @@ jobs:
       if: always()
       env:
         PASSWORD: ${{ secrets.PLAYWRIGHT_TEST_ADMIN_PASSWORD }}
-      run: |
-        7z a ./playwright-report.7z -p"$PASSWORD"
+      run: 7z a ./e2e/playwright-report.7z ./e2e/.report/* -p"$PASSWORD"
     - name: Upload Playwright Report if Tests Fail
-      # if: failure()
+      if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: playwright-report
-        path: playwright-report/
+        name: e2e-report
+        path: e2e/playwright-report.7z
         retention-days: 7
