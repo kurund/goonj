@@ -30,7 +30,10 @@ jobs:
       if: always()
       env: 
         PASSWORD: ${{ secrets.PLAYWRIGHT_TEST_ADMIN_PASSWORD }}
-      run: 7z a ./playwright-report.7z ./e2e/.report/* -p"$PASSWORD"
+      run: |
+          sudo apt-get update
+          sudo apt-get install -y p7zip-full
+          7z a ./playwright-report.7z ./playwright-report/* -p"$PASSWORD"
       # run: 7z a ./playwright-traces.7z ./bin/playwright-traces/*.* -p"$PASSWORD"
     - name: Upload Playwright Report if Tests Fail
       # if: failure()
