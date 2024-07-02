@@ -27,16 +27,16 @@ jobs:
     - name: Run Playwright tests
       run: npx playwright test
     - name: Install 7-Zip
-      run: sudo apt-get install p7zip-full
+        run: sudo apt-get install p7zip-full
     - name: Password protect Playwright traces
       if: always()
       env:
-        PASSWORD: ${{ secrets.PLAYWRIGHT_TEST_ADMIN_PASSWORD }}
-      run: 7z a ./e2e/playwright-report.7z ./e2e/.report/* -p"$PASSWORD"
+          PASSWORD: ${{ secrets.PLAYWRIGHT_TEST_ADMIN_PASSWORD }}
+      run: 7z a ./playwright-report ./playwright-report/* -p"$PASSWORD"
     - name: Upload Playwright Report if Tests Fail
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: e2e-report
-        path: e2e/playwright-report.7z
+        name: playwright-report
+        path: playwright-report/
         retention-days: 7
