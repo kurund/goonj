@@ -36,7 +36,5 @@ wp-config.php
 node_modules/
 /test-results/
 /playwright-report/
-/e2e/.report
-/e2e/playwright-report.7z
 /blob-report/
 /playwright/.cache/
