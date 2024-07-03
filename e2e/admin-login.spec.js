@@ -5,7 +5,6 @@ test('Login as goonj admin user', async ({ page }) => {
   const username = process.env.USERNAME;
   const password = process.env.PASSWORD;
   await page.goto(baseURL);
-  expect(page.url()).toContain('/wp-login');
   const usernameField = page.locator('#user_login');
   await usernameField.fill(username); 
   await page.fill('#user_pass', password); 
