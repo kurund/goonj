@@ -11,6 +11,7 @@ test('Login into admin site ', async ({ page }) => {
   await page.fill('#user_pass', password); 
   await page.click('#wp-submit');
   expect(page.url()).toContain('/wp-admin');
+  await page.click('.wp-menu-name:has-text("Media")');
 
 });
 
