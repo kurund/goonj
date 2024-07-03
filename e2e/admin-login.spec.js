@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('Login into admin site ', async ({ page }) => {
+test('Login to admin site ', async ({ page }) => {
   const baseURL = process.env.BASE_URL_ADMIN_SITE
   const username = process.env.USERNAME;
   const password = process.env.PASSWORD;
@@ -12,6 +12,5 @@ test('Login into admin site ', async ({ page }) => {
   await page.click('#wp-submit');
   expect(page.url()).toContain('/wp-admin');
   await page.click('.wp-menu-name:has-text("Media")');
-
 });
 
