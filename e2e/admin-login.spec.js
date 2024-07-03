@@ -10,8 +10,10 @@ test('Login as goonj admin user', async ({ page }) => {
   await page.fill('#user_pass', password); 
   await page.click('#wp-submit');
   expect(page.url()).toContain('page=CiviCRM');
-  const title = page.locator('h1.title');
-  // Check if the text content is "CiviCRM Home"
-  await expect(title).toHaveText('CiviCRM Home');
+  await page.waitForSelector('.crm-title .title');
+  //Get the text content of the CRM title
+  const crmTitleText = await page.textContent('.crm-title .title');
+  // Verify the CRM title text
+  expect(crmTitleText.trim()).toBe('CiviCRM Home');
 });
 
