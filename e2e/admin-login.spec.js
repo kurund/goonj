@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-test('Login to admin site ', async ({ page }) => {
-  const baseURL = process.env.BASE_URL_ADMIN_SITE
+test('Login as goonj admin user', async ({ page }) => {
+  const baseURL = process.env.BASE_URL_USER_SITE
   const username = process.env.USERNAME;
   const password = process.env.PASSWORD;
   await page.goto(baseURL);
@@ -10,7 +10,9 @@ test('Login to admin site ', async ({ page }) => {
   await usernameField.fill(username); 
   await page.fill('#user_pass', password); 
   await page.click('#wp-submit');
-  expect(page.url()).toContain('/wp-admin');
-  await page.click('.wp-menu-name:has-text("Media")');
+  expect(page.url()).toContain('page=CiviCRM');
+  const title = page.locator('h1.title');
+  // Check if the text content is "CiviCRM Home"
+  await expect(title).toHaveText('CiviCRM Home');
 });
 
