@@ -33,7 +33,7 @@ jobs:
       if: always()
       run: |
         mkdir -p ./playwright-protected
-        7z a ./playwright-protected/playwright-report.7z ./playwright-report/* -p"$ARTIFACT_ZIP_PASSWORD:"
+        7z a ./playwright-protected/playwright-report.7z ./playwright-report/* -p"$ARTIFACT_PASSWORD"
     - name: Upload artifacts
       if: always()
       uses: actions/upload-artifact@v4
