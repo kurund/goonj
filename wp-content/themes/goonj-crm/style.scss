@@ -1,0 +1,20 @@
+/*!
+Theme Name: Goonj CRM
+Theme URI: https://coloredcow.com
+Author: coloredcow
+Author URI: https://coloredcow.com
+Description: Theme for Goonj CRM
+Requires at least: 6.0
+Tested up to: 6.5
+Requires PHP: 5.7
+Version: 1.0
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: goonj-crm
+Tags: non-profit, crm, coloredcow
+*/
+
+@use 'assets/styles/main';
+@use 'assets/styles/md';
+@use 'assets/styles/lg';
+@use 'assets/styles/xl';

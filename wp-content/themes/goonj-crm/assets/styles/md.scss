@@ -1,0 +1,11 @@
+@use 'variables';
+
+@media (min-width: variables.$breakpoint-tablet) {
+    .crm-container {
+        padding: 0;
+
+        .form-item {
+            margin-right: 15px;
+        }
+    }
+}
