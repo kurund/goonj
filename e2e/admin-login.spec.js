@@ -15,5 +15,7 @@ test('Login as goonj admin user', async ({ page }) => {
   const crmTitleText = await page.textContent('.crm-title .title');
   // Verify the CRM title text
   expect(crmTitleText.trim()).toBe('CiviCRM Home');
+  const volunteersTab = page.locator('.wp-menu-name', { hasText: 'Volunteers' });
+  await volunteersTab.click();
 });
 
