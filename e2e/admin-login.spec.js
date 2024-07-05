@@ -12,8 +12,8 @@ test('Login as goonj admin user', async ({ page }) => {
   await page.waitForSelector('.crm-title .title');
   //Get the text content of the CRM title
   const crmTitleText = await page.textContent('.crm-title .title');
-  // Verify the CRM title text
   expect(crmTitleText.trim()).toBe('CiviCRM Home');
-  page.locator('.wp-menu-name', { hasText: 'Volunteers' });
+  const volunteersTab =  page.locator('.wp-submenu .wp-submenu-head:has-text("Volunteers")');
+  await expect(volunteersTab).toHaveText('Volunteers');
 });
 
