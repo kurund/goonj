@@ -1,4 +1,24 @@
 @use 'variables';
+@each $size, $length in variables.$sizes {
+    .w-#{$size} {
+        width: $length !important;
+    }
+    .h-#{$size} {
+        height: $length !important;
+    }
+    .min-h-#{$size} {
+        min-height: $length;
+    }
+    .max-h-#{$size} {
+        max-height: $length;
+    }
+    .min-w-#{$size} {
+        min-width: $length;
+    }
+    .max-w-#{$size} {
+        max-width: $length;
+    }
+}
 
 a {
     color: variables.$theme-primary;
@@ -11,6 +31,44 @@ body p {
     line-height: 21.79px;
     letter-spacing: -0.02em;
 }
+
+.has-login-form {
+    display: flex;
+    justify-content: center;
+    padding: 15px;
+    form {
+        width: -webkit-fill-available;
+        p {
+            display: grid;
+        }
+    }
+}
+
+.login-remember {
+    display: flex !important;
+    align-items: center;
+    label {
+        display: flex !important;
+        align-items: center;
+    }
+}
+
+form input {
+    height: 29px !important;
+    border: 1px solid rgba(0, 0, 0, 0.3) !important;
+    border-radius: 4px !important;
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.button-primary {
+    background: variables.$theme-primary !important;
+    color: #fff;
+    height: 45px !important;
+}
+
 .crm-container {
     padding: 15px;
     background-color: #fff !important;
