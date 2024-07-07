@@ -3525,6 +3525,9 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
     foreach (CRM_Contact_BAO_ContactType::basicTypes() as $contactType) {
       $profiles[] = 'new_' . strtolower($contactType);
     }
+    ob_start();
+    var_dump( ['IN' => array_merge($profiles, (array) $appendProfiles)] );
+    error_log( ob_get_clean() );
     $retrieved = civicrm_api3('uf_group', 'get', [
       'name' => ['IN' => array_merge($profiles, (array) $appendProfiles)],
       'is_active' => 1,
