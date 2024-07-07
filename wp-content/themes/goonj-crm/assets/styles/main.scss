@@ -1,3 +1,16 @@
+@use 'variables';
+
+a {
+    color: variables.$theme-primary;
+}
+
+body p {
+    font-family: Open Sans;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 21.79px;
+    letter-spacing: -0.02em;
+}
 .crm-container {
     padding: 15px;
     background-color: #fff !important;
@@ -34,6 +47,10 @@
         padding: 8px 12px;
         border-radius: 4px;
         font-size: 16px;
+    }
+
+    input[type=radio] {
+        margin: 0px !important;
     }
 
     .form-control {
@@ -84,28 +101,9 @@
         background: rgba(214, 70, 49, 1) !important;
     }
 
-    .ng-binding {
-         /* Default padding for .ng-binding */
-      
-        /* Adjust padding bottom when .crm-form-radio is a direct child */
-        > .crm-form-radio {
-          margin-bottom: 20px; /* Adjust margin as needed */
-        }
+    label:has(input[type="radio"]) {
+        margin-bottom: 15px !important;
+        padding-right: 15px !important;
     }
 
-    .crm-form-radio {
-        margin-right: 5px;
-    }
-
-    // label > .crm-form-radio {
-    //     display: flex;
-    //     align-items: center;
-    // }
-    
-    .crm-af-field.ng-scope > label > .crm-form-radio {
-        display: flex;
-        align-items: center;
-    }
 }
-
-

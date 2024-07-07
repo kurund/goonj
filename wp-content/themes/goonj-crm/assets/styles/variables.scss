@@ -1,3 +1,9 @@
 $breakpoint-tablet: 768px;
 $breakpoint-tablet-landscape: 1024px;
 $breakpoint-desktop: 1200px;
+
+$theme-primary: rgba(214, 70, 49, 1);
+
+$theme-colors: (
+    'theme-primary': $theme-primary,
+);
