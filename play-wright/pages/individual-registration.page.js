@@ -53,14 +53,11 @@ exports.IndividualRegistrationPage =  class IndividualRegistrationPage {
   async selectDropdownOption(dropdownSelector, inputField, option) {
     // Click the dropdown to activate it
     await this.page.click(dropdownSelector);
-
     // Input the search option into the input field
     await this.page.fill(inputField, option);
-
     // Click the desired option by text
     const optionSelector = `.select2-result-label:text-is("${option}")`;
     await this.page.click(optionSelector);
-
     // Press Tab to move to the next field
     await this.page.keyboard.press('Tab');
   }
@@ -69,6 +66,20 @@ exports.IndividualRegistrationPage =  class IndividualRegistrationPage {
     // Find the label with the specific text and click the associated radio button
     const labelSelector = `label:has-text("${buttonOption}")`;
     await this.page.click(`${labelSelector} input[type="radio"]`);
+  }
+
+  async handleDialogMessage(expectedMessage) {
+    // Register event listener for dialog
+    this.page.on('dialog', async (dialog) => {
+    // Verify the message in dialog box
+    expect(dialog.message()).toContain(expectedMessage);
+    // Accept the dialog (click on OK button)
+    await dialog.accept();
+    });
+  }
+
+  async clickSubmitButton() {
+    await this.page.getByRole('button', { name: /submit/i }).click({force: true});
   }
 
   getAppendedUrl(stringToAppend) {
