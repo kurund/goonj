@@ -1,43 +1,9 @@
-import { test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { IndividualRegistrationPage } from '../pages/individual-registration.page'; 
 
-// async function selectDropdownOption(page, dropdownSelector, dropdownOption) {
-//     // Click the dropdown to activate it
-//     await page.click(dropdownSelector);
-//     // Input the search term
-//     await page.fill('#s2id_autogen2_search', dropdownOption);
-//     // Click the desired option
-//     const optionSelector = `.select2-result-label:text("${dropdownOption}")`;
-//     await page.click(optionSelector);
-//     // Press Enter to select the option
-//     await page.press('.select2-input', 'Enter');
-//     await page.keyboard.press('Tab');
-// }
-
-// async function selectOptionByText(page, dropdownSelector, inputSelector, optionText) {
-//     // Click the dropdown to activate it
-//     await page.click(dropdownSelector);
-
-//     // Input the search term into the input field
-//     await page.fill(inputSelector, optionText);
-
-//     // Click the desired option by text
-//     const optionSelector = `.select2-result-label:text-is("${optionText}")`;
-//     await page.click(optionSelector);
-
-//     // Optionally, press Tab to move to the next field
-//     await page.keyboard.press('Tab');
-// }
-
-async function selectRadioButton(page, optionText) {
-    // Find the label with the specific text and click the associated radio button
-    const labelSelector = `label:has-text("${optionText}")`;
-    await page.click(`${labelSelector} input[type="radio"]`);
-}
-
-test('get appended URL test', async ({ page }) => {
+test('submit the basic registration form', async ({ page }) => {
   const individualRegistrationPage = new IndividualRegistrationPage(page);
-        // Get the appended URL
+// Get the appended URL
   const baseUrl = individualRegistrationPage.getAppendedUrl('/Registration');
   await page.goto(baseUrl);
   await page.waitForTimeout(1000)
@@ -59,8 +25,15 @@ test('get appended URL test', async ({ page }) => {
   individualRegistrationPage.enterPostalCode('110070')
   await individualRegistrationPage.selectDropdownOption('#select2-chosen-4', '#s2id_autogen4_search', 'India');
   await individualRegistrationPage.selectRadioButton('Yes');
-  await page.waitForTimeout(400); 
+  await page.waitForTimeout(2000); 
+//   await individualRegistrationPage.selectDropdownOption('#s2id_autogen5', '#s2id_autogen5', 'Raise funds'); 
+//   await individualRegistrationPage.selectDropdownOption('#s2id_autogen6', '#s2id_autogen6', 'Marketing'); 
+//   await individualRegistrationPage.selectDropdownOption('#s2id_autogen7', '#s2id_autogen7', 'Learn new skills');
+  await individualRegistrationPage.selectDropdownOption('#select2-chosen-8', '#s2id_autogen8_search', '2 to 6 hours daily');
   individualRegistrationPage.enterProfession('Devops engineer')
-
+  await page.waitForTimeout(400);  
+  await individualRegistrationPage.handleDialogMessage('Please fill all required fields.');
+  await individualRegistrationPage.clickSubmitButton();
+  await page.waitForTimeout(1000)
 });
 
