@@ -12,6 +12,7 @@ exports.IndividualRegistrationPage =  class IndividualRegistrationPage {
     this.streetAddress = page.locator('input#street-address-10');
     this.cityName = page.locator('input#city-12');
     this.postalCode = page.locator('input#postal-code-14');
+    this.profession = page.locator('input#volunteer-fields-profession-21')
   }
   
   async enterFirstName(firstName) {
@@ -43,6 +44,33 @@ exports.IndividualRegistrationPage =  class IndividualRegistrationPage {
   {
     await this.cityName.fill(cityName)
   }
+
+  async enterProfession(profession)
+  {
+    await this.profession.fill(profession)
+  }
+
+  async selectDropdownOption(dropdownSelector, inputField, option) {
+    // Click the dropdown to activate it
+    await this.page.click(dropdownSelector);
+
+    // Input the search option into the input field
+    await this.page.fill(inputField, option);
+
+    // Click the desired option by text
+    const optionSelector = `.select2-result-label:text-is("${option}")`;
+    await this.page.click(optionSelector);
+
+    // Press Tab to move to the next field
+    await this.page.keyboard.press('Tab');
+  }
+
+  async selectRadioButton(buttonOption) {
+    // Find the label with the specific text and click the associated radio button
+    const labelSelector = `label:has-text("${buttonOption}")`;
+    await this.page.click(`${labelSelector} input[type="radio"]`);
+  }
+
   getAppendedUrl(stringToAppend) {
     return this.url + stringToAppend;
   }
