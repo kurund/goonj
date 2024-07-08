@@ -1,0 +1,43 @@
+name: e2e-tests
+on:
+  pull_request:
+    types: [ labeled ]
+    branches:
+      - main
+
+jobs:
+  checkout-and-test:
+    if: contains(github.event.pull_request.labels.*.name, 'in review')
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    env:
+      BASE_URL_ADMIN_SITE: ${{ secrets.GOONJ_STAGING_SITE_WPADMIN_URL }}
+      BASE_URL_USER_SITE: ${{  secrets.GOONJ_STAGING_SITE_URL }}
+      USERNAME: ${{ secrets.PLAYWRIGHT_TEST_ADMIN }}
+      PASSWORD: ${{ secrets.PLAYWRIGHT_TEST_ADMIN_PASSWORD }}
+      ARTIFACT_PASSWORD: ${{ secrets.ARTIFACT_ZIP_PASSWORD }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+    - name: Install dependencies
+      run: npm ci
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+    - name: Run Playwright tests
+      run: npx playwright test
+    - name: Install 7-Zip
+      run: sudo apt-get install p7zip-full
+    - name: Password protect playwright report
+      if: always()
+      run: |
+        mkdir -p ./playwright-protected
+        7z a ./playwright-protected/playwright-report.7z ./playwright-report/* -p"$ARTIFACT_PASSWORD"
+    - name: Upload artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-report
+        path: ./playwright-protected/playwright-report.7z
+        retention-days: 7

@@ -1,0 +1,18 @@
+{
+  "name": "goonj",
+  "version": "1.0.0",
+  "description": "Constituent relationship management system",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {},
+  "keywords": [],
+  "author": "coloredcow",
+  "license": "AGPL",
+  "devDependencies": {
+    "@playwright/test": "^1.45.0",
+    "@types/node": "^20.14.9",
+    "dotenv": "^16.4.5"
+  }
+}
