@@ -41,3 +41,12 @@ To watch the changes and have live compilation, run:
 cd path/to/theme
 sass style.scss style.css --style compressed --no-source-map --watch
 ```
+
+### Export Theme changes
+
+1. Go to the `Appearance > theme > Goonj Theme > Customize`.
+2. Select `Style` from left panel.
+3. Click on 3 dots at top right corner
+4. Under `Tool`, click on `export`.
+5. A folder with theme name `goonj-crm should be downloaded. Replace this with your project theme under `wp-content > themes > goonj-crm`.
+6. Commit the changes and push to Github.
