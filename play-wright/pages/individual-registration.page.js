@@ -63,6 +63,39 @@ exports.IndividualRegistrationPage =  class IndividualRegistrationPage {
     await this.page.keyboard.press('Tab');
   }
 
+  async selectTitle(title) {
+    await this.selectDropdownOption('#select2-chosen-2', '#s2id_autogen2_search', title);
+  }
+
+  async selectCountry(country) {
+    await this.selectDropdownOption('#select2-chosen-4', '#s2id_autogen4_search', country);
+  }
+
+  async selectGender(gender) {
+    await this.selectDropdownOption('#select2-chosen-3', '#s2id_autogen3_search', gender);
+  }
+
+  async selectState(state) {
+    await this.selectDropdownOption('#select2-chosen-1', '#s2id_autogen1_search', state);
+  }
+
+  async selectActivityInterested(activity) {
+    await this.selectDropdownOption('#s2id_autogen5', '#s2id_autogen5', activity);
+  }
+
+  async selectVoluntarySkills(skill) {
+    await this.selectDropdownOption('#s2id_autogen6', '#s2id_autogen6', skill);
+  }
+
+  async selectVolunteerMotivation(motivation) {
+    await this.selectDropdownOption('#s2id_autogen7', '#s2id_autogen7', motivation);
+  }
+
+  async selectVolunteerHours(hours) {
+    await this.selectDropdownOption('#select2-chosen-8', '#s2id_autogen8_search', hours);
+  }
+
+
   async selectRadioButton(buttonOption) {
     // Find the label with the specific text and click the associated radio button
     const labelSelector = `label:has-text("${buttonOption}")`;
