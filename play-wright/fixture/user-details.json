@@ -1,0 +1,18 @@
+{
+    "firstName": "DEEPAK",
+    "lastName": "SINGH",
+    "email": "deepak@mail.com",
+    "mobileNumber": "7838485783",
+    "gender": "Male",
+    "streetAddress": "56, dwarka, sector-7",
+    "cityName": "delhi",
+    "state": "delhi",
+    "postalCode": "110070",
+    "country": "India",
+    "radioOption": "Yes",
+    "activityInterested": "Raise funds",
+    "voluntarySkills": "Marketing",
+    "volunteerMotivation": "Learn new skills",
+    "volunteerHours": "2 to 6 hours daily",
+    "profession": "Devops engineer"
+  }
