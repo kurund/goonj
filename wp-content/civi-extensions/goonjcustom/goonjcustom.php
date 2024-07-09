@@ -127,8 +127,6 @@ function goonjcustom_civicrm_buildForm($formName, $form) {
             $subjectField->setType('hidden');
             $subjectField->setLabel('');
         }
-
-        $form->removeElement('engagement_level');
       }
       break;
   }
