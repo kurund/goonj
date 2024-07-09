@@ -58,6 +58,35 @@ function goonjcustom_evaluate_tokens(\Civi\Token\Event\TokenValueEvent $e) {
   foreach ($e->getRows() as $row) {
     /** @var TokenRow $row */
     $row->format('text/html');
-    $row->tokens('contact', 'inductionDetails', 'induction details to come here' . $row->context['contactId']);
+
+    $contacts = \Civi\Api4\Contact::get(TRUE)
+      ->addSelect('address_primary.state_province_id')
+      ->addWhere('id', '=', 230)
+      ->setLimit(25)
+      ->execute();
+
+    foreach ($contacts as $contact) {
+      $stateId = $contact['address_primary.state_province_id'];
+
+      $processingCenters = \Civi\Api4\EckEntity::get('Processing_Center', TRUE)
+        ->addSelect('*', 'custom.*')
+        ->addWhere('Processing_Center.State', 'IN', [$stateId])
+        ->setLimit(25)
+        ->execute();
+
+      if ( ! empty( $processingCenters ) ) {
+        $inductionDetailsMarkup = '<ol>';
+
+        foreach ($processingCenters as $processingCenter) {
+          $inductionDetailsMarkup .= '<li>' . $processingCenter['Processing_Center.Induction_Details'] . '</li>';
+        }
+
+        $inductionDetailsMarkup = '</ol>';
+      } else {
+        $inductionDetailsMarkup = 'Unfortunately, we don\'t currently have a processing center near to the location you have provided. Someone from the Goonj team will reach out and will share the details of induction.';
+      }
+
+      $row->tokens('contact', 'inductionDetails', $inductionDetailsMarkup);
+    }
   }
 }
