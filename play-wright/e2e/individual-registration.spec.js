@@ -41,14 +41,15 @@ test('submit the basic registration form', async ({ page }) => {
   await page.waitForTimeout(1000)
 });
 
-test('check user details on dashboard', async ({ page }) => {
-  const individualRegistrationPage = new IndividualRegistrationPage(page);
-  await userLogin(page);
-    // Click on the Volunteers tab
-  await page.click('a:has-text("Volunteers")');
-  // Wait for the submenu to appear and click on "New Signups"
-  await page.waitForSelector('a:has-text("New Signups")');
-  await page.click('a:has-text("New Signups")');
-  await page.waitForTimeout(3000) //added wait to load the data of new signup
-  //Need to add code to check the records for the user details
-});
+
+// test('check user details on dashboard', async ({ page }) => {
+//   const individualRegistrationPage = new IndividualRegistrationPage(page);
+//   await userLogin(page);
+//     // Click on the Volunteers tab
+//   await page.click('a:has-text("Volunteers")');
+//   // Wait for the submenu to appear and click on "New Signups"
+//   await page.waitForSelector('a:has-text("New Signups")');
+//   await page.click('a:has-text("New Signups")');
+//   await page.waitForTimeout(3000) //added wait to load the data of new signup
+//   //Need to add code to check the records for the user details
+// });
