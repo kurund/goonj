@@ -22,6 +22,7 @@
 
 a {
     color: variables.$theme-primary;
+    cursor: pointer;
 }
 
 body p {
@@ -67,6 +68,7 @@ form input {
     background: variables.$theme-primary !important;
     color: #fff;
     height: 45px !important;
+    cursor: pointer;
 }
 
 .wp-form-block-group {
