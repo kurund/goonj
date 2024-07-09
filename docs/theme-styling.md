@@ -42,7 +42,9 @@ cd path/to/theme
 sass style.scss style.css --style compressed --no-source-map --watch
 ```
 
-### Export Theme changes
+### Export theme changes
+
+If there are some changes from WordPress dashboard within the theme (like form styling updates from form builder, adding fonts from dashboard, etc) and the changes are not reflected in the version control, we have to export the theme to check in the code.
 
 1. Go to the `Appearance > theme > Goonj Theme > Customize`.
 2. Select `Style` from left panel.
