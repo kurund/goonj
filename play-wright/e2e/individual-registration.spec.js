@@ -8,7 +8,7 @@ test('submit the basic registration form', async ({ page }) => {
   const baseUrl = individualRegistrationPage.getAppendedUrl('volunteer-registration/');
   await page.goto(baseUrl);
   await page.waitForTimeout(1000)
-  await individualRegistrationPage.selectDropdownOption('#select2-chosen-2', '#s2id_autogen2_search', 'Ms.');
+  await individualRegistrationPage.selectDropdownOption('#select2-chosen-2', '#s2id_autogen2_search', 'Mr.');
   individualRegistrationPage.enterFirstName(userDetails.firstName)
   await page.waitForTimeout(200); 
   individualRegistrationPage.enterLastName(userDetails.lastName)
