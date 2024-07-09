@@ -1,6 +1,77 @@
+@use 'variables';
+@each $size, $length in variables.$sizes {
+    .w-#{$size} {
+        width: $length !important;
+    }
+    .h-#{$size} {
+        height: $length !important;
+    }
+    .min-h-#{$size} {
+        min-height: $length;
+    }
+    .max-h-#{$size} {
+        max-height: $length;
+    }
+    .min-w-#{$size} {
+        min-width: $length;
+    }
+    .max-w-#{$size} {
+        max-width: $length;
+    }
+}
+
+a {
+    color: variables.$theme-primary;
+}
+
+body p {
+    font-family: Open Sans;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 21.79px;
+    letter-spacing: -0.02em;
+}
+
+.has-login-form {
+    display: flex;
+    justify-content: center;
+    padding: 15px;
+    form {
+        width: -webkit-fill-available;
+        p {
+            display: grid;
+        }
+    }
+}
+
+.login-remember {
+    display: flex !important;
+    align-items: center;
+    label {
+        display: flex !important;
+        align-items: center;
+    }
+}
+
+form input {
+    height: 29px !important;
+    border: 1px solid rgba(0, 0, 0, 0.3) !important;
+    border-radius: 4px !important;
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.button-primary {
+    background: variables.$theme-primary !important;
+    color: #fff;
+    height: 45px !important;
+}
+
 .crm-container {
-    padding-left: 15px;
-    padding-right: 15px;
+    padding: 15px;
+    background-color: #fff !important;
 
     .crm-profile {
         border: none;
@@ -33,9 +104,64 @@
         flex: 1;
         padding: 8px 12px;
         border-radius: 4px;
-        border: 1px solid #DDD;
         font-size: 16px;
     }
+
+    input[type=radio] {
+        margin: 0px !important;
+    }
+
+    .form-control {
+        height: 45px !important;
+        border: 1px solid rgba(0, 0, 0, 0.3) !important;
+        border-radius: 4px !important;
+    }
+
+    .select2-container-multi > .select2-choices {
+        min-height: 43px !important;
+    }
+
+    .af-container.af-layout-cols > * {
+        width: 100%;
+        flex-basis: auto;
+    }
+    
+    .af-field-type-email, 
+    .af-field-type-text,
+    .af-field-type-select,
+    .af-field-type-chain-select {
+        width: 100%;
+        padding-bottom: 15px !important;
+    }
+
+    .af-field-type-radio {
+        margin-bottom: 15px !important;
+    }
+
+    .af-container > .form-group {
+        margin-bottom: 0px !important;
+    }
+
+    .select2-chosen,
+    .select2-arrow {
+        padding-top: 7px !important;
+    }
+
+    .select2-choices, ::before {
+        padding-top: 5px !important;
+    }
+
+    .af-field-type-hidden {
+        display: none !important;
+    }
+
+    .btn-primary {
+        background: rgba(214, 70, 49, 1) !important;
+    }
+
+    label:has(input[type="radio"]) {
+        margin-bottom: 15px !important;
+        padding-right: 15px !important;
+    }
+
 }
-
-

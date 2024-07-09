@@ -1,5 +1,24 @@
 @use 'variables';
 
 @media (min-width: variables.$breakpoint-desktop) {
-
+    @each $size, $length in variables.$sizes {
+        .w-xl-#{$size} {
+            width: $length !important;
+        }
+        .h-xl-#{$size} {
+            height: $length !important;
+        }
+        .min-h-xl-#{$size} {
+            min-height: $length;
+        }
+        .max-h-xl-#{$size} {
+            max-height: $length;
+        }
+        .min-w-xl-#{$size} {
+            min-width: $length;
+        }
+        .max-w-xl-#{$size} {
+            max-width: $length;
+        }
+    }
 }
