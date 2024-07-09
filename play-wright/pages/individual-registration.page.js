@@ -10,9 +10,10 @@ exports.IndividualRegistrationPage =  class IndividualRegistrationPage {
     this.emailField = page.locator('input#email-4');
     this.mobileNumberField = page.locator('input#phone-6');
     this.streetAddress = page.locator('input#street-address-10');
-    this.cityName = page.locator('input#city-12');
-    this.postalCode = page.locator('input#postal-code-14');
+    this.cityName = page.locator('input#city-14');
+    this.postalCode = page.locator('input#postal-code-15');
     this.profession = page.locator('input#volunteer-fields-profession-21')
+    this.otherSkills = page.locator('input#volunteer-fields-others-skills-18')
   }
   
   async enterFirstName(firstName) {
@@ -56,7 +57,7 @@ exports.IndividualRegistrationPage =  class IndividualRegistrationPage {
     // Input the search option into the input field
     await this.page.fill(inputField, option);
     // Click the desired option by text
-    const optionSelector = `.select2-result-label:text-is("${option}")`;
+    const optionSelector = `.select2-result-label:text("${option}")`;
     await this.page.click(optionSelector);
     // Press Tab to move to the next field
     await this.page.keyboard.press('Tab');
@@ -80,6 +81,11 @@ exports.IndividualRegistrationPage =  class IndividualRegistrationPage {
 
   async clickSubmitButton() {
     await this.page.getByRole('button', { name: /submit/i }).click({force: true});
+  }
+ 
+  async enterOtherSkills(skills)
+  {
+    await this.otherSkills.fill(skills)
   }
 
   getAppendedUrl(stringToAppend) {
