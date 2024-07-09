@@ -59,34 +59,52 @@ function goonjcustom_evaluate_tokens(\Civi\Token\Event\TokenValueEvent $e) {
     /** @var TokenRow $row */
     $row->format('text/html');
 
-    $contacts = \Civi\Api4\Contact::get(TRUE)
-      ->addSelect('address_primary.state_province_id')
-      ->addWhere('id', '=', 230)
-      ->setLimit(25)
-      ->execute();
+    $contactId = $row->context['contactId'];
 
-    foreach ($contacts as $contact) {
-      $stateId = $contact['address_primary.state_province_id'];
 
-      $processingCenters = \Civi\Api4\EckEntity::get('Processing_Center', TRUE)
+    if ( empty( $contactId ) ) {
+      $row->tokens('contact', 'inductionDetails', '');
+      continue;
+    }
+  
+
+    $contacts = \Civi\Api4\Contact::get(FALSE)
+    ->addSelect('address_primary.state_province_id')
+    ->addWhere('id', '=', $contactId)
+    ->setLimit(25)
+    ->execute();
+
+    $stateId = $contacts[0]['address_primary.state_province_id'];
+
+    ob_start();
+    echo "Contact details fetched:";
+    var_dump($contacts[0]);
+    error_log( ob_get_clean() );
+
+    $processingCenters = \Civi\Api4\EckEntity::get('Processing_Center', FALSE)
         ->addSelect('*', 'custom.*')
         ->addWhere('Processing_Center.State', 'IN', [$stateId])
-        ->setLimit(25)
         ->execute();
 
-      if ( ! empty( $processingCenters ) ) {
-        $inductionDetailsMarkup = '<ol>';
+    $inductionDetailsMarkup = 'The next step in your volunteering journey is to get inducted with Goonj.';
 
-        foreach ($processingCenters as $processingCenter) {
-          $inductionDetailsMarkup .= '<li>' . $processingCenter['Processing_Center.Induction_Details'] . '</li>';
-        }
+    if ( $processingCenters->rowCount > 0 ) {
+      $inductionDetailsMarkup .= ' You can visit any of our following center(s) during the time specified to complete your induction:';
+      $inductionDetailsMarkup .= '<ol>';
 
-        $inductionDetailsMarkup = '</ol>';
-      } else {
-        $inductionDetailsMarkup = 'Unfortunately, we don\'t currently have a processing center near to the location you have provided. Someone from the Goonj team will reach out and will share the details of induction.';
+      foreach ($processingCenters as $processingCenter) {
+        $inductionDetailsMarkup .= '<li><strong>' . $processingCenter['title'] . '</strong>' .$processingCenter['Processing_Center.Induction_Details'] . '</li>';
       }
 
-      $row->tokens('contact', 'inductionDetails', $inductionDetailsMarkup);
+      $inductionDetailsMarkup .= '</ol>';
+    } else {
+      $inductionDetailsMarkup .= ' Unfortunately, we don\'t currently have a processing center near to the location you have provided. Someone from our team will reach out and will share the details of induction.';
     }
+
+    ob_start();
+    var_dump( $inductionDetailsMarkup );
+    error_log( ob_get_clean() );
+    
+    $row->tokens('contact', 'inductionDetails', $inductionDetailsMarkup);
   }
 }
