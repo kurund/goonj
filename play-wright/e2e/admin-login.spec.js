@@ -5,8 +5,11 @@ test('Login as goonj admin user', async ({ page }) => {
   const username = process.env.USERNAME;
   const password = process.env.PASSWORD;
   await page.goto(baseURL);
+  await page.waitForTimeout(500); 
   await page.fill('#user_login', username); 
+  await page.waitForTimeout(500); 
   await page.fill('#user_pass', password); 
+  await page.waitForTimeout(500); 
   await page.click('#wp-submit');
   expect(page.url()).toContain('page=CiviCRM');
   await page.waitForSelector('.crm-title .title');
