@@ -76,11 +76,6 @@ function goonjcustom_evaluate_tokens(\Civi\Token\Event\TokenValueEvent $e) {
 
     $stateId = $contacts[0]['address_primary.state_province_id'];
 
-    ob_start();
-    echo "Contact details fetched:";
-    var_dump($contacts[0]);
-    error_log( ob_get_clean() );
-
     $processingCenters = \Civi\Api4\EckEntity::get('Processing_Center', FALSE)
         ->addSelect('*', 'custom.*')
         ->addWhere('Processing_Center.State', 'IN', [$stateId])
@@ -100,10 +95,6 @@ function goonjcustom_evaluate_tokens(\Civi\Token\Event\TokenValueEvent $e) {
     } else {
       $inductionDetailsMarkup .= ' Unfortunately, we don\'t currently have a processing center near to the location you have provided. Someone from our team will reach out and will share the details of induction.';
     }
-
-    ob_start();
-    var_dump( $inductionDetailsMarkup );
-    error_log( ob_get_clean() );
     
     $row->tokens('contact', 'inductionDetails', $inductionDetailsMarkup);
   }
