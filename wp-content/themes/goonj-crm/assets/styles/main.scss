@@ -69,6 +69,9 @@ form input {
     color: #fff;
     height: 45px !important;
     cursor: pointer;
+    &:active {
+        background: variables.$theme-dark-red !important;
+    }
 }
 
 .wp-form-block-group {
@@ -200,6 +203,9 @@ form input {
     .btn-primary {
         background: rgba(214, 70, 49, 1) !important;
         width: 100%;
+        &:active {
+            background: variables.$theme-dark-red !important;
+        }
     }
 
     label:has(input[type="radio"]) {
