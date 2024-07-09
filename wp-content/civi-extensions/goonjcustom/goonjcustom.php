@@ -128,7 +128,7 @@ function goonjcustom_civicrm_buildForm($formName, $form) {
             $subjectField->setLabel('');
         }
 
-        $form->getElement('campaign_id')->setLabel('');
+        $form->removeElement('campaign_id');
         $form->removeElement('engagement_level');
       }
       break;
