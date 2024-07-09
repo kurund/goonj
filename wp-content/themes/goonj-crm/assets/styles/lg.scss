@@ -1,5 +1,29 @@
 @use 'variables';
 
 @media (min-width: variables.$breakpoint-tablet-landscape) {
+    @each $size, $length in variables.$sizes {
+        .w-lg-#{$size} {
+            width: $length !important;
+        }
+        .h-lg-#{$size} {
+            height: $length !important;
+        }
+        .min-h-lg-#{$size} {
+            min-height: $length;
+        }
+        .max-h-lg-#{$size} {
+            max-height: $length;
+        }
+        .min-w-lg-#{$size} {
+            min-width: $length;
+        }
+        .max-w-lg-#{$size} {
+            max-width: $length;
+        }
+    }
+
+    form {
+        width: 520px !important;
+    }
 
 }
