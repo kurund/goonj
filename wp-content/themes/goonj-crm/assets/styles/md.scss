@@ -1,6 +1,28 @@
 @use 'variables';
 
 @media (min-width: variables.$breakpoint-tablet) {
+
+    @each $size, $length in variables.$sizes {
+        .w-md-#{$size} {
+            width: $length !important;
+        }
+        .h-md-#{$size} {
+            height: $length !important;
+        }
+        .min-h-md-#{$size} {
+            min-height: $length;
+        }
+        .max-h-md-#{$size} {
+            max-height: $length;
+        }
+        .min-w-md-#{$size} {
+            min-width: $length;
+        }
+        .max-w-md-#{$size} {
+            max-width: $length;
+        }
+    }
+
     .crm-container {
         padding: 0;
 
