@@ -25,5 +25,14 @@
     form {
         width: 520px !important;
     }
+    .crm-container {
+        padding: 24px;
+        
+        af-form {
+            width: 520px !important;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
 
 }
