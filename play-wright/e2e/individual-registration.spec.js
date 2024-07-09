@@ -7,7 +7,7 @@ const userDetails = require('../fixture/user-details.json');
 test('submit the basic registration form', async ({ page }) => {
   const individualRegistrationPage = new IndividualRegistrationPage(page);
 // Get the appended URL
-  const baseUrl = individualRegistrationPage.getAppendedUrl('volunteer-registration/');
+  const baseUrl = individualRegistrationPage.getAppendedUrl('/volunteer-registration/');
   await page.goto(baseUrl);
   await page.waitForTimeout(1000)
   await individualRegistrationPage.selectDropdownOption('#select2-chosen-2', '#s2id_autogen2_search', 'Mr.');
