@@ -27,9 +27,9 @@ a {
 
 body p {
     font-family: Open Sans;
-    font-size: 16px;
+    font-size: 12px;
     font-weight: 400;
-    line-height: 21.79px;
+    line-height:16px;
     letter-spacing: -0.02em;
 }
 
@@ -143,7 +143,7 @@ form input {
     }
 
     .select2-search-choice-close {
-        padding-top: 8px !important;
+        padding-top: 5px !important;
         &::before {
             color: rgba(0, 0, 0, 1) !important;
         }
@@ -154,7 +154,7 @@ form input {
     }
 
     .form-control {
-        height: 45px !important;
+        min-height: 45px;
         border: 1px solid rgba(0, 0, 0, 0.3) !important;
         border-radius: 4px !important;
         box-shadow: none !important;
@@ -163,15 +163,15 @@ form input {
     .select2-container-multi > .select2-choices {
         min-height: 43px !important;
         box-shadow: none !important;
+        padding-bottom: 10px;
     }
 
     .af-container.af-layout-cols > * {
         width: 100%;
         flex-basis: auto;
     }
-    
+
     .af-field-type-email, 
-    .af-field-type-text,
     .af-field-type-select,
     .af-field-type-chain-select {
         width: 100%;
@@ -226,7 +226,24 @@ form input {
     .select2-drop-active,
     .select2-search > input {
         border-color: rgba(0, 0, 0, 0.3) !important;
-        height: 45px;
         padding: 10px
+    }
+
+    .select2-container-multi .select2-choices {
+        min-height: 45px;
+    }
+
+    .select2-search-choice {
+        padding: 8px 25px 8px 8px !important;
+        border: 1px solid rgba(0, 0, 0, 0.3) !important;
+    }
+
+    .select2-default > .select2-chosen {
+        color: rgb(165, 159, 159) !important;
+    }
+
+    .af-field-type-text input {
+        margin-bottom: 15px !important;
+        width: 100%;
     }
 }
