@@ -63,6 +63,7 @@ exports.IndividualRegistrationPage =  class IndividualRegistrationPage {
     await this.page.keyboard.press('Tab');
   }
 
+  // Need to add the selector passed on selectDropdownOption to class IndividualRegistrationPage
   async selectTitle(title) {
     await this.selectDropdownOption('#select2-chosen-2', '#s2id_autogen2_search', title);
   }

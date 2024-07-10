@@ -3,6 +3,9 @@ import { IndividualRegistrationPage } from '../pages/individual-registration.pag
 import { userLogin } from '../utils';
 const userDetails = require('../fixture/user-details.json');
 
+// Currently we are have implemented the registration with single user delete will need to
+// add functionality to delete user from admin dashboard or use faker library to generate new user in registration
+
 
 test('submit the basic registration form', async ({ page }) => {
   const individualRegistrationPage = new IndividualRegistrationPage(page);
@@ -40,7 +43,6 @@ test('submit the basic registration form', async ({ page }) => {
   await individualRegistrationPage.clickSubmitButton();
   await page.waitForTimeout(1000);
 });
-
 
 // test('check user details on dashboard', async ({ page }) => {
 //   const individualRegistrationPage = new IndividualRegistrationPage(page);
