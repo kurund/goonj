@@ -34,7 +34,7 @@ First we will setup a WordPress site on top of which we will setup CiviCRM. For 
 
 1. Change to project root directory
    ```sh
-   cd civicrm
+   cd goonj
    ```
 
 1. Create the WordPress config file (**specify the correct database credentials**)
