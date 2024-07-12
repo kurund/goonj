@@ -16,10 +16,10 @@ function goonj_theme_setup() {
 add_action('after_setup_theme', 'goonj_theme_setup');
 
 # Redirecting to civi dashboard if already logged in
-function redirect_logged_in_user_to_civi_dashboard() {
+function goonj_redirect_logged_in_user_to_civi_dashboard() {
     if (is_user_logged_in() && is_front_page()) {
         wp_redirect(home_url('/wp-admin/admin.php?page=CiviCRM'));
         exit();
     }
 }
-add_action('template_redirect', 'redirect_logged_in_user_to_civi_dashboard');
+add_action('template_redirect', 'goonj_redirect_logged_in_user_to_civi_dashboard');
