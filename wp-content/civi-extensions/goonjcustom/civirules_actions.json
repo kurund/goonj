@@ -1,7 +1,0 @@
-[
-    {
-      "name": "create_user_from_contact",
-      "label": "Create User From Contact",
-      "class_name": "CRM_CivirulesActions_CreateUserFromContact"
-    }
-]
