@@ -39,11 +39,13 @@ class CRM_Goonjcustom_CivirulesAction_CreateUserFromContact extends CRM_Civirule
 		}
 
 		try {
-			$uf_id = wp_insert_user( $userParams );
+			$user_id = wp_insert_user( $userParams );
 
-			if ( empty( $uf_id ) || $uf_id instanceof \WP_Error ) {
+			if ( empty( $user_id ) || $user_id instanceof \WP_Error ) {
 				return false;
 			}
+
+			wp_new_user_notification( $user_id, null, 'user' );
 		} catch ( \Exception $e ) {
 			return false;
 		}
