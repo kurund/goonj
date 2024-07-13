@@ -27,6 +27,10 @@ First we will setup a WordPress site on top of which we will setup CiviCRM. For 
    exit
    ```
 
+1. Download the database dump from here [LINK](https://drive.google.com/drive/folders/13h9c76wD6Po6ezYDPEaFXlYGgnier-iW)
+
+1. After importing the database, run the `wp search-replace //goonj-crm.staging.coloredcow.com //goonj-civicrm.test` command to update the UAT URLs to your local URLs.
+
 1. Clone this repository
    ```sh
    git clone https://github.com/ColoredCow/goonj.git
@@ -36,6 +40,13 @@ First we will setup a WordPress site on top of which we will setup CiviCRM. For 
    ```sh
    cd goonj
    ```
+
+1. Delete the existing uploads folder in wp-content and download and unzip the new one from [Here](https://drive.google.com/drive/folders/13h9c76wD6Po6ezYDPEaFXlYGgnier-iW)
+
+1. Open `wp-content/uploads/civicrm/civicrm.settings.php` and  Search and replace 3 things:
+   1. All the staging URLs: `https://goonj-crm.staging.coloredcow.com` to your local URL.
+   2. All the staging paths: `/var/www/html/goonj-crm.staging.coloredcow.com` to your local path.
+   3. All the MySQL links: `mysql://goonj-crm:EZZ....@localhost/goonj-crm?new_link=true` to your local.
 
 1. Create the WordPress config file (**specify the correct database credentials**)
    ```sh
