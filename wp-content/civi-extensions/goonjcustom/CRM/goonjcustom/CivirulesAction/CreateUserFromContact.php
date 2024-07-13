@@ -20,7 +20,7 @@ class CRM_Goonjcustom_CivirulesAction_CreateUserFromContact extends CRM_Civirule
 			return false;
 		}
 
-		$defaultPassword = 'goonj@2024'; // to be updated 
+		$defaultPassword =  wp_generate_password();
 
 		$userParams = array(
 			'user_login'   => $contact['email'],
