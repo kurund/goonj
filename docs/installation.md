@@ -41,9 +41,9 @@ First we will setup a WordPress site on top of which we will setup CiviCRM. For 
    cd goonj
    ```
 
-1. Delete the existing uploads folder in wp-content and download and unzip the new one from [Here](https://drive.google.com/drive/folders/13h9c76wD6Po6ezYDPEaFXlYGgnier-iW)
+1. Delete the existing uploads folder in wp-content and replace it with the new one downloaded and unzipped from [Here](https://drive.google.com/drive/folders/13h9c76wD6Po6ezYDPEaFXlYGgnier-iW)
 
-1. Open `wp-content/uploads/civicrm/civicrm.settings.php` and  Search and replace 3 things:
+1. Open `wp-content/uploads/civicrm/civicrm.settings.php`. Search and replace 3 things:
    1. All the staging URLs: `https://goonj-crm.staging.coloredcow.com` to your local URL.
    2. All the staging paths: `/var/www/html/goonj-crm.staging.coloredcow.com` to your local path.
    3. All the MySQL links: `mysql://goonj-crm:EZZ....@localhost/goonj-crm?new_link=true` to your local.
