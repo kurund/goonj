@@ -16,7 +16,7 @@ async function clickSubmitButton(page) {
   await page.getByRole('button', { name: /search/i }).click();
 }
 
-test('submit the basic registration form', async ({ page }) => {
+test('submit the volunteer registration form and confirm on admin', async ({ page }) => {
   const individualRegistrationPage = new IndividualRegistrationPage(page);
 
   // Get the appended URL
@@ -62,10 +62,11 @@ test('submit the basic registration form', async ({ page }) => {
   // Click on 'Find Contacts' within the submenu
   await page.click('[data-name="Find Contacts"] a', {force : true});
   await page.waitForTimeout(2000)
-  await page.fill('input#sort_name', 'Himani')
+  await page.fill('input#sort_name', email)
   // await page.fill('input#sort_name', userFirstName)
   await selectOptionFromDropdown(page, '#s2id_contact_type', 'Individual');
   await clickSubmitButton(page)
+  await page.waitForTimeout(2000)
   // You can add further assertions or actions here
   // Example: verify the selected value
   // const selectedValue = await page.locator('#s2id_contact_type .select2-chosen').innerText();
