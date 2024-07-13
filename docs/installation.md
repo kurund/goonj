@@ -51,13 +51,19 @@ First we will setup a WordPress site on top of which we will setup CiviCRM. For 
    ```sh
    wp rewrite structure '/%postname%/'
    ```
+# Create a Virtual Host
+1. For Windows
+   Create a Virtual host for your project. The virtual host should point to /path_to_project_directory/public : The virtual host should point to /path_to_project_directory/public
+      1. WAMP: If you prefer using WAMP, you can set up virtual host by following steps mentioned on this [link]{https://stackoverflow.com/questions/22217386/how-to-setup-virtual-host-using-wamp-server-properly}.
+      2. XAMPP: If you prefer using XAMPP, you can set up virtual host by following steps mentioned on this [link]{https://github.com/ColoredCow/resources/blob/master/virtualhost/WINDOWS.md}.
 
-1. Create a virtual host
+2. For macOS
+   1. Create a virtual host
    ```sh
    valet link goonj
    ```
 
-1. Secure the virtual host
+   2. Secure the virtual host
    ```sh
    valet secure goonj
    ```
