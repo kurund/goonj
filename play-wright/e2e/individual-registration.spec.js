@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { IndividualRegistrationPage } from '../pages/individual-registration.page';
 import { userDetails,userFirstName, userEmail, userMobileNumber, userLogin } from '../utils.js';
 
-async function selectOptionFromDropdown(page, dropdownSelector, optionText) {
+async function selectContactTypeDropdown(page, dropdownSelector, optionText) {
   // Click to open the dropdown
   await page.click(`${dropdownSelector} .select2-choice`);
 
@@ -62,11 +62,17 @@ test('submit the volunteer registration form and confirm on admin', async ({ pag
   // Click on 'Find Contacts' within the submenu
   await page.click('[data-name="Find Contacts"] a', {force : true});
   await page.waitForTimeout(2000)
-  await page.fill('input#sort_name', email)
+  await page.fill('input#sort_name', userEmail)
   // await page.fill('input#sort_name', userFirstName)
-  await selectOptionFromDropdown(page, '#s2id_contact_type', 'Individual');
+  await selectContactTypeDropdown(page, '#s2id_contact_type', 'Individual');
   await clickSubmitButton(page)
   await page.waitForTimeout(2000)
+  // click on view button based on email provided 
+  // const emailToSearch = 'shankar_bhattathiri@hotmail.com';
+  const rowSelector = `table tbody tr:has(span[title="${userEmail}"])`;
+  await page.waitForTimeout(1000)
+  expect(rowSelector).toContain(userEmail)
+  await page.waitForTimeout(1000)
   // You can add further assertions or actions here
   // Example: verify the selected value
   // const selectedValue = await page.locator('#s2id_contact_type .select2-chosen').innerText();
