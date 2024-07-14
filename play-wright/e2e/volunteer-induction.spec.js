@@ -60,74 +60,107 @@ async function volunteerProfileTabs(page, tabName) {
     await page.click(tabSelectors[tabName]);
 }
 
+async function clickActivitiesActionButton(page, type, status, action) {
+    const rowSelector = `tr[data-entity="activity"] td:has-text("${type}") ~ td:has-text("${status}")`;
+  
+    // Wait for the row to be present
+    await page.waitForSelector(rowSelector);
+  
+    // Click the specified button within the located row
+    await page.click(`${rowSelector} ~ td a:has-text("${action}")`);
+  }
+
+async function selectActivityStatusValue(page, value) {
+    // Click the dropdown to open the options
+    await page.click(`#s2id_status_id .select2-choice`);
+  
+    // Select the desired value
+    await page.click(`.select2-results li:has-text("${value}")`);
+}
+
+async function clickVolunteersTabs(page, tabText) {
+    // Wait for the tab to be present in the DOM
+    await page.waitForSelector(`ul.wp-submenu-wrap li a:has-text("${tabText}")`);
+  
+    // Click the tab
+    await page.click(`ul.wp-submenu-wrap li a:has-text("${tabText}")`);
+  }
 test('schedule induction and update induction status as completed', async ({ page }) => {
   const individualRegistrationPage = new IndividualRegistrationPage(page);
 
   // Get the appended URL
-  const vounteerURl = individualRegistrationPage.getAppendedUrl('/volunteer-registration/');
-  await page.goto(vounteerURl);
-  await page.waitForTimeout(1000);
-  await individualRegistrationPage.selectTitle(userDetails.nameInital);
-  await page.waitForTimeout(200);
-  await individualRegistrationPage.enterFirstName(userFirstName);
-  await page.waitForTimeout(200);
-  await individualRegistrationPage.enterLastName(userDetails.lastName);
-  await page.waitForTimeout(200);
-  await individualRegistrationPage.enterEmail(userEmail);
-  await page.waitForTimeout(200);
-  await individualRegistrationPage.selectCountry(userDetails.country);
-  await individualRegistrationPage.enterMobileNumber(userMobileNumber);
-  await page.waitForTimeout(200);
-  await individualRegistrationPage.selectGender(userDetails.gender);
-  await individualRegistrationPage.enterStreetAddress(userDetails.streetAddress);
-  await page.waitForTimeout(200);
-  await individualRegistrationPage.enterCityName(userDetails.cityName);
-  await page.waitForTimeout(200);
-  await individualRegistrationPage.enterPostalCode(userDetails.postalCode);
-  await individualRegistrationPage.selectState(userDetails.state);
-  // await individualRegistrationPage.selectRadioButton(userDetails.radioOption);
-  // await page.waitForTimeout(2000);
-  await individualRegistrationPage.selectActivityInterested(userDetails.activityInterested);
-  await individualRegistrationPage.selectVoluntarySkills(userDetails.voluntarySkills);
-  await individualRegistrationPage.enterOtherSkills(userDetails.otherSkills);
-  await individualRegistrationPage.selectVolunteerMotivation(userDetails.volunteerMotivation);
-  await individualRegistrationPage.selectVolunteerHours(userDetails.volunteerHours);
-  await individualRegistrationPage.enterProfession(userDetails.profession);
-  await page.waitForTimeout(400);
-  // // await individualRegistrationPage.handleDialogMessage('Please fill all required fields.'); // This code would be required for required field message
-  await individualRegistrationPage.clickSubmitButton();
-  await page.waitForTimeout(2000);
+//   const vounteerURl = individualRegistrationPage.getAppendedUrl('/volunteer-registration/');
+//   await page.goto(vounteerURl);
+//   await page.waitForTimeout(1000);
+//   await individualRegistrationPage.selectTitle(userDetails.nameInital);
+//   await page.waitForTimeout(200);
+//   await individualRegistrationPage.enterFirstName(userFirstName);
+//   await page.waitForTimeout(200);
+//   await individualRegistrationPage.enterLastName(userDetails.lastName);
+//   await page.waitForTimeout(200);
+//   await individualRegistrationPage.enterEmail(userEmail);
+//   await page.waitForTimeout(200);
+//   await individualRegistrationPage.selectCountry(userDetails.country);
+//   await individualRegistrationPage.enterMobileNumber(userMobileNumber);
+//   await page.waitForTimeout(200);
+//   await individualRegistrationPage.selectGender(userDetails.gender);
+//   await individualRegistrationPage.enterStreetAddress(userDetails.streetAddress);
+//   await page.waitForTimeout(200);
+//   await individualRegistrationPage.enterCityName(userDetails.cityName);
+//   await page.waitForTimeout(200);
+//   await individualRegistrationPage.enterPostalCode(userDetails.postalCode);
+//   await individualRegistrationPage.selectState(userDetails.state);
+//   // await individualRegistrationPage.selectRadioButton(userDetails.radioOption);
+//   // await page.waitForTimeout(2000);
+//   await individualRegistrationPage.selectActivityInterested(userDetails.activityInterested);
+//   await individualRegistrationPage.selectVoluntarySkills(userDetails.voluntarySkills);
+//   await individualRegistrationPage.enterOtherSkills(userDetails.otherSkills);
+//   await individualRegistrationPage.selectVolunteerMotivation(userDetails.volunteerMotivation);
+//   await individualRegistrationPage.selectVolunteerHours(userDetails.volunteerHours);
+//   await individualRegistrationPage.enterProfession(userDetails.profession);
+//   await page.waitForTimeout(400);
+//   // // await individualRegistrationPage.handleDialogMessage('Please fill all required fields.'); // This code would be required for required field message
+//   await individualRegistrationPage.clickSubmitButton();
+//   await page.waitForTimeout(2000);
   await userLogin(page);
   // Click on the Volunteers tab
-  await page.click('a:has-text("Volunteers")');
-  await page.click('[data-name="Search"]');
-  // Click on 'Find Contacts' within the submenu
-  await page.click('[data-name="Find Contacts"] a', {force : true});
-  await page.waitForTimeout(2000)
-//   await page.fill('input#sort_name', 'shankar_bhattathiri@hotmail.com')
-  await page.fill('input#sort_name', userEmail)
-  await selectContactTypeDropdown(page, '#s2id_contact_type', 'Individual');
-  await clickSubmitButton(page)
-  await page.waitForTimeout(2000)
-  // click on view button based on email provided 
-//   const emailToSearch = 'shankar_bhattathiri@hotmail.com';
-  const rowSelector = `table tbody tr:has(span[title="${userEmail}"])`;
-  await page.waitForTimeout(1000)
-  // Click the "View" button within the identified row
-  await page.click(`${rowSelector} a.view-contact`);
+//   await page.click('a:has-text("Volunteers")');
+//   await page.click('[data-name="Search"]');
+//   // Click on 'Find Contacts' within the submenu
+//   await page.click('[data-name="Find Contacts"] a', {force : true});
 //   await page.waitForTimeout(2000)
-//   await page.click('#crm-contact-actions-link')
-//   await selectRecordActivityOption(page, 'Induction');
+//   await page.fill('input#sort_name', 'shankar_bhattathiri@hotmail.com')
+// //   await page.fill('input#sort_name', userEmail)
+//   await selectContactTypeDropdown(page, '#s2id_contact_type', 'Individual');
+//   await clickSubmitButton(page)
+//   await page.waitForTimeout(2000)
+//   // click on view button based on email provided 
+//   const emailToSearch = 'shankar_bhattathiri@hotmail.com';
+// const rowSelector = `table tbody tr:has(span[title="${emailToSearch}"])`;
+// //   const rowSelector = `table tbody tr:has(span[title="${userEmail}"])`;
+//   await page.waitForTimeout(1000)
+//   // Click the "View" button within the identified row
+//   await page.click(`${rowSelector} a.view-contact`);
+// //   await page.waitForTimeout(2000)
+// //   await page.click('#crm-contact-actions-link')
+// //   await selectRecordActivityOption(page, 'Induction');
+// //   await page.waitForTimeout(2000)
+// //   await clickDialogButton(page, 'save');
+//   await page.waitForTimeout(2000)
+//   await volunteerProfileTabs(page, 'activities');
+//   await page.waitForTimeout(2000)
+//   await clickActivitiesActionButton(page, 'Induction', 'Completed', 'Edit');
+//   await page.waitForTimeout(2000)
+//   await selectActivityStatusValue(page, 'Completed');
 //   await page.waitForTimeout(2000)
 //   await clickDialogButton(page, 'save');
-  await page.waitForTimeout(2000)
-  await page.volunteerProfileTabs(page, 'activities');
-  await page.waitForTimeout(2000)
-  // Create a selector to find a cell with the specified email
-//   const emailSelector = `table tbody span[title="${emailToSearch}"]`;
-//   const emailValue = await page.getAttribute(emailSelector, 'title');
-
-//   // Assert that the value contains the specified email
-//   expect(emailValue).toBe(emailToSearch);
+  await page.click('a:has-text("Volunteers")');
+  await page.waitForTimeout(4000)
+  await clickVolunteersTabs(page, 'Active')
+  await page.waitForTimeout(4000)
+    const emailToSearch = 'shankar_bhattathiri@hotmail.com';
+const rowSelector = `table tbody tr:has(span[title="${emailToSearch}"])`;
+await page.waitForTimeout(1000)
+  expect(rowSelector).toContain(emailToSearch )
 
 });
