@@ -11,7 +11,7 @@ test('schedule induction and update induction status as completed', async ({ pag
   // Get the appended URL
   const vounteerURl = volunteerRegistrationPage.getAppendedUrl('/volunteer-registration/');
   await page.goto(vounteerURl);
-  await page.waitForTimeout(1000);
+  await page.waitForURL(vounteerURl)
   await volunteerRegistrationPage.selectTitle(userDetails.nameInital);
   await page.waitForTimeout(200);
   await volunteerRegistrationPage.enterFirstName(userDetails.firstName);

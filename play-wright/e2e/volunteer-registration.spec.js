@@ -9,8 +9,7 @@ test('submit the volunteer registration form and confirm on admin', async ({ pag
   // Get the appended URL
   const vounteerURl = volunteerRegistrationPage.getAppendedUrl('/volunteer-registration/');
   await page.goto(vounteerURl);
-  expect(page.url()).toContain('/volunteer-registration');
-  await page.waitForTimeout(1000);
+  await page.waitForURL(vounteerURl)
   await volunteerRegistrationPage.selectTitle(userDetails.nameInital);
   await page.waitForTimeout(200);
   await volunteerRegistrationPage.enterFirstName(userDetails.firstName);
