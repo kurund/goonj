@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { VolunteerRegistrationPage } from '../pages/volunteer-registration.page';
-import { userDetails,userFirstName, userEmail, userMobileNumber, userLogin } from '../utils.js';
+import { userDetails, userEmail, userLogin } from '../utils.js';
 import { SearchContactsPage } from '../pages/search-contact.page';
 import { VolunteerProfilePage } from '../pages/volunteer-profile.page';
 
@@ -14,14 +14,14 @@ test('schedule induction and update induction status as completed', async ({ pag
   await page.waitForTimeout(1000);
   await volunteerRegistrationPage.selectTitle(userDetails.nameInital);
   await page.waitForTimeout(200);
-  await volunteerRegistrationPage.enterFirstName(userFirstName);
+  await volunteerRegistrationPage.enterFirstName(userDetails.firstName);
   await page.waitForTimeout(200);
   await volunteerRegistrationPage.enterLastName(userDetails.lastName);
   await page.waitForTimeout(200);
   await volunteerRegistrationPage.enterEmail(userEmail);
   await page.waitForTimeout(200);
   await volunteerRegistrationPage.selectCountry(userDetails.country);
-  await volunteerRegistrationPage.enterMobileNumber(userMobileNumber);
+  await volunteerRegistrationPage.enterMobileNumber(userDetails.mobileNumber);
   await page.waitForTimeout(200);
   await volunteerRegistrationPage.selectGender(userDetails.gender);
   await volunteerRegistrationPage.enterStreetAddress(userDetails.streetAddress);

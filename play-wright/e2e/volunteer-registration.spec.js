@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { VolunteerRegistrationPage } from '../pages/volunteer-registration.page';
 import { SearchContactsPage } from '../pages/search-contact.page';
-import { userDetails,userFirstName, userEmail, userMobileNumber, userLogin } from '../utils.js';
+import { userDetails, userEmail, userLogin } from '../utils.js';
 
 test('submit the volunteer registration form and confirm on admin', async ({ page }) => {
   const volunteerRegistrationPage = new VolunteerRegistrationPage(page);
@@ -13,14 +13,14 @@ test('submit the volunteer registration form and confirm on admin', async ({ pag
   await page.waitForTimeout(1000);
   await volunteerRegistrationPage.selectTitle(userDetails.nameInital);
   await page.waitForTimeout(200);
-  await volunteerRegistrationPage.enterFirstName(userFirstName);
+  await volunteerRegistrationPage.enterFirstName(userDetails.firstName);
   await page.waitForTimeout(200);
   await volunteerRegistrationPage.enterLastName(userDetails.lastName);
   await page.waitForTimeout(200);
   await volunteerRegistrationPage.enterEmail(userEmail);
   await page.waitForTimeout(200);
   await volunteerRegistrationPage.selectCountry(userDetails.country);
-  await volunteerRegistrationPage.enterMobileNumber(userMobileNumber);
+  await volunteerRegistrationPage.enterMobileNumber(userDetails.mobileNumber);
   await page.waitForTimeout(200);
   await volunteerRegistrationPage.selectGender(userDetails.gender);
   await volunteerRegistrationPage.enterStreetAddress(userDetails.streetAddress);
@@ -40,7 +40,6 @@ test('submit the volunteer registration form and confirm on admin', async ({ pag
   await volunteerRegistrationPage.clickSubmitButton();
   await page.waitForTimeout(2000);  //added wait as page was taking time load 
   await userLogin(page);
-  // Click on the Volunteers tab
   await searchContactsPage.clickSearchLabel()
   await searchContactsPage.clickFindContacts()
   await searchContactsPage.inputUserNameOrEmail(userEmail)
