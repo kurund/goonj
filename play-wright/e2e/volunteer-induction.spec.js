@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { IndividualRegistrationPage } from '../pages/individual-registration.page';
+import { VolunteerRegistrationPage } from '../pages/volunteer-registration.page';
 import { userDetails,userFirstName, userEmail, userMobileNumber, userLogin } from '../utils.js';
 
 async function selectContactTypeDropdown(page, dropdownSelector, optionText) {
@@ -73,39 +73,39 @@ async function clickVolunteerSuboption(page, option) {
   }
 
 test('schedule induction and update induction status as completed', async ({ page }) => {
-  const individualRegistrationPage = new IndividualRegistrationPage(page);
+  const volunteerRegistrationPage = new VolunteerRegistrationPage(page);
   // Get the appended URL
-  const vounteerURl = individualRegistrationPage.getAppendedUrl('/volunteer-registration/');
+  const vounteerURl = volunteerRegistrationPage.getAppendedUrl('/volunteer-registration/');
   await page.goto(vounteerURl);
   await page.waitForTimeout(1000);
-  await individualRegistrationPage.selectTitle(userDetails.nameInital);
+  await volunteerRegistrationPage.selectTitle(userDetails.nameInital);
   await page.waitForTimeout(200);
-  await individualRegistrationPage.enterFirstName(userFirstName);
+  await volunteerRegistrationPage.enterFirstName(userFirstName);
   await page.waitForTimeout(200);
-  await individualRegistrationPage.enterLastName(userDetails.lastName);
+  await volunteerRegistrationPage.enterLastName(userDetails.lastName);
   await page.waitForTimeout(200);
-  await individualRegistrationPage.enterEmail(userEmail);
+  await volunteerRegistrationPage.enterEmail(userEmail);
   await page.waitForTimeout(200);
-  await individualRegistrationPage.selectCountry(userDetails.country);
-  await individualRegistrationPage.enterMobileNumber(userMobileNumber);
+  await volunteerRegistrationPage.selectCountry(userDetails.country);
+  await volunteerRegistrationPage.enterMobileNumber(userMobileNumber);
   await page.waitForTimeout(200);
-  await individualRegistrationPage.selectGender(userDetails.gender);
-  await individualRegistrationPage.enterStreetAddress(userDetails.streetAddress);
+  await volunteerRegistrationPage.selectGender(userDetails.gender);
+  await volunteerRegistrationPage.enterStreetAddress(userDetails.streetAddress);
   await page.waitForTimeout(200);
-  await individualRegistrationPage.enterCityName(userDetails.cityName);
+  await volunteerRegistrationPage.enterCityName(userDetails.cityName);
   await page.waitForTimeout(200);
-  await individualRegistrationPage.enterPostalCode(userDetails.postalCode);
-  await individualRegistrationPage.selectState(userDetails.state);
-  // await individualRegistrationPage.selectRadioButton(userDetails.radioOption);
+  await volunteerRegistrationPage.enterPostalCode(userDetails.postalCode);
+  await volunteerRegistrationPage.selectState(userDetails.state);
+  // await volunteerRegistrationPage.selectRadioButton(userDetails.radioOption);
   // await page.waitForTimeout(2000);
-  await individualRegistrationPage.selectActivityInterested(userDetails.activityInterested);
-  await individualRegistrationPage.selectVoluntarySkills(userDetails.voluntarySkills);
-  await individualRegistrationPage.enterOtherSkills(userDetails.otherSkills);
-  await individualRegistrationPage.selectVolunteerMotivation(userDetails.volunteerMotivation);
-  await individualRegistrationPage.selectVolunteerHours(userDetails.volunteerHours);
-  await individualRegistrationPage.enterProfession(userDetails.profession);
-  // // await individualRegistrationPage.handleDialogMessage('Please fill all required fields.'); // This code would be required for required field message
-  await individualRegistrationPage.clickSubmitButton();
+  await volunteerRegistrationPage.selectActivityInterested(userDetails.activityInterested);
+  await volunteerRegistrationPage.selectVoluntarySkills(userDetails.voluntarySkills);
+  await volunteerRegistrationPage.enterOtherSkills(userDetails.otherSkills);
+  await volunteerRegistrationPage.selectVolunteerMotivation(userDetails.volunteerMotivation);
+  await volunteerRegistrationPage.selectVolunteerHours(userDetails.volunteerHours);
+  await volunteerRegistrationPage.enterProfession(userDetails.profession);
+  // // await volunteerRegistrationPage.handleDialogMessage('Please fill all required fields.'); // This code would be required for required field message
+  await volunteerRegistrationPage.clickSubmitButton();
   await page.waitForTimeout(2000);
   await userLogin(page);
   //Click on the Volunteers tab
@@ -119,11 +119,12 @@ test('schedule induction and update induction status as completed', async ({ pag
   await clickSubmitButton(page)
   await page.waitForTimeout(2000)
   page.locator('a.view-contact').click({force: true})
-  await page.click('#crm-contact-actions-link')
-  await selectRecordActivityOption(page, 'Induction');
-  await page.waitForTimeout(2000)
-  await clickDialogButton(page, 'save');
-  await page.waitForTimeout(2000)
+  //commented below code as flow is modified but can be used in other scenarios
+//   await page.click('#crm-contact-actions-link')
+//   await selectRecordActivityOption(page, 'Induction');
+//   await page.waitForTimeout(2000)
+//   await clickDialogButton(page, 'save');
+//   await page.waitForTimeout(2000)
   await volunteerProfileTabs(page, 'activities');
   await page.waitForTimeout(2000)
   await clickActivitiesActionButton(page, 'Induction', 'Scheduled', 'Edit');

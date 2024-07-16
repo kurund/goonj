@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { IndividualRegistrationPage } from '../pages/individual-registration.page';
+import { VolunteerRegistrationPage } from '../pages/volunteer-registration.page';
 import { userDetails,userFirstName, userEmail, userMobileNumber, userLogin } from '../utils.js';
 
 async function selectContactTypeDropdown(page, dropdownSelector, optionText) {
@@ -14,40 +14,40 @@ async function clickSubmitButton(page) {
 }
 
 test('submit the volunteer registration form and confirm on admin', async ({ page }) => {
-  const individualRegistrationPage = new IndividualRegistrationPage(page);
+  const volunteerRegistrationPage = new VolunteerRegistrationPage(page);
 
   // Get the appended URL
-  const vounteerURl = individualRegistrationPage.getAppendedUrl('/volunteer-registration/');
+  const vounteerURl = volunteerRegistrationPage.getAppendedUrl('/volunteer-registration/');
   await page.goto(vounteerURl);
   expect(page.url()).toContain('/volunteer-registration');
   await page.waitForTimeout(1000);
-  await individualRegistrationPage.selectTitle(userDetails.nameInital);
+  await volunteerRegistrationPage.selectTitle(userDetails.nameInital);
   await page.waitForTimeout(200);
-  await individualRegistrationPage.enterFirstName(userFirstName);
+  await volunteerRegistrationPage.enterFirstName(userFirstName);
   await page.waitForTimeout(200);
-  await individualRegistrationPage.enterLastName(userDetails.lastName);
+  await volunteerRegistrationPage.enterLastName(userDetails.lastName);
   await page.waitForTimeout(200);
-  await individualRegistrationPage.enterEmail(userEmail);
+  await volunteerRegistrationPage.enterEmail(userEmail);
   await page.waitForTimeout(200);
-  await individualRegistrationPage.selectCountry(userDetails.country);
-  await individualRegistrationPage.enterMobileNumber(userMobileNumber);
+  await volunteerRegistrationPage.selectCountry(userDetails.country);
+  await volunteerRegistrationPage.enterMobileNumber(userMobileNumber);
   await page.waitForTimeout(200);
-  await individualRegistrationPage.selectGender(userDetails.gender);
-  await individualRegistrationPage.enterStreetAddress(userDetails.streetAddress);
+  await volunteerRegistrationPage.selectGender(userDetails.gender);
+  await volunteerRegistrationPage.enterStreetAddress(userDetails.streetAddress);
   await page.waitForTimeout(200);
-  await individualRegistrationPage.enterCityName(userDetails.cityName);
+  await volunteerRegistrationPage.enterCityName(userDetails.cityName);
   await page.waitForTimeout(200);
-  await individualRegistrationPage.enterPostalCode(userDetails.postalCode);
-  await individualRegistrationPage.selectState(userDetails.state);
-  await individualRegistrationPage.selectActivityInterested(userDetails.activityInterested);
-  await individualRegistrationPage.selectVoluntarySkills(userDetails.voluntarySkills);
-  await individualRegistrationPage.enterOtherSkills(userDetails.otherSkills);
-  await individualRegistrationPage.selectVolunteerMotivation(userDetails.volunteerMotivation);
-  await individualRegistrationPage.selectVolunteerHours(userDetails.volunteerHours);
-  await individualRegistrationPage.enterProfession(userDetails.profession);
+  await volunteerRegistrationPage.enterPostalCode(userDetails.postalCode);
+  await volunteerRegistrationPage.selectState(userDetails.state);
+  await volunteerRegistrationPage.selectActivityInterested(userDetails.activityInterested);
+  await volunteerRegistrationPage.selectVoluntarySkills(userDetails.voluntarySkills);
+  await volunteerRegistrationPage.enterOtherSkills(userDetails.otherSkills);
+  await volunteerRegistrationPage.selectVolunteerMotivation(userDetails.volunteerMotivation);
+  await volunteerRegistrationPage.selectVolunteerHours(userDetails.volunteerHours);
+  await volunteerRegistrationPage.enterProfession(userDetails.profession);
   await page.waitForTimeout(400);
-  // // await individualRegistrationPage.handleDialogMessage('Please fill all required fields.'); // This code would be required for required field message
-  await individualRegistrationPage.clickSubmitButton();
+  // // await volunteerRegistrationPage.handleDialogMessage('Please fill all required fields.'); // This code would be required for required field message
+  await volunteerRegistrationPage.clickSubmitButton();
   await page.waitForTimeout(2000);  //added wait as page was taking time load 
   await userLogin(page);
   // Click on the Volunteers tab
