@@ -128,3 +128,49 @@ function goonjcustom_civicrm_buildForm( $formName, $form ) {
 		}
 	}
 }
+
+function goonjcustom_civicrm_pageRun( &$page ) {
+	// Check if we are on the activity edit form page
+	CRM_Core_Region::instance( 'page-footer' )->add(
+		array(
+			'script' => '
+              (function($) {
+                  $(document).ajaxComplete(function(event, xhr, settings) {
+                    var isInductionActivity = false;
+                    var urlParams = new URLSearchParams(settings.url);
+                    var activityTypeId = "57";
+
+                    if ((urlParams.get("atype") === activityTypeId && urlParams.get("action") === "view") ||
+                        (urlParams.get("subType") === activityTypeId && urlParams.get("action") === "2")) {
+                        isInductionActivity = true;
+                    }
+
+                    if (isInductionActivity) {
+                      var fieldsToRemove = [
+                          ".crm-activity-form-block-subject",
+                          ".crm-activity-form-block-campaign_id",
+                          ".crm-activity-form-block-engagement_level",
+                          ".crm-activity-form-block-duration",
+                          ".crm-activity-form-block-priority_id",
+                          ".crm-activity-form-block-location",
+                          ".crm-activity-form-block-attachment",
+                          ".crm-activity-form-block-recurring_activity",
+                          ".crm-activity-form-block-recurring_activity",
+                          ".crm-activity-form-block-schedule_followup",
+                      ];
+
+                      fieldsToRemove.forEach(function(field) {
+                          $(field).remove();
+                      });
+
+                      var inductionFields = $(".custom-group-Induction_Fields tr");
+
+                      $(".crm-activity-form-block-activity_date_time").after(inductionFields);
+                      $(".custom-group-Induction_Fields").remove();
+                    }
+                  });
+              })(CRM.$);
+          ',
+		)
+	);
+}
