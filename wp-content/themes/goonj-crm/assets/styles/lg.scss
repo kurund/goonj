@@ -31,10 +31,24 @@
     .error {
         font-size: 14px;
     }
+
+    .wp-block-post-template-is-layout-flow {
+        max-width: 750px !important;
+    }
+    .form-heading, .form-description {
+        margin: 0px !important;
+        max-width: 100% !important;
+    }
+
+    .wp-block-group-is-layout-constrained {
+        margin-right: 0px !important;
+        margin-left: 0px !important;
+        max-width: 100% !important;
+    }
     
     .crm-container {
         width: 720px !important;
-        padding: 24px;
+        padding: 15px;
         
         af-form {
             margin-left: auto;
@@ -81,6 +95,16 @@
 
         .crm-af-field, af-field {
             margin-bottom: 0px !important;
+        }
+
+        .btn-primary {
+            margin-left: 10px !important;
+            margin-right: 10px !important;
+        }
+
+        fieldset .af-layout-cols {
+            display: flex !important;
+            flex-wrap: wrap !important;
         }
     }
 }
