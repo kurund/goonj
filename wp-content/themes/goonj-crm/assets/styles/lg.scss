@@ -78,5 +78,9 @@
         .af-container.af-layout-inline > * {
             margin-right: 0px !important;
         }
+
+        .crm-af-field, af-field {
+            margin-bottom: 0px !important;
+        }
     }
 }

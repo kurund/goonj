@@ -187,6 +187,7 @@ form input {
     .btn-primary {
         background: rgba(214, 70, 49, 1) !important;
         width: 100%;
+        height: 45px !important;
         margin-left: 10px !important;
         margin-right: 10px !important;
         margin-top: 45px !important;
@@ -237,8 +238,8 @@ form input {
         flex-wrap: nowrap !important;
     }
 
-    af-field {
-        margin-bottom: 15px !important;
+    .crm-af-field, af-field {
+        margin-bottom: 10px !important;
     }
 
     .af-field-type-email,
