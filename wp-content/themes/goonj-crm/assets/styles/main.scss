@@ -147,7 +147,7 @@ form input {
     }
 
     .select2-search-choice-close {
-        padding-top: 5px !important;
+        top: 9px !important;
         &::before {
             color: rgba(0, 0, 0, 1) !important;
         }
@@ -230,5 +230,19 @@ form input {
 
     .select2-container .select2-choice {
         min-height: 45px !important;
+    }
+
+    fieldset .af-layout-cols {
+        display: block !important;
+        flex-wrap: nowrap !important;
+    }
+
+    af-field {
+        margin-bottom: 15px m !important;
+    }
+
+    .af-field-type-email,
+    .af-field-type-text {
+        width: 100% !important;
     }
 }

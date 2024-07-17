@@ -42,7 +42,7 @@
         }
 
         .select2-container .select2-choice abbr {
-            top: 5px !important;
+            top: 10px !important;
         }
 
         .crm-af-field-label {
@@ -65,9 +65,22 @@
             box-sizing: border-box !important;
             padding: 10px !important;
         }
+
+        .af-field-type-email>.crm-af-field,
+        div[af-join]>af-field {
+            padding-bottom: 0px !important;
+            &>.crm-af-field {
+                padding-right: 10px !important;
+                padding-left: 10px !important;
+            }
+        }
     
         .af-container.af-layout-inline > * {
             margin-right: 0px !important;
+        }
+
+        af-field {
+            margin-bottom: 15px m !important;
         }
     }
 
