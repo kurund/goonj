@@ -121,8 +121,6 @@ form input {
         flex: 1;
         display: flex;
         flex-direction: column;
-        // margin-right: 30px;
-
         label {
             font-size: 14px;
             span.crm-marker {
@@ -155,10 +153,6 @@ form input {
         }
     }
 
-    input[type=radio] {
-        margin: 0px !important;
-    }
-
     .form-control {
         min-height: 45px;
         border: 1px solid rgba(0, 0, 0, 0.3) !important;
@@ -172,23 +166,7 @@ form input {
         padding-bottom: 10px;
     }
 
-    .af-container.af-layout-cols > * {
-        width: 100%;
-        flex-basis: auto;
-    }
-
-    .af-field-type-email, 
-    .af-field-type-select,
-    .af-field-type-chain-select {
-        width: 100%;
-        padding-bottom: 15px !important;
-    }
-
-    .af-field-type-radio {
-        margin-bottom: 15px !important;
-    }
-
-    .af-container > .form-group {
+    .crm-af-field > .form-group {
         margin-bottom: 0px !important;
     }
 
@@ -199,7 +177,7 @@ form input {
     }
 
     .select2-choices, ::before {
-        padding-top: 5px !important;
+        padding-top: 8px !important;
     }
 
     .af-field-type-hidden {
@@ -209,14 +187,12 @@ form input {
     .btn-primary {
         background: rgba(214, 70, 49, 1) !important;
         width: 100%;
+        margin-left: 10px !important;
+        margin-right: 10px !important;
+        margin-top: 45px !important;
         &:active {
             background: variables.$theme-dark-red !important;
         }
-    }
-
-    label:has(input[type="radio"]) {
-        margin-bottom: 15px !important;
-        padding-right: 15px !important;
     }
 
     .crm-af-field-label {
@@ -231,7 +207,7 @@ form input {
 
     .select2-drop-active,
     .select2-search > input {
-        border-color: rgba(0, 0, 0, 0.3) !important;
+        border-color: rgba(195, 184, 184, 0.3) !important;
         padding: 10px
     }
 
@@ -248,8 +224,11 @@ form input {
         color: rgb(165, 159, 159) !important;
     }
 
-    .af-field-type-text input {
-        margin-bottom: 15px !important;
-        width: 100%;
+    .af-field-type-hidden {
+        display: none;
+    }
+
+    .select2-container .select2-choice {
+        min-height: 45px !important;
     }
 }
