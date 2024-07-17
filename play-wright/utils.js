@@ -10,7 +10,7 @@ const generateIndianMobileNumber = () => {
 
 // Generate user details using Faker with Indian locale
 export const userDetails = {
-  nameInital: faker.helpers.arrayElement(['Mr.', 'Dr.', 'Mr']),
+  nameInitial: faker.helpers.arrayElement(['Mr.', 'Dr.', 'Mr']),
   firstName: faker.person.firstName(),
   lastName: faker.person.lastName(),
   email: faker.internet.email(),
@@ -39,7 +39,3 @@ export async function userLogin(page) {
   await page.fill('#user_pass', password); 
   await page.click('#wp-submit');
 };
-
-export const userEmail = userDetails.email;
-export const userMobileNumber = userDetails.mobileNumber;
-export const userFirstName = userDetails.firstName;

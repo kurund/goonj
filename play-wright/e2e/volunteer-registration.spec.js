@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { VolunteerRegistrationPage } from '../pages/volunteer-registration.page';
 import { SearchContactsPage } from '../pages/search-contact.page';
-import { userDetails, userEmail, userLogin } from '../utils.js';
+import { userDetails, userLogin } from '../utils.js';
+
 
 test('submit the volunteer registration form and confirm on admin', async ({ page }) => {
   const volunteerRegistrationPage = new VolunteerRegistrationPage(page);
@@ -10,13 +11,13 @@ test('submit the volunteer registration form and confirm on admin', async ({ pag
   const vounteerURl = volunteerRegistrationPage.getAppendedUrl('/volunteer-registration/');
   await page.goto(vounteerURl);
   await page.waitForURL(vounteerURl)
-  await volunteerRegistrationPage.selectTitle(userDetails.nameInital);
+  await volunteerRegistrationPage.selectTitle(userDetails.nameInitial);
   await page.waitForTimeout(200);
   await volunteerRegistrationPage.enterFirstName(userDetails.firstName);
   await page.waitForTimeout(200);
   await volunteerRegistrationPage.enterLastName(userDetails.lastName);
   await page.waitForTimeout(200);
-  await volunteerRegistrationPage.enterEmail(userEmail);
+  await volunteerRegistrationPage.enterEmail(userDetails.email);
   await page.waitForTimeout(200);
   await volunteerRegistrationPage.selectCountry(userDetails.country);
   await volunteerRegistrationPage.enterMobileNumber(userDetails.mobileNumber);
@@ -35,19 +36,18 @@ test('submit the volunteer registration form and confirm on admin', async ({ pag
   await volunteerRegistrationPage.selectVolunteerHours(userDetails.volunteerHours);
   await volunteerRegistrationPage.enterProfession(userDetails.profession);
   await page.waitForTimeout(400);
-  // // await volunteerRegistrationPage.handleDialogMessage('Please fill all required fields.'); // This code would be required for required field message
   await volunteerRegistrationPage.clickSubmitButton();
   await page.waitForTimeout(2000);  //added wait as page was taking time load 
   await userLogin(page);
   await searchContactsPage.clickSearchLabel()
   await searchContactsPage.clickFindContacts()
-  await searchContactsPage.inputUserNameOrEmail(userEmail)
+  await searchContactsPage.inputUserNameOrEmail(userDetails.email)
   await searchContactsPage.selectContactType('Individual');
   await searchContactsPage.clickSearchButton();
   await page.waitForTimeout(2000) //added wait as page was taking time load 
-  const contactRowSelector = `table tbody tr:has(span[title="${userEmail}"])`;
+  const contactRowSelector = `table tbody tr:has(span[title="${userDetails.email}"])`;
   await page.waitForTimeout(1000)
-  expect(contactRowSelector).toContain(userEmail)
+  expect(contactRowSelector).toContain(userDetails.email)
   await page.waitForTimeout(1000)
 });
 

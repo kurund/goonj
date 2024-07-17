@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { VolunteerRegistrationPage } from '../pages/volunteer-registration.page';
-import { userDetails, userEmail, userLogin } from '../utils.js';
+import { userDetails, userLogin } from '../utils.js';
 import { SearchContactsPage } from '../pages/search-contact.page';
 import { VolunteerProfilePage } from '../pages/volunteer-profile.page';
 
@@ -8,17 +8,16 @@ test('schedule induction and update induction status as completed', async ({ pag
   const volunteerRegistrationPage = new VolunteerRegistrationPage(page);
   const searchContactsPage = new SearchContactsPage (page);
   const volunteerProfilePage = new VolunteerProfilePage(page);
-  // Get the appended URL
   const vounteerURl = volunteerRegistrationPage.getAppendedUrl('/volunteer-registration/');
   await page.goto(vounteerURl);
   await page.waitForURL(vounteerURl)
-  await volunteerRegistrationPage.selectTitle(userDetails.nameInital);
+  await volunteerRegistrationPage.selectTitle(userDetails.nameInitial);
   await page.waitForTimeout(200);
   await volunteerRegistrationPage.enterFirstName(userDetails.firstName);
   await page.waitForTimeout(200);
   await volunteerRegistrationPage.enterLastName(userDetails.lastName);
   await page.waitForTimeout(200);
-  await volunteerRegistrationPage.enterEmail(userEmail);
+  await volunteerRegistrationPage.enterEmail(userDetails.email);
   await page.waitForTimeout(200);
   await volunteerRegistrationPage.selectCountry(userDetails.country);
   await volunteerRegistrationPage.enterMobileNumber(userDetails.mobileNumber);
@@ -30,31 +29,22 @@ test('schedule induction and update induction status as completed', async ({ pag
   await page.waitForTimeout(200);
   await volunteerRegistrationPage.enterPostalCode(userDetails.postalCode);
   await volunteerRegistrationPage.selectState(userDetails.state);
-  // await volunteerRegistrationPage.selectRadioButton(userDetails.radioOption);
-  // await page.waitForTimeout(2000);
   await volunteerRegistrationPage.selectActivityInterested(userDetails.activityInterested);
   await volunteerRegistrationPage.selectVoluntarySkills(userDetails.voluntarySkills);
   await volunteerRegistrationPage.enterOtherSkills(userDetails.otherSkills);
   await volunteerRegistrationPage.selectVolunteerMotivation(userDetails.volunteerMotivation);
   await volunteerRegistrationPage.selectVolunteerHours(userDetails.volunteerHours);
   await volunteerRegistrationPage.enterProfession(userDetails.profession);
-  // // await volunteerRegistrationPage.handleDialogMessage('Please fill all required fields.'); // This code would be required for required field message
   await volunteerRegistrationPage.clickSubmitButton();
   await page.waitForTimeout(2000);
   await userLogin(page);
   await searchContactsPage.clickSearchLabel()
   await searchContactsPage.clickFindContacts()
-  await searchContactsPage.inputUserNameOrEmail(userEmail)
+  await searchContactsPage.inputUserNameOrEmail(userDetails.email)
   await searchContactsPage.selectContactType('Individual');
   await searchContactsPage.clickSearchButton();
   await page.waitForTimeout(2000)
   page.locator('a.view-contact').click({force: true})
-//commented below code as flow is modified but can be used in other scenarios
-//   await page.click('#crm-contact-actions-link')
-//   await selectRecordActivityOption(page, 'Induction');
-//   await page.waitForTimeout(2000)
-//   await clickDialogButton(page, 'save');
-//   await page.waitForTimeout(2000)
   await volunteerProfilePage.volunteerProfileTabs('activities');
   await page.waitForTimeout(2000)
   await volunteerProfilePage.clickActivitiesActionButton('Induction', 'Scheduled', 'Edit');
@@ -66,8 +56,8 @@ test('schedule induction and update induction status as completed', async ({ pag
   await page.waitForTimeout(3000)
   await volunteerProfilePage.clickVolunteerSuboption('Active')
   await page.waitForTimeout(2000)
-  const activeVolunteerRowSelector = `table tbody tr:has(span[title="${userEmail}"])`;
+  const activeVolunteerRowSelector = `table tbody tr:has(span[title="${userDetails.email}"])`;
   await page.waitForTimeout(1000)
-  expect(activeVolunteerRowSelector).toContain(userEmail)
+  expect(activeVolunteerRowSelector).toContain(userDetails.email)
 
 });

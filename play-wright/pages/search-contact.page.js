@@ -21,8 +21,8 @@ exports.SearchContactsPage = class SearchContactsPage {
 
     }
   
-    async inputUserNameOrEmail(userEmail) {
-      await this.page.fill('input#sort_name', userEmail);
+    async inputUserNameOrEmail(userNameOrEmail) {
+      await this.page.fill('input#sort_name', userNameOrEmail);
     }
   
     async selectContactType(contactType) {
