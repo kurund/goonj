@@ -52,6 +52,7 @@ exports.VolunteerRegistrationPage =  class VolunteerRegistrationPage {
 
   async selectDropdownOption(dropdownSelector, inputField, option) {
     await this.page.click(dropdownSelector);
+    await page.waitForTimeout(1000)
     await this.page.fill(inputField, option);
     const optionSelector = `.select2-result-label:text("${option}")`;
     await this.page.click(optionSelector);
