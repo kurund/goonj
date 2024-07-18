@@ -12,7 +12,7 @@ exports.VolunteerRegistrationPage =  class VolunteerRegistrationPage {
     this.cityName = page.locator('input#city-14');
     this.postalCode = page.locator('input#postal-code-15');
     this.profession = page.locator('input#volunteer-fields-profession-21')
-    this.otherSkills = page.locator('input#volunteer-fields-others-skills-18')
+    this.otherSkills = page.locator('input#volunteer-fields-others-skills-19')
   }
   
   async enterFirstName(firstName) {
@@ -81,11 +81,11 @@ exports.VolunteerRegistrationPage =  class VolunteerRegistrationPage {
   }
 
   async selectVoluntarySkills(skill) {
-    await this.selectDropdownOption('#s2id_autogen6', '#s2id_autogen6', skill);
+    await this.selectDropdownOption('#s2id_autogen7', '#s2id_autogen7', skill);
   }
 
   async selectVolunteerMotivation(motivation) {
-    await this.selectDropdownOption('#s2id_autogen7', '#s2id_autogen7', motivation);
+    await this.selectDropdownOption('#s2id_autogen6', '#s2id_autogen6', motivation);
   }
 
   async selectVolunteerHours(hours) {

@@ -24,10 +24,10 @@ export const userDetails = {
   postalCode: faker.location.zipCode('######'), // Indian postal code format
 //   state: faker.location.state(), //form was not having certain states in dropdwon
   state: 'Haryana',
-  activityInterested: faker.helpers.arrayElement(['Raise funds', 'Run campaign']), 
+  activityInterested: faker.helpers.arrayElement(['Raise funds', 'Explore CSR']), 
   voluntarySkills: faker.helpers.arrayElement(['Marketing', 'Content Writing']), 
   otherSkills: faker.helpers.arrayElement(['Research', 'Content Writing']),
-  volunteerMotivation: faker.helpers.arrayElement(['Learn new skills']),
+  volunteerMotivation: faker.helpers.arrayElement(['Learn new skills', 'Use my skills']),
   volunteerHours: faker.helpers.arrayElement(['2 to 6 hours daily', '2 to 6 hours weekly', '2 to 6 hours monthly']),
   profession: faker.person.jobTitle(),
 };
@@ -67,9 +67,9 @@ export async function submitVolunteerRegistrationForm(page, userDetails) {
   await volunteerRegistrationPage.enterPostalCode(userDetails.postalCode);
   await volunteerRegistrationPage.selectState(userDetails.state);
   await volunteerRegistrationPage.selectActivityInterested(userDetails.activityInterested);
+  await volunteerRegistrationPage.selectVolunteerMotivation(userDetails.volunteerMotivation);
   await volunteerRegistrationPage.selectVoluntarySkills(userDetails.voluntarySkills);
   await volunteerRegistrationPage.enterOtherSkills(userDetails.otherSkills);
-  await volunteerRegistrationPage.selectVolunteerMotivation(userDetails.volunteerMotivation);
   await volunteerRegistrationPage.selectVolunteerHours(userDetails.volunteerHours);
   await volunteerRegistrationPage.enterProfession(userDetails.profession);
   await page.waitForTimeout(400);
