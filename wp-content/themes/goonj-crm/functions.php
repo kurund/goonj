@@ -66,3 +66,19 @@ add_action('login_form_rp', 'goonj_custom_reset_password_form');
 function goonj_custom_reset_password_form() {
     get_template_part('templates/password-reset');
 }
+
+add_action( 'validate_password_reset', 'goonj_custom_password_reset_redirection', 10, 2 );
+function goonj_custom_password_reset_redirection( $errors, $user ) {
+    if ( $errors->has_errors() ) {
+        return;
+    }
+
+    if ( isset( $_POST['pass1'] ) && ! empty( $_POST['pass1'] ) ) {
+        reset_password( $user, $_POST['pass1'] );
+        $rp_cookie = 'wp-resetpass-' . COOKIEHASH;
+        $rp_path = preg_replace( '|https?://[^/]+|i', '', get_permalink( get_page_by_path( 'wp-login.php' ) ) );
+        setcookie( $rp_cookie, ' ', time() - YEAR_IN_SECONDS, $rp_path, COOKIE_DOMAIN, is_ssl(), true );
+        wp_redirect( home_url() );
+        exit;
+    }
+}
