@@ -88,7 +88,7 @@ wp_enqueue_script( 'utils' );
 wp_enqueue_script( 'user-profile' );
 
 ?>
-<form name="resetpassform" id="resetpassform" action="<?php echo esc_url( home_url( '/reset-password/' ) ); ?>" method="post" autocomplete="off">
+<form name="resetpassform" id="resetpassform" action="<?php echo esc_url( home_url( '/password-confirmation/' ) ); ?>" method="post" autocomplete="off">
 	<div class="w-150 m-auto mb-35">
 		<a href="<?php echo home_url(); ?>">
 			<img class="w-150" src="<?php echo get_stylesheet_directory_uri(); ?>/images/goonj-logo.png" alt="Goonj-logo">

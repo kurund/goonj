@@ -61,7 +61,8 @@ function goonj_login_form_validation_errors( $string ) {
 
     return $string;
 }
-function goonj_custom_reset_password_form() {
-    include get_template_directory() . '/templates/password-reset.php';
-}
+
 add_action('login_form_rp', 'goonj_custom_reset_password_form');
+function goonj_custom_reset_password_form() {
+    get_template_part('templates/password-reset');
+}
