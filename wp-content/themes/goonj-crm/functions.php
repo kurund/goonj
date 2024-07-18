@@ -59,6 +59,10 @@ function goonj_login_form_validation_errors( $string ) {
         return '<p class="error">Login failed: Invalid username or password.</p>';
     }
 
+    if ( isset( $_REQUEST['password'] ) && $_REQUEST['password'] === 'true'  ) {
+        return '<p class="password-message">You can now log-in using your email address and the password you\'ve already set.</p>';
+    }
+
     return $string;
 }
 
@@ -78,7 +82,7 @@ function goonj_custom_password_reset_redirection( $errors, $user ) {
         $rp_cookie = 'wp-resetpass-' . COOKIEHASH;
         $rp_path = preg_replace( '|https?://[^/]+|i', '', get_permalink( get_page_by_path( 'wp-login.php' ) ) );
         setcookie( $rp_cookie, ' ', time() - YEAR_IN_SECONDS, $rp_path, COOKIE_DOMAIN, is_ssl(), true );
-        wp_redirect( home_url() );
+        wp_redirect( add_query_arg( 'password', 'true', home_url() ) );
         exit;
     }
 }
