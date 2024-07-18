@@ -138,6 +138,6 @@ wp_enqueue_script( 'user-profile' );
 	?>
 	<input type="hidden" name="rp_key" value="<?php echo esc_attr( $rp_key ); ?>" />
 	<p class="submit reset-pass-submit">
-		<input type="submit" name="wp-submit" id="wp-submit" class="button button-primary button-large fw-400 theme-black fz-16 leading-21" value="<?php esc_attr_e( 'Set Account Password >' ); ?>" />
+		<input type="submit" name="wp-submit" id="wp-submit" class="button button-primary button-large fw-400 theme-black fz-16 leading-21" value="<?php esc_attr_e( 'Set Account Password' ); ?>" />
 	</p>
 </form>
