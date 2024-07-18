@@ -11,8 +11,8 @@
 </style>
 <div class="w-500">
 	<div class="w-150 m-auto mb-35">
-		<a href="<?php echo home_url(); ?>">
-			<img class="w-150" src="<?php echo get_stylesheet_directory_uri(); ?>/images/password-confirmation.png" alt="Goonj-logo">
+		<a>
+			<img class="w-100" src="<?php echo get_stylesheet_directory_uri(); ?>/images/password-confirmation.png" alt="Goonj-logo">
 		</a>
 	</div>
 	<div class="text-center m-auto">
