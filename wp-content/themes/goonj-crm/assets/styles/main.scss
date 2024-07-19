@@ -21,42 +21,42 @@
 }
 
 @each $size, $value in variables.$font-sizes {
-	.fz-#{$size} {
-		font-size: $value !important;
-	}
+    .fz-#{$size} {
+        font-size: $value !important;
+    }
 }
 
 @each $size, $value in variables.$font-weight {
-	.fw-#{$size} {
-		font-weight: $value !important;
-	}
+    .fw-#{$size} {
+        font-weight: $value !important;
+    }
 }
 
 @each $name, $value in variables.$spacers{
-	.mr-#{$name} {
-		margin-right: $value !important;
-	}
-	.ml-#{$name} {
-		margin-left: $value !important;
-	}
+    .mr-#{$name} {
+        margin-right: $value !important;
+    }
+    .ml-#{$name} {
+        margin-left: $value !important;
+    }
     .mt-#{$name} {
-		margin-top: $value !important;
-	}
+        margin-top: $value !important;
+    }
     .mb-#{$name} {
-		margin-bottom: $value !important;
-	}
-	.pr-#{$name} {
-		padding-right: $value !important;
-	}
-	.pl-#{$name} {
-		padding-left: $value !important;
-	}
+        margin-bottom: $value !important;
+    }
+    .pr-#{$name} {
+        padding-right: $value !important;
+    }
+    .pl-#{$name} {
+        padding-left: $value !important;
+    }
     .pt-#{$name} {
-		padding-top: $value !important;
-	}
+        padding-top: $value !important;
+    }
     .pb-#{$name} {
-		padding-bottom: $value !important;
-	}
+        padding-bottom: $value !important;
+    }
 }
 
 a {
