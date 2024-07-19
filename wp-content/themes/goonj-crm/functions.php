@@ -60,7 +60,9 @@ function goonj_login_form_validation_errors( $string ) {
     }
 
     if ( isset( $_REQUEST['password-reset'] ) && $_REQUEST['password-reset'] === 'success'  ) {
-        return '<p class="password-message">You can now log-in using your email address and the password you\'ve already set.</p>';
+        return 
+        '<p class="fw-600 fz-16 mb-6">Your password has been set successful</p>
+        <p class="fw-400 fz-16 mt-0 mb-24">You can now login to your account using your new password</p>';
     }
 
     return $string;
