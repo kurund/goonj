@@ -80,7 +80,7 @@ function goonj_custom_password_reset_redirection( $errors, $user ) {
     if ( isset( $_POST['pass1'] ) && ! empty( $_POST['pass1'] ) ) {
         reset_password( $user, $_POST['pass1'] );
         $rp_cookie = 'wp-resetpass-' . COOKIEHASH;
-        $rp_path = preg_replace( '|https?://[^/]+|i', '', get_permalink( get_page_by_path( 'wp-login.php' ) ) );
+        list( $rp_path ) = explode( '?', wp_unslash( $_SERVER['REQUEST_URI'] ) );
         setcookie( $rp_cookie, ' ', time() - YEAR_IN_SECONDS, $rp_path, COOKIE_DOMAIN, is_ssl(), true );
         wp_redirect( add_query_arg( 'password-reset', 'success', home_url() ) );
         exit;
