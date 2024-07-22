@@ -146,7 +146,7 @@ function goonjcustom_civicrm_buildForm( $formName, $form ) {
                         });
 
                         // It takes time to load the form fields so adding a delay to run the js once form is loaded.
-                        setTimeout(updateCustomGroupVisibility, 500);
+                        setTimeout(updateCustomGroupVisibility, 1000);
                     });
                 ",
             ));
