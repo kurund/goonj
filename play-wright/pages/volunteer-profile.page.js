@@ -62,4 +62,9 @@ exports.VolunteerProfilePage = class VolunteerProfilePage {
     const volunteerHeader = 'li[data-name="Volunteers"] > a';
     await this.page.click(volunteerHeader);
   }
+
+  async clickAddButton() {
+    // Locate the submit button by its role and click it
+    await this.page.getByRole('button', { name: /Add/i }).click();
+  }
 }
