@@ -59,10 +59,32 @@ function goonj_login_form_validation_errors( $string ) {
         return '<p class="error">Login failed: Invalid username or password.</p>';
     }
 
+    if ( isset( $_REQUEST['password-reset'] ) && $_REQUEST['password-reset'] === 'success'  ) {
+        return 
+        '<p class="fw-600 fz-16 mb-6">Your password has been set successful</p>
+        <p class="fw-400 fz-16 mt-0 mb-24">You can now login to your account using your new password</p>';
+    }
+
     return $string;
 }
 
 add_action('login_form_rp', 'goonj_custom_reset_password_form');
 function goonj_custom_reset_password_form() {
     get_template_part('templates/password-reset');
+}
+
+add_action( 'validate_password_reset', 'goonj_custom_password_reset_redirection', 10, 2 );
+function goonj_custom_password_reset_redirection( $errors, $user ) {
+    if ( $errors->has_errors() ) {
+        return;
+    }
+
+    if ( isset( $_POST['pass1'] ) && ! empty( $_POST['pass1'] ) ) {
+        reset_password( $user, $_POST['pass1'] );
+        $rp_cookie = 'wp-resetpass-' . COOKIEHASH;
+        list( $rp_path ) = explode( '?', wp_unslash( $_SERVER['REQUEST_URI'] ) );
+        setcookie( $rp_cookie, ' ', time() - YEAR_IN_SECONDS, $rp_path, COOKIE_DOMAIN, is_ssl(), true );
+        wp_redirect( add_query_arg( 'password-reset', 'success', home_url() ) );
+        exit;
+    }
 }
