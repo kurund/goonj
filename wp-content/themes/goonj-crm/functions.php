@@ -99,12 +99,12 @@ function goonj_user_identification(){
 add_action('wp', 'handle_user_identification_form');
 function handle_user_identification_form() {
 	if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'user-identification') {
-		/// Retrieve the email and phone number from the POST data.
+		// Retrieve the email and phone number from the POST data
         $email = isset($_POST['email']) ? $_POST['email'] : '';
         $phone_number = isset($_POST['phone-number']) ? $_POST['phone-number'] : '';
     
         try {
-            // Find the contact ID based on email and phone number.
+            // Find the contact ID based on email and phone number
             $contactResult = civicrm_api3('Contact', 'get', [
                 'sequential' => 1,
                 'return' => ['id'],
@@ -127,7 +127,9 @@ function handle_user_identification_form() {
                 ]);
     
                 if (!empty($activityResult['values'])) {
-                    echo 'Yes, the user has completed the Volunteer induction activity.';
+                    // Redirect user to the collection camp URL with user ID.
+                    wp_redirect(get_home_url() . "/civicrm/collection-camp/?user_id=" . $contactId);
+                    exit;
                 } else {
                     echo 'No, the user has not completed the Volunteer induction activity.';
                 }
