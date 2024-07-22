@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { userDetails, userLogin, submitVolunteerRegistrationForm, searchAndVerifyContact  } from '../utils.js';
 import { VolunteerProfilePage } from '../pages/volunteer-profile.page';
 
-test('update status of volunteer from active to Lead', async ({ page }) => {
+test('update status of volunteer from Active to Lead', async ({ page }) => {
   const volunteerProfilePage = new VolunteerProfilePage(page);
   const individualContactType = 'Individual'
   const volunteerContactType = '- Volunteer'
