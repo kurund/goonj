@@ -99,26 +99,44 @@ function goonj_user_identification(){
 add_action('wp', 'handle_user_identification_form');
 function handle_user_identification_form() {
 	if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'user-identification') {
-		// Retrieve the email and phone number from the POST data.
-		$email = isset($_POST['email']) ? $_POST['email'] : '';
-		$phone_number = isset($_POST['phone-number']) ? $_POST['phone-number'] : '';
-
-		// Use CiviCRM API to check for the contact.
-		$result = civicrm_api3('Contact', 'get', [
-			'sequential' => 1,
-			'email' => $email,
-			'phone' => $phone_number,
-			'contact_sub_type' => ['IN' => ["Volunteer"]],
-		]);
-
-		// Display the result for now to check is the user is correct or not. Later on we modify the below code and redirect it to the collection camp if all the condition satisfies.
-		echo '<pre>';
-		if (!empty($result['values'])) {
-			echo 'User found:';
-			var_dump($result['values']);
-		} else {
-			echo 'User not found.';
-		}
-		echo '</pre>';
+		/// Retrieve the email and phone number from the POST data.
+        $email = isset($_POST['email']) ? $_POST['email'] : '';
+        $phone_number = isset($_POST['phone-number']) ? $_POST['phone-number'] : '';
+    
+        try {
+            // Find the contact ID based on email and phone number.
+            $contactResult = civicrm_api3('Contact', 'get', [
+                'sequential' => 1,
+                'return' => ['id'],
+                'email' => $email,
+                'phone' => $phone_number,
+                'is_deleted' => 0,
+                'contact_type' => 'Individual',
+            ]);
+    
+            if (!empty($contactResult['values'])) {
+                $contactId = $contactResult['values'][0]['id'];
+    
+                // Check if the contact has a completed "Induction" activity
+                $activityResult = civicrm_api3('Activity', 'get', [
+                    'sequential' => 1,
+                    'return' => ['id'],
+                    'contact_id' => $contactId,
+                    'activity_type_id' => ['IN' => [57]],
+                    'status_id' => ['IN' => [2]],
+                ]);
+    
+                if (!empty($activityResult['values'])) {
+                    echo 'Yes, the user has completed the Volunteer induction activity.';
+                } else {
+                    echo 'No, the user has not completed the Volunteer induction activity.';
+                }
+            } else {
+                echo 'No, the user not found or does not exist.';
+            }
+        } catch (CiviCRM_API3_Exception $e) {
+            $error = $e->getMessage();
+            echo "API error: $error";
+        }
 	}
 }
