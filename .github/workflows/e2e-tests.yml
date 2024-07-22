@@ -5,11 +5,11 @@ on:
     branches:
       - main
   schedule:
-    - cron: '0 22 * * 1-6'
+    - cron: '0 22 * * 1-6'  # Run at 22:00 from Monday to Saturday
 
 jobs:
   checkout-and-test:
-    if: contains(github.event.pull_request.labels.*.name, 'in review')
+    if: github.event_name == 'schedule' || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'in review'))
     timeout-minutes: 20
     runs-on: ubuntu-latest
     env:
