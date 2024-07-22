@@ -88,3 +88,10 @@ function goonj_custom_password_reset_redirection( $errors, $user ) {
         exit;
     }
 }
+
+add_action('template_redirect', 'goonj_user_identification');
+function goonj_user_identification(){
+    if (is_page('user-identification-form')) {
+        get_template_part('templates/user-identification');
+    }
+}
