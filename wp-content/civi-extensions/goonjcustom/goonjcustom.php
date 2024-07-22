@@ -125,6 +125,31 @@ function goonjcustom_civicrm_buildForm( $formName, $form ) {
 					$form->removeElement( $field );
 				}
 			}
+
+            CRM_Core_Region::instance('page-body')->add(array(
+                'script' => "
+                    CRM.$(function($) {
+                        function updateCustomGroupVisibility() {
+                            var selectedText = $('#status_id').find('option:selected').text();
+                            var customGroup = $('.custom-group-INDUCTION_DETAILS');
+
+                            if (selectedText === 'Completed') {
+                                customGroup.show();
+                                // TODO - need to add logic to handle required fields
+                            } else {
+                                customGroup.hide();
+                                // TODO - need to add logic to handle required fields
+                            }
+                        }
+                        $('#status_id').change(function() {
+                            updateCustomGroupVisibility();
+                        });
+
+                        // It takes time to load the form fields so adding a delay to run the js once form is loaded.
+                        setTimeout(updateCustomGroupVisibility, 500);
+                    });
+                ",
+            ));
 		}
 	}
 }
