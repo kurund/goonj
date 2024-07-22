@@ -98,8 +98,8 @@ function goonj_user_identification(){
 
 add_action('wp', 'goonj_handle_user_identification_form');
 function goonj_handle_user_identification_form() {
-	if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'user-identification') {
-		// Retrieve the email and phone number from the POST data
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'user-identification') {
+        // Retrieve the email and phone number from the POST data
         $email = isset($_POST['email']) ? $_POST['email'] : '';
         $phone_number = isset($_POST['phone-number']) ? $_POST['phone-number'] : '';
     
@@ -140,5 +140,5 @@ function goonj_handle_user_identification_form() {
             $error = $e->getMessage();
             echo "API error: $error";
         }
-	}
+    }
 }
