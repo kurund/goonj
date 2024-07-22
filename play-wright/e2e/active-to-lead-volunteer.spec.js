@@ -9,7 +9,7 @@ test('update status of volunteer from Active to Lead', async ({ page }) => {
   await submitVolunteerRegistrationForm(page, userDetails);
   await page.waitForTimeout(2000)
   await userLogin(page);
-  await searchAndVerifyContact(page, userDetails, contactType)
+  await searchAndVerifyContact(page, userDetails, individualContactType)
   page.locator('a.view-contact').click({force: true})
   await volunteerProfilePage.volunteerProfileTabs('activities');
   await page.waitForTimeout(2000)
@@ -26,7 +26,7 @@ test('update status of volunteer from Active to Lead', async ({ page }) => {
   await page.waitForTimeout(1000)
   expect(activeVolunteerRowSelector).toContain(userDetails.email)
   await page.waitForTimeout(1000)
-  await searchAndVerifyContact(page, userDetails, individualContactType)
+  await searchAndVerifyContact(page, userDetails, volunteerContactType)
   page.locator('a.view-contact').click({force: true})
   await volunteerProfilePage.volunteerProfileTabs('groups');
   await page.waitForTimeout(1000)
