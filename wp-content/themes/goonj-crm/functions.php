@@ -96,8 +96,8 @@ function goonj_user_identification(){
     }
 }
 
-add_action('wp', 'handle_user_identification_form');
-function handle_user_identification_form() {
+add_action('wp', 'goonj_handle_user_identification_form');
+function goonj_handle_user_identification_form() {
 	if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'user-identification') {
 		// Retrieve the email and phone number from the POST data
         $email = isset($_POST['email']) ? $_POST['email'] : '';
