@@ -67,4 +67,12 @@ exports.VolunteerProfilePage = class VolunteerProfilePage {
     // Locate the submit button by its role and click it
     await this.page.getByRole('button', { name: /Add/i }).click();
   }
+
+  async selectAddToGroupOption(optionText) {
+    await this.page.click('a.select2-choice.select2-default');
+    await this.page.fill('.select2-drop-active .select2-input', optionText);
+    await this.page.waitForTimeout(500);
+    const optionSelector = `.select2-drop-active .select2-results li div:has-text("${optionText}")`;
+    await this.page.click(optionSelector);
+  }
 }
