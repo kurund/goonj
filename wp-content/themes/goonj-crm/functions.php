@@ -88,3 +88,102 @@ function goonj_custom_password_reset_redirection( $errors, $user ) {
         exit;
     }
 }
+
+add_shortcode( 'goonj_check_user_form', 'goonj_check_user_action' );
+function goonj_check_user_action() {
+    ob_start();
+    $message = '';
+    if (isset($_GET['message'])) {
+        if ($_GET['message'] === 'waiting-induction') {
+            $message = '<p class="fw-600 fz-16 mb-6">Your induction process is pending.</p>
+                        <p class="fw-400 fz-16 mt-0 mb-24">Please check your email for further instructions.</p>';
+        }
+    }
+
+    // Pass the message to the template
+    set_query_var('goonj_pending_induction_message', $message);
+    get_template_part( 'templates/form', 'check-user' );
+    return ob_get_clean();
+}
+
+add_action('wp', 'goonj_handle_user_identification_form');
+function goonj_handle_user_identification_form() {
+    if ( ! isset( $_POST['action'] ) || $_POST['action'] !== 'goonj-check-user' ) {
+        return;
+    }
+
+    // Retrieve the email and phone number from the POST data
+    $email = $_POST['email'] ?? '';
+    $phone = $_POST['phone'] ?? '';
+
+    if ( empty( $phone ) || empty( $email ) ) {
+        return;
+    }
+
+    try {
+        // Find the contact ID based on email and phone number
+        $contactResult = civicrm_api3('Contact', 'get', [
+            'sequential' => 1,
+            'return' => ['id', 'contact_sub_type'],
+            'email' => $email,
+            'phone' => $phone,
+            'is_deleted' => 0,
+            'contact_type' => 'Individual',
+        ]);
+        $foundContacts = $contactResult['values'];
+        // If the user does not exist in the Goonj database then
+        // redirect to the volunteer registration form.
+        $volunteer_registration_form_path = '/volunteer-registration';
+        if ( empty( $foundContacts ) ) {
+            // We are currently hardcoding the path of the volunteer registration page.
+            // If this path changes, then this code needs to be updated.
+            wp_redirect( $volunteer_registration_form_path );
+            exit;
+        }
+
+        $contact = $foundContacts[0];
+
+        // If we are here, then it means the contact of type "Individual" exists.
+        // We need to now check if the contact sub_type is "Volunteer".
+        // If the Individual is not a Volunteer, then again we redirect it to
+        // volunteer registration form.
+        if ( ! in_array( 'Volunteer', $contact['contact_sub_type'] ) ) {
+            wp_redirect( $volunteer_registration_form_path );
+            exit;
+        }
+
+        // If we are here, then it means Volunteer exists in our system.
+        // Now we need to check if the volunteer is inducted or not.
+        // If the volunteer is not inducted,
+        //   1. Trigger an email for Induction 
+        //   2. Change volunteer status to "Waiting for Induction"
+        if ( ! goonj_is_volunteer_inducted( $contact ) ) {
+            // Use CiviCRM email API to send the induction email.
+            // Use CiviCRM contact API to update the contact status (custom data).
+            // Redirect back to the same page with a message.
+            wp_redirect( wp_get_referer() . '?message=waiting-induction' );
+            exit;
+        }
+
+        // If we are here, then it means the user exists as an inducted volunteer.
+        wp_redirect(get_home_url() . "/civicrm/collection-camp/?user_id=" . $contact['id'] );
+        exit;
+    } catch (CiviCRM_API3_Exception $e) {
+        $error = $e->getMessage();
+        echo "API error: $error";
+    }
+}
+
+function goonj_is_volunteer_inducted( $volunteer ) {
+    $activityResult = civicrm_api3('Activity', 'get', [
+        'sequential' => 1,
+        'return' => ['id'],
+        'contact_id' => $volunteer['id'],
+        'activity_type_id' => ['IN' => [57]], // hardcode ID of activity type "Induction"
+        'status_id' => ['IN' => [2]], // hardcode ID of activity status "Completed"
+    ]);
+
+    $foundCompletedInductionActivities = $activityResult['values'];
+
+    return ! empty( $foundCompletedInductionActivities );
+}
