@@ -2,7 +2,9 @@
 /**
  * Theme file to Design User Identification form
  */
-$message = get_query_var('goonj_message', '');
+
+// Retrieve the message from the global variable
+$message = get_query_var('goonj_pending_induction_message', '');
 ?>
 
 <div class="text-center">

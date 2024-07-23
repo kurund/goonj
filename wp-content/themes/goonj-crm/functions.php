@@ -101,7 +101,7 @@ function goonj_check_user_action() {
     }
 
     // Pass the message to the template
-    set_query_var('goonj_message', $message);
+    set_query_var('goonj_pending_induction_message', $message);
     get_template_part( 'templates/form', 'check-user' );
     return ob_get_clean();
 }
