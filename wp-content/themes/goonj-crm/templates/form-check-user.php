@@ -2,10 +2,16 @@
 /**
  * Theme file to Design User Identification form
  */
+$message = get_query_var('goonj_message', '');
 ?>
 
 <div class="text-center">
 	<form class="logged-out wp-block-loginout" action="<?php echo home_url(); ?>" method="POST">
+		<?php if ($message) : ?>
+				<div class="message">
+					<?php echo $message; ?>
+				</div>
+		<?php endif; ?>
 		<input type="hidden" name="action" value="goonj-check-user" />
 		<div class="d-grid">
 			<label for="email">Email</label>

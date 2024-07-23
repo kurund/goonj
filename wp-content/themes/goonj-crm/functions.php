@@ -92,6 +92,16 @@ function goonj_custom_password_reset_redirection( $errors, $user ) {
 add_shortcode( 'goonj_check_user_form', 'goonj_check_user_action' );
 function goonj_check_user_action() {
     ob_start();
+    $message = '';
+    if (isset($_GET['message'])) {
+        if ($_GET['message'] === 'waiting-induction') {
+            $message = '<p class="fw-600 fz-16 mb-6">Your induction process is pending.</p>
+                        <p class="fw-400 fz-16 mt-0 mb-24">Please check your email for further instructions.</p>';
+        }
+    }
+
+    // Pass the message to the template
+    set_query_var('goonj_message', $message);
     get_template_part( 'templates/form', 'check-user' );
     return ob_get_clean();
 }
