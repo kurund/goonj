@@ -161,7 +161,6 @@ function goonj_handle_user_identification_form() {
             // Use CiviCRM email API to send the induction email.
             // Use CiviCRM contact API to update the contact status (custom data).
             // Redirect back to the same page with a message.
-            var_dump("hello");
             wp_redirect( wp_get_referer() . '?message=waiting-induction' );
             exit;
         }
