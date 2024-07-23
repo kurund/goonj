@@ -89,73 +89,76 @@ function goonj_custom_password_reset_redirection( $errors, $user ) {
     }
 }
 
-add_action('template_redirect', 'goonj_user_identification');
-function goonj_user_identification(){
-    if (is_page('user-identification-form')) {
-        get_template_part('templates/user-identification');
-    }
+add_shortcode( 'goonj_check_user_form', 'goonj_check_user_action' );
+function goonj_check_user_action(){
+    get_template_part( 'templates/form', 'check-user' );
 }
 
 add_action('wp', 'goonj_handle_user_identification_form');
 function goonj_handle_user_identification_form() {
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'user-identification') {
-        // Retrieve the email and phone number from the POST data
-        $email = isset($_POST['email']) ? $_POST['email'] : '';
-        $phone_number = isset($_POST['phone-number']) ? $_POST['phone-number'] : '';
-    
-        try {
-            // Find the contact ID based on email and phone number
-            $contactResult = civicrm_api3('Contact', 'get', [
-                'sequential' => 1,
-                'return' => ['id'],
-                'email' => $email,
-                'phone' => $phone_number,
-                'is_deleted' => 0,
-                'contact_type' => 'Individual',
-            ]);
+    if ( ! isset( $_POST['action'] ) || $_POST['action'] !== 'goonj-check-user' ) {
+        return;
+    }
 
-            $foundContacts = $contactResult['values'];
+    // Retrieve the email and phone number from the POST data
+    $email = $_POST['email'] ?? '';
+    $phone = $_POST['phone'] ?? '';
 
-            // If the user does not exist in the Goonj database then
-            // redirect to the volunteer registration form.
-            if ( empty( $foundContacts ) ) {
-                // We are currently hardcoding the path of the volunteer registration page.
-                // If this path changes, then this code needs to be updated.
-                $volunteer_registration_form_path = '/volunteer-registration';
-                wp_redirect( $volunteer_registration_form_path );
-                exit;
-            }
+    if ( empty( $phone ) || empty( $email ) ) {
+        return;
+    }
 
-            $contact = $foundContacts[0];
+    try {
+        // Find the contact ID based on email and phone number
+        $contactResult = civicrm_api3('Contact', 'get', [
+            'sequential' => 1,
+            'return' => ['id', 'contact_sub_type'],
+            'email' => $email,
+            'phone' => $phone,
+            'is_deleted' => 0,
+            'contact_type' => 'Individual',
+        ]);
+        $foundContacts = $contactResult['values'];
 
-            // If we are here, then it means the contact of type "Individual" exists.
-            // We need to now check if the contact sub_type is "Volunteer".
-            // If the Individual is not a Volunteer, then again we redirect it to
-            // volunteer registration form.
-            if ( ! in_array( 'Volunteer', $contact['contact_sub_type'] ) ) {
-                wp_redirect( $volunteer_registration_form_path );
-                exit;
-            }
-
-            // If we are here, then it means Volunteer exists in our system.
-            // Now we need to check if the volunteer is inducted or not.
-            // If the volunteer is not inducted,
-            //   1. Trigger an email for Induction 
-            //   2. Change volunteer status to "Waiting for Induction"
-            if ( ! goonj_is_volunteer_inducted( $contact ) ) {
-                // Use CiviCRM email API to send the induction email.
-                // Use CiviCRM contact API to update the contact status (custom data).
-                // Redirect back to the same page with a message.
-                wp_redirect( wp_get_referer() . '?message=waiting-induction' );
-            }
-
-            // If we are here, then it means the user exists as an inducted volunteer.
-            wp_redirect(get_home_url() . "/civicrm/collection-camp/?user_id=" . $contact['id'] );
+        // If the user does not exist in the Goonj database then
+        // redirect to the volunteer registration form.
+        if ( empty( $foundContacts ) ) {
+            // We are currently hardcoding the path of the volunteer registration page.
+            // If this path changes, then this code needs to be updated.
+            $volunteer_registration_form_path = '/volunteer-registration';
+            wp_redirect( $volunteer_registration_form_path );
             exit;
-        } catch (CiviCRM_API3_Exception $e) {
-            $error = $e->getMessage();
-            echo "API error: $error";
         }
+
+        $contact = $foundContacts[0];
+
+        // If we are here, then it means the contact of type "Individual" exists.
+        // We need to now check if the contact sub_type is "Volunteer".
+        // If the Individual is not a Volunteer, then again we redirect it to
+        // volunteer registration form.
+        if ( ! in_array( 'Volunteer', $contact['contact_sub_type'] ) ) {
+            wp_redirect( $volunteer_registration_form_path );
+            exit;
+        }
+
+        // If we are here, then it means Volunteer exists in our system.
+        // Now we need to check if the volunteer is inducted or not.
+        // If the volunteer is not inducted,
+        //   1. Trigger an email for Induction 
+        //   2. Change volunteer status to "Waiting for Induction"
+        if ( ! goonj_is_volunteer_inducted( $contact ) ) {
+            // Use CiviCRM email API to send the induction email.
+            // Use CiviCRM contact API to update the contact status (custom data).
+            // Redirect back to the same page with a message.
+            wp_redirect( wp_get_referer() . '?message=waiting-induction' );
+        }
+
+        // If we are here, then it means the user exists as an inducted volunteer.
+        wp_redirect(get_home_url() . "/civicrm/collection-camp/?user_id=" . $contact['id'] );
+        exit;
+    } catch (CiviCRM_API3_Exception $e) {
+        $error = $e->getMessage();
+        echo "API error: $error";
     }
 }
 

@@ -5,16 +5,16 @@
 ?>
 
 <div class="text-center">
-	<form action="<?php echo esc_url($_SERVER['REQUEST_URI']); ?>" method="post">
-		<input type="hidden" name="action" value="user-identification" />
+	<form action="<?php echo esc_url($_SERVER['REQUEST_URI']); ?>" method="POST">
+		<input type="hidden" name="action" value="goonj-check-user" />
 		<div>
 			<label for="email">Email:</label>
 			<input type="email" id="email" name="email" required value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
 		</div>
 		<br>
 		<div>
-			<label for="phone-number">Phone Number:</label>
-			<input type="tel" id="phone-number" name="phone-number" required value="<?php echo isset($_POST['phone-number']) ? htmlspecialchars($_POST['phone-number']) : ''; ?>">
+			<label for="phone">Phone Number:</label>
+			<input type="tel" id="phone" name="phone" required value="<?php echo isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : ''; ?>">
 		</div>
 		<br>
 		<input type="submit" value="Submit">
