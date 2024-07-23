@@ -90,8 +90,10 @@ function goonj_custom_password_reset_redirection( $errors, $user ) {
 }
 
 add_shortcode( 'goonj_check_user_form', 'goonj_check_user_action' );
-function goonj_check_user_action(){
+function goonj_check_user_action() {
+    ob_start();
     get_template_part( 'templates/form', 'check-user' );
+    return ob_get_clean();
 }
 
 add_action('wp', 'goonj_handle_user_identification_form');
