@@ -130,10 +130,17 @@ function goonj_handle_user_identification_form() {
             'is_deleted' => 0,
             'contact_type' => 'Individual',
         ]);
+
         $foundContacts = $contactResult['values'];
         // If the user does not exist in the Goonj database then
         // redirect to the volunteer registration form.
-        $volunteer_registration_form_path = '/volunteer-registration';
+        $volunteer_registration_form_path = sprintf(
+            '/volunteer-registration/#?email=%1$s&phone=%2$s',
+            $email,
+            $phone,
+        );
+
+
         if ( empty( $foundContacts ) ) {
             // We are currently hardcoding the path of the volunteer registration page.
             // If this path changes, then this code needs to be updated.
