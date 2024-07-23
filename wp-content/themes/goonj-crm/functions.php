@@ -119,13 +119,12 @@ function goonj_handle_user_identification_form() {
             'contact_type' => 'Individual',
         ]);
         $foundContacts = $contactResult['values'];
-
         // If the user does not exist in the Goonj database then
         // redirect to the volunteer registration form.
+        $volunteer_registration_form_path = '/volunteer-registration';
         if ( empty( $foundContacts ) ) {
             // We are currently hardcoding the path of the volunteer registration page.
             // If this path changes, then this code needs to be updated.
-            $volunteer_registration_form_path = '/volunteer-registration';
             wp_redirect( $volunteer_registration_form_path );
             exit;
         }
@@ -150,7 +149,9 @@ function goonj_handle_user_identification_form() {
             // Use CiviCRM email API to send the induction email.
             // Use CiviCRM contact API to update the contact status (custom data).
             // Redirect back to the same page with a message.
+            var_dump("hello");
             wp_redirect( wp_get_referer() . '?message=waiting-induction' );
+            exit;
         }
 
         // If we are here, then it means the user exists as an inducted volunteer.
@@ -164,12 +165,12 @@ function goonj_handle_user_identification_form() {
 
 function goonj_is_volunteer_inducted( $volunteer ) {
     $activityResult = civicrm_api3('Activity', 'get', [
-                    'sequential' => 1,
-                    'return' => ['id'],
-                    'contact_id' => $volunteer['id'],
-                    'activity_type_id' => ['IN' => [57]], // hardcode ID of activity type "Induction"
-                    'status_id' => ['IN' => [2]], // hardcode ID of activity status "Completed"
-                ]);
+        'sequential' => 1,
+        'return' => ['id'],
+        'contact_id' => $volunteer['id'],
+        'activity_type_id' => ['IN' => [57]], // hardcode ID of activity type "Induction"
+        'status_id' => ['IN' => [2]], // hardcode ID of activity status "Completed"
+    ]);
 
     $foundCompletedInductionActivities = $activityResult['values'];
 
