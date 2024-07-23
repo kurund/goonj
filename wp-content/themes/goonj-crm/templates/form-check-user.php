@@ -5,7 +5,7 @@
 ?>
 
 <div class="text-center">
-	<form action="<?php echo esc_url($_SERVER['REQUEST_URI']); ?>" method="POST">
+	<form action="<?php echo home_url(); ?>" method="POST">
 		<input type="hidden" name="action" value="goonj-check-user" />
 		<div>
 			<label for="email">Email:</label>
