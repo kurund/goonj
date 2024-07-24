@@ -114,8 +114,15 @@ exports.VolunteerRegistrationPage =  class VolunteerRegistrationPage {
   {
     await this.otherSkills.fill(skills)
   }
-
+  
   getAppendedUrl(stringToAppend) {
     return this.url + stringToAppend;
+  }
+
+  async fillAndClearField(fieldName, value, clearValue = '') {
+    await this[fieldName](value);
+    await this.clickSubmitButton();
+    await this.page.waitForTimeout(2000);
+    await this[fieldName](clearValue);
   }
 }
