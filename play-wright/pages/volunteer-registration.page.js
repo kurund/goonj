@@ -91,9 +91,16 @@ exports.VolunteerRegistrationPage =  class VolunteerRegistrationPage {
   async selectVolunteerHours(hours) {
     await this.selectDropdownOption('#select2-chosen-8', '#s2id_autogen8_search', hours);
   }
-
+  
   async selectAndClearDropdownOption(dropdownSelector, inputField, option) {
     const closeIconSelector = `${dropdownSelector} + abbr.select2-search-choice-close`;
+    await this.selectDropdownOption(dropdownSelector, inputField, option);
+    await this.clickSubmitButton();
+    await this.page.click(closeIconSelector);
+  }
+
+  async selectAndClearMultipleDropdownOption(dropdownSelector, inputField, option) {
+    const closeIconSelector = `ul.select2-choices .select2-search-choice-close`
     await this.selectDropdownOption(dropdownSelector, inputField, option);
     await this.clickSubmitButton();
     await this.page.click(closeIconSelector);
@@ -116,15 +123,15 @@ exports.VolunteerRegistrationPage =  class VolunteerRegistrationPage {
   }
 
   async selectActivityInterestedAndClear(activity) {
-    await this.selectAndClearDropdownOption('#s2id_autogen5', '#s2id_autogen5', activity);
+    await this.selectAndClearMultipleDropdownOption('#s2id_autogen5', '#s2id_autogen5', activity);
   }
 
   async selectVoluntarySkillsAndClear(skill) {
-    await this.selectAndClearDropdownOption('#s2id_autogen7', '#s2id_autogen7', skill);
+    await this.selectAndClearMultipleDropdownOption('#s2id_autogen7', '#s2id_autogen7', skill);
   }
 
   async selectVolunteerMotivationAndClear(motivation) {
-    await this.selectAndClearDropdownOption('#s2id_autogen6', '#s2id_autogen6', motivation);
+    await this.selectAndClearMultipleDropdownOption('#s2id_autogen6', '#s2id_autogen6', motivation);
   }
 
   async selectVolunteerHoursAndClear(hours) {
