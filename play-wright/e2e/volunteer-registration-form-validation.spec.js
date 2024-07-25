@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
-import { userDetails, userLogin, submitVolunteerRegistrationForm, searchAndVerifyContact  } from '../utils.js';
+import { test } from '@playwright/test';
+import { userDetails } from '../utils.js';
 import { VolunteerRegistrationPage} from '../pages/volunteer-registration.page.js'
 
 
@@ -13,49 +13,27 @@ test('check mandatory field validation for registration form fields', async ({ p
   await volunteerRegistrationPage.fillAndClearField('enterLastName', userDetails.lastName);
   await volunteerRegistrationPage.fillAndClearField('enterEmail', userDetails.email);
   await volunteerRegistrationPage.fillAndClearField('enterMobileNumber', userDetails.mobileNumber);
-  await volunteerRegistrationPage.fillAndClearField('enterMobileNumber', userDetails.mobileNumber);
+  await volunteerRegistrationPage.selectGenderAndClear(userDetails.gender);
   await volunteerRegistrationPage.fillAndClearField('enterStreetAddress', userDetails.streetAddress);
   await volunteerRegistrationPage.fillAndClearField('enterCityName', userDetails.cityName);
   await volunteerRegistrationPage.fillAndClearField('enterPostalCode', userDetails.postalCode);
+  await volunteerRegistrationPage.selectCountry(userDetails.country) 
+  await volunteerRegistrationPage.selectStateAndClear(userDetails.state);
+  await volunteerRegistrationPage.selectCountryAndClear(userDetails.country);
+//   await volunteerRegistrationPage.selectActivityInterestedAndClear(userDetails.activityInterested);
+//   await volunteerRegistrationPage.selectVolunteerMotivationAndClear(userDetails.volunteerMotivation);
+//   await volunteerRegistrationPage.selectVoluntarySkillsAndClear(userDetails.voluntarySkills);
   await volunteerRegistrationPage.fillAndClearField('enterOtherSkills', userDetails.otherSkills);
-//   await volunteerRegistrationPage.enterFirstName(userDetails.firstName);
-//   await volunteerRegistrationPage.clickSubmitButton()
-//   await page.waitForTimeout(2000)
-//   await volunteerRegistrationPage.enterFirstName('')
-//   await volunteerRegistrationPage.enterLastName(userDetails.lastName);
-//   await volunteerRegistrationPage.clickSubmitButton()
-//   await page.waitForTimeout(2000)
-//   await volunteerRegistrationPage.enterLastName('')
-//   await volunteerRegistrationPage.enterEmail(userDetails.email);
-//   await volunteerRegistrationPage.clickSubmitButton()
-//   await page.waitForTimeout(2000)
-//   await volunteerRegistrationPage.enterEmail('')
-//   await volunteerRegistrationPage.enterMobileNumber(userDetails.mobileNumber);
-//   await volunteerRegistrationPage.clickSubmitButton()
-//   await volunteerRegistrationPage.clearMobileNumber()
-//   await volunteerRegistrationPage.selectCountry(userDetails.country);
-//   await volunteerRegistrationPage.clickSubmitButton()
-//   await volunteerRegistrationPage.clearFirstName()
-//   await volunteerRegistrationPage.selectGender(userDetails.gender);
-//   await volunteerRegistrationPage.clickSubmitButton()
-//   await volunteerRegistrationPage.enterStreetAddress(userDetails.streetAddress);
-//   await volunteerRegistrationPage.clickSubmitButton()
-//   await volunteerRegistrationPage.selectState(userDetails.state);
-//   await volunteerRegistrationPage.clickSubmitButton()
-//   await volunteerRegistrationPage.enterCityName(userDetails.cityName);
-//   await volunteerRegistrationPage.clickSubmitButton()
-//   await volunteerRegistrationPage.enterPostalCode(userDetails.postalCode);
-//   await volunteerRegistrationPage.clickSubmitButton()
-//   await volunteerRegistrationPage.selectActivityInterested(userDetails.activityInterested);
-//   await volunteerRegistrationPage.clickSubmitButton()
-//   await volunteerRegistrationPage.selectVolunteerMotivation(userDetails.volunteerMotivation);
-//   await volunteerRegistrationPage.clickSubmitButton()
-//   await volunteerRegistrationPage.selectVoluntarySkills(userDetails.voluntarySkills);
-//   await volunteerRegistrationPage.clickSubmitButton()
-//   await volunteerRegistrationPage.enterOtherSkills(userDetails.otherSkills);
-//   await volunteerRegistrationPage.clickSubmitButton()
-//   await volunteerRegistrationPage.selectVolunteerHours(userDetails.volunteerHours);
-//   await volunteerRegistrationPage.clickSubmitButton()
-//   await volunteerRegistrationPage.enterProfession(userDetails.profession);
-//   await volunteerRegistrationPage.clickSubmitButton()
+  await volunteerRegistrationPage.selectVolunteerHoursAndClear(userDetails.volunteerHours)
+  await volunteerRegistrationPage.fillAndClearField('enterProfession', userDetails.profession);
 });
+
+// await volunteerRegistrationPage.selectCountry(userDetails.country);
+//   await volunteerRegistrationPage.enterMobileNumber(userDetails.mobileNumber);
+//   await page.waitForTimeout(200);
+//   await volunteerRegistrationPage.selectGender(userDetails.gender);
+//   await volunteerRegistrationPage.enterStreetAddress(userDetails.streetAddress);
+//   await page.waitForTimeout(200);
+//   await volunteerRegistrationPage.enterCityName(userDetails.cityName);
+//   await page.waitForTimeout(200);
+//   await volunteerRegistrationPage.enterPostalCode(userDetails.postalCode);
