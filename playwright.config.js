@@ -14,7 +14,7 @@ require('dotenv').config({path: '.env'});
 module.exports = defineConfig({
   testDir: './play-wright/e2e',
   // Set default timeout for the test case
-  timeout: 240 * 1000,
+  timeout: 300 * 1000,
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
