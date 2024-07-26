@@ -27,10 +27,8 @@ jobs:
       run: npm ci
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
-    - name: Run Playwright tests and generate report
-      run: npx playwright test --reporter=html
-    # - name: Run Playwright tests
-    #   run: npx playwright test
+    - name: Run Playwright tests
+      run: npx playwright test
     - name: Install 7-Zip
       run: sudo apt-get install p7zip-full
     - name: Password protect playwright report
