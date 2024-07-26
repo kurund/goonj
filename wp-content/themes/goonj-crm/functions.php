@@ -211,6 +211,16 @@ function goonj_handle_collection_camp_form() {
     }
 }
 
+function decode_jwt($jwt) {
+    try {
+        // Decode without specifying key ID, just the key
+        $decoded = JWT::decode($jwt, new Key(JWT_SECRET_KEY, 'HS256'));
+        return (array) $decoded;
+    } catch (Exception $e) {
+        return ['error' => $e->getMessage()];
+    }
+}
+
 function goonj_is_volunteer_inducted( $volunteer ) {
     $activityResult = civicrm_api3('Activity', 'get', [
         'sequential' => 1,
@@ -223,14 +233,4 @@ function goonj_is_volunteer_inducted( $volunteer ) {
     $foundCompletedInductionActivities = $activityResult['values'];
 
     return ! empty( $foundCompletedInductionActivities );
-}
-
-function decode_jwt($jwt) {
-    try {
-        // Decode without specifying key ID, just the key
-        $decoded = JWT::decode($jwt, new Key(JWT_SECRET_KEY, 'HS256'));
-        return (array) $decoded;
-    } catch (Exception $e) {
-        return ['error' => $e->getMessage()];
-    }
 }
