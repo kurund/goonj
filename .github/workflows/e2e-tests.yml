@@ -27,8 +27,12 @@ jobs:
       run: npm ci
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
-    - name: Run Playwright tests
-      run: npx playwright test
+    - name: Install GitHub Actions Reporter
+      run: npm install @estruyf/github-actions-reporter
+    - name: Run Playwright tests with GitHub Actions Reporter
+      run: npx playwright test --reporter=@estruyf/github-actions-reporter
+    # - name: Run Playwright tests
+    #   run: npx playwright test
     - name: Install 7-Zip
       run: sudo apt-get install p7zip-full
     - name: Password protect playwright report
