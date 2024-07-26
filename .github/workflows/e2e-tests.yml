@@ -27,10 +27,8 @@ jobs:
       run: npm ci
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
-    - name: Install GitHub Actions Reporter
-      run: npm install @estruyf/github-actions-reporter
-    - name: Run Playwright tests with GitHub Actions Reporter
-      run: npx playwright test --reporter=@estruyf/github-actions-reporter
+    - name: Run Playwright tests and generate report
+      run: npx playwright test --reporter=html
     # - name: Run Playwright tests
     #   run: npx playwright test
     - name: Install 7-Zip

@@ -24,14 +24,7 @@ module.exports = defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 9 : 9,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  // reporter: 'html',
-  reporter: [
-    ['@estruyf/github-actions-reporter', {
-      title: 'My custom title',
-      useDetails: true,
-      showError: true
-    }]
-  ],
+  reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
