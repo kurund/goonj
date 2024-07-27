@@ -26,18 +26,14 @@ jobs:
     - name: Install dependencies
       run: npm ci
     - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
+      run: npx playwright install --with-deps  
     - name: Run Playwright tests
-      run: npx playwright test
-    - name: Prepare Report for Upload
-      run: |
-        mkdir -p ./report-output
-        if [ -f ./ctrf/playwright-report.json ]; then
-          cp ./ctrf/playwright-report.json ./report-output/
-        else
-          echo "Report file not found"
-          exit 1
-        fi
+    #   run: npx playwright test
+      run: PLAYWRIGHT_JSON_OUTPUT_NAME=results.json npx playwright test --reporter json
+    - uses: daun/playwright-report-summary@v3
+      if: always()
+      with:
+        report-file: results.json
     - name: Install 7-Zip
       run: sudo apt-get install p7zip-full
     - name: Password protect playwright report
@@ -52,6 +48,3 @@ jobs:
         name: playwright-report
         path: ./playwright-protected/playwright-report.7z
         retention-days: 7
-    - name: Report URL
-      if: always()
-      run: echo "Report can be downloaded from [this link](https://github.com/${{ github.repository }}/suites/${{ github.run_id }}/artifacts)"
