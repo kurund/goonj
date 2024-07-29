@@ -11,12 +11,8 @@ test('schedule induction and update induction status as completed', async ({ pag
   await searchAndVerifyContact(page, userDetails, contactType)
   page.locator('a.view-contact').click({force: true})
   await volunteerProfilePage.volunteerProfileTabs('activities');
-  await page.waitForTimeout(2000)
-  await volunteerProfilePage.clickActivitiesActionButton('Induction', 'Scheduled', 'Edit');
-  await page.waitForTimeout(4000)
-  await volunteerProfilePage.selectActivityStatusValue('Completed');
-  await page.waitForTimeout(2000)
-  await volunteerProfilePage.clickDialogButton('save');
+  await volunteerProfilePage.updateInductionForm('Induction', 'To be scheduled', 'Edit', 'Scheduled', 'save')
+  await volunteerProfilePage.updateInductionForm('Induction', 'Scheduled', 'Edit', 'Completed', 'save')
   await page.click('a:has-text("Volunteers")');
   await page.waitForTimeout(3000)
   await volunteerProfilePage.clickVolunteerSuboption('Active')
@@ -24,5 +20,4 @@ test('schedule induction and update induction status as completed', async ({ pag
   const activeVolunteerRowSelector = `table tbody tr:has(span[title="${userDetails.email}"])`;
   await page.waitForTimeout(1000)
   expect(activeVolunteerRowSelector).toContain(userDetails.email)
-
 });

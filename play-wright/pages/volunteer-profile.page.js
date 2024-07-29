@@ -54,7 +54,7 @@ exports.VolunteerProfilePage = class VolunteerProfilePage {
   }
 
   async clickVolunteerSuboption(option) {
-    const suboption = `li[data-name="${option}"] > a`;
+    const suboption = `[data-name="${option}"]`;
     await this.page.click(suboption);
   }
 
@@ -74,5 +74,15 @@ exports.VolunteerProfilePage = class VolunteerProfilePage {
     await this.page.waitForTimeout(500);
     const optionSelector = `.select2-drop-active .select2-results li div:has-text("${optionText}")`;
     await this.page.click(optionSelector);
+  }
+
+  async updateInductionForm(activityName, currentStatus, action, newStatus, buttonText) {
+    await this.page.waitForTimeout(2000)
+    await this.clickActivitiesActionButton(activityName, currentStatus, action);
+    await this.page.waitForTimeout(2000);
+    await this.selectActivityStatusValue(newStatus);
+    await this.page.waitForTimeout(2000);
+    await this.clickDialogButton(buttonText);
+    await this.page.waitForTimeout(3000)
   }
 }
