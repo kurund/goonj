@@ -126,30 +126,30 @@ function goonjcustom_civicrm_buildForm( $formName, $form ) {
 				}
 			}
 
-            CRM_Core_Region::instance('page-body')->add(array(
-                'script' => "
-                    CRM.$(function($) {
-                        function updateCustomGroupVisibility() {
-                            var selectedText = $('#status_id').find('option:selected').text();
-                            var customGroup = $('.custom-group-INDUCTION_DETAILS');
+			CRM_Core_Region::instance('page-body')->add(array(
+				'script' => "
+					CRM.$(function($) {
+						function updateCustomGroupVisibility() {
+							var selectedText = $('#status_id').find('option:selected').text();
+							var customGroup = $('.custom-group-INDUCTION_DETAILS');
 
-                            if (selectedText === 'Completed') {
-                                customGroup.show();
-                                // TODO - need to add logic to handle required fields
-                            } else {
-                                customGroup.hide();
-                                // TODO - need to add logic to handle required fields
-                            }
-                        }
-                        $('#status_id').change(function() {
-                            updateCustomGroupVisibility();
-                        });
+							if (selectedText === 'Completed') {
+								customGroup.show();
+								// TODO - need to add logic to handle required fields
+							} else {
+								customGroup.hide();
+								// TODO - need to add logic to handle required fields
+							}
+						}
+						$('#status_id').change(function() {
+							updateCustomGroupVisibility();
+						});
 
-                        // It takes time to load the form fields so adding a delay to run the js once form is loaded.
-                        setTimeout(updateCustomGroupVisibility, 500);
-                    });
-                ",
-            ));
+						// It takes time to load the form fields so adding a delay to run the js once form is loaded.
+						setTimeout(updateCustomGroupVisibility, 500);
+					});
+				",
+			));
 		}
 	}
 }
@@ -159,43 +159,68 @@ function goonjcustom_civicrm_pageRun( &$page ) {
 	CRM_Core_Region::instance( 'page-footer' )->add(
 		array(
 			'script' => '
-              (function($) {
-                  $(document).ajaxComplete(function(event, xhr, settings) {
-                    var isInductionActivity = false;
-                    var urlParams = new URLSearchParams(settings.url);
-                    var activityTypeId = "57";
+			  (function($) {
+				  $(document).ajaxComplete(function(event, xhr, settings) {
+					var isInductionActivity = false;
+					var isCollectionCampActivity = false;
+					var urlParams = new URLSearchParams(settings.url);
+					var activityTypeId57 = "57";
+					var activityTypeId61 = "61";
 
-                    if ((urlParams.get("atype") === activityTypeId && urlParams.get("action") === "view") ||
-                        (urlParams.get("subType") === activityTypeId && urlParams.get("action") === "2")) {
-                        isInductionActivity = true;
-                    }
+					if ((urlParams.get("atype") === activityTypeId57 && urlParams.get("action") === "view") ||
+						(urlParams.get("subType") === activityTypeId57 && urlParams.get("action") === "2")) {
+						isInductionActivity = true;
+					}
 
-                    if (isInductionActivity) {
-                      var fieldsToRemove = [
-                          ".crm-activity-form-block-subject",
-                          ".crm-activity-form-block-campaign_id",
-                          ".crm-activity-form-block-engagement_level",
-                          ".crm-activity-form-block-duration",
-                          ".crm-activity-form-block-priority_id",
-                          ".crm-activity-form-block-location",
-                          ".crm-activity-form-block-attachment",
-                          ".crm-activity-form-block-recurring_activity",
-                          ".crm-activity-form-block-recurring_activity",
-                          ".crm-activity-form-block-schedule_followup",
-                      ];
+					if ((urlParams.get("atype") === activityTypeId61 && urlParams.get("action") === "view") ||
+						(urlParams.get("subType") === activityTypeId61 && urlParams.get("action") === "2")) {
+						isCollectionCampActivity = true;
+					}
 
-                      fieldsToRemove.forEach(function(field) {
-                          $(field).remove();
-                      });
+					if (isInductionActivity || isCollectionCampActivity) {
+					  var fieldsToRemove = [];
 
-                      var inductionFields = $(".custom-group-Induction_Fields tr");
+					  if (isInductionActivity) {
+						  fieldsToRemove = [
+							  ".crm-activity-form-block-subject",
+							  ".crm-activity-form-block-campaign_id",
+							  ".crm-activity-form-block-engagement_level",
+							  ".crm-activity-form-block-duration",
+							  ".crm-activity-form-block-priority_id",
+							  ".crm-activity-form-block-location",
+							  ".crm-activity-form-block-attachment",
+							  ".crm-activity-form-block-recurring_activity",
+							  ".crm-activity-form-block-schedule_followup",
+						  ];
+					  } else if (isCollectionCampActivity) {
+						  fieldsToRemove = [
+							  ".crm-activity-form-block-subject",
+							  ".crm-activity-form-block-campaign_id",
+							  ".crm-activity-form-block-engagement_level",
+							  ".crm-activity-form-block-duration",
+							  ".crm-activity-form-block-priority_id",
+							  ".crm-activity-form-block-location",
+							  ".crm-activity-form-block-attachment",
+							  ".crm-activity-form-block-recurring_activity",
+							  ".crm-activity-form-block-schedule_followup",
+							  ".crm-activity-form-block-target_contact_id",
+							  ".crm-activity-form-block-assignee_contact_id",
+						  ];
+					  }
 
-                      $(".crm-activity-form-block-activity_date_time").after(inductionFields);
-                      $(".custom-group-Induction_Fields").remove();
-                    }
-                  });
-              })(CRM.$);
-          ',
+						fieldsToRemove.forEach(function(field) {
+							$(field).remove();
+						});
+
+					  if (isInductionActivity) {
+						  var inductionFields = $(".custom-group-Induction_Fields tr");
+						  $(".crm-activity-form-block-activity_date_time").after(inductionFields);
+						  $(".custom-group-Induction_Fields").remove();
+					  }
+					}
+				  });
+			  })(CRM.$);
+		  ',
 		)
 	);
 }
