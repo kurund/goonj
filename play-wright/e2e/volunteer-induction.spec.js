@@ -12,7 +12,7 @@ test.describe('Volunteer Induction Tests', () => {
     await page.waitForTimeout(2000);
     await userLogin(page);
     await searchAndVerifyContact(page, userDetails, contactType);
-    await page.locator('a.view-contact').click({ force: true });
+    // await page.locator('a.view-contact').click({ force: true });
   });
 
   test('schedule induction and update induction status as completed', async ({ page }) => {
@@ -22,10 +22,13 @@ test.describe('Volunteer Induction Tests', () => {
     await page.click('a:has-text("Volunteers")');
     await page.waitForTimeout(3000)
     await volunteerProfilePage.clickVolunteerSuboption('Active')
-    await page.waitForTimeout(2000)
-    const activeVolunteerRowSelector = `table tbody tr:has(span[title="${userDetails.email}"])`;
-    await page.waitForTimeout(2000)
-    expect(activeVolunteerRowSelector).toContain(userDetails.email)
+    await page.waitForTimeout(5000)
+    const emailSelector = 'td[data-field-name=""] span.ng-binding.ng-scope';
+    const emailAddress = await page.$$eval(emailSelector, nodes =>
+      nodes.map(n => n.innerText.trim())
+    );
+    const userEmailAddress = userDetails.email.toLowerCase()
+    expect(emailAddress).toContain(userEmailAddress)
   });
 
 });
