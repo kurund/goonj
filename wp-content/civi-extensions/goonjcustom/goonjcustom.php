@@ -190,12 +190,9 @@ function goonjcustom_civicrm_pageRun( &$page ) {
 							  ".crm-activity-form-block-location",
 							  ".crm-activity-form-block-attachment",
 							  ".crm-activity-form-block-recurring_activity",
-							  ".crm-activity-form-block-recurring_activity",
 							  ".crm-activity-form-block-schedule_followup",
 						  ];
-					  }
-
-					  if (isCollectionCampActivity) {
+					  } else if (isCollectionCampActivity) {
 						  fieldsToRemove = [
 							  ".crm-activity-form-block-subject",
 							  ".crm-activity-form-block-campaign_id",
