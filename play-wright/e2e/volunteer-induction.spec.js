@@ -31,4 +31,19 @@ test.describe('Volunteer Induction Tests', () => {
     expect(emailAddress).toContain(userEmailAddress)
   });
 
+  test('schedule induction and update induction status as cancelled', async ({ page }) => {
+    await volunteerProfilePage.volunteerProfileTabs('activities');
+    await volunteerProfilePage.updateInductionForm('Induction', 'To be scheduled', 'Edit', 'Cancelled', 'save')
+    await page.click('a:has-text("Volunteers")');
+    await page.waitForTimeout(3000)
+    await volunteerProfilePage.clickVolunteerSuboption('Active')
+     await page.waitForTimeout(5000)
+    const emailSelector = 'td[data-field-name=""] span.ng-binding.ng-scope';
+    const emailAddress = await page.$$eval(emailSelector, nodes =>
+      nodes.map(n => n.innerText.trim())
+    );
+    const userEmailAddress = userDetails.email.toLowerCase()
+    expect(emailAddress).not.toContain(userEmailAddress)
+  });
+
 });
