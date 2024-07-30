@@ -16,7 +16,7 @@ test('Add a volunteer to Lead Volunteer group', async ({ page }) => {
   await page.click('a:has-text("Volunteers")');
   await page.waitForTimeout(3000)
   await volunteerProfilePage.clickVolunteerSuboption('Active')
-  await page.waitForTimeout(6000)
+  await page.waitForTimeout(8000)
   const emailSelector = 'td[data-field-name=""] span.ng-binding.ng-scope';
   const emailAddress = await page.$$eval(emailSelector, nodes =>
     nodes.map(n => n.innerText.trim())

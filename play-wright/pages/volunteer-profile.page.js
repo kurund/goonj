@@ -50,7 +50,7 @@ exports.VolunteerProfilePage = class VolunteerProfilePage {
 
   async selectActivityStatusValue(value) {
     await this.page.click(`#s2id_status_id .select2-choice`);
-    await this.page.waitForTimeout(800);
+    await this.page.waitForTimeout(1000);
     await this.page.click(`.select2-results li:has-text("${value}")`);
   }
 
