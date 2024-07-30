@@ -38,7 +38,7 @@ module.exports = defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
-    // {
+    // {  //disabled as test case failing on multiple browsers
     //   name: 'chromium',
     //   use: { ...devices['Desktop Chrome'] },
     // },
