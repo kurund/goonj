@@ -205,6 +205,8 @@ function goonjcustom_civicrm_pageRun( &$page ) {
 							  ".crm-activity-form-block-schedule_followup",
 							  ".crm-activity-form-block-target_contact_id",
 							  ".crm-activity-form-block-assignee_contact_id",
+							  ".crm-activity-form-block-activity_date_time",
+							  ".crm-activity-form-block-details",
 						  ];
 					  }
 
