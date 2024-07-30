@@ -129,17 +129,13 @@ function goonj_handle_user_identification_form() {
             'phone' => $phone,
             'is_deleted' => 0,
             'contact_type' => 'Individual',
+            'contact_sub_type' => 'Volunteer'
         ]);
 
         $foundContacts = $contactResult['values'];
 
-        // Filter contacts to get those with the 'Volunteer' contact subtype
-        $volunteerContacts = array_filter($foundContacts, function($contact) {
-            return is_array($contact['contact_sub_type']) && in_array('Volunteer', $contact['contact_sub_type']);
-        });
-
         // If the user does not exist in the Goonj database 
-        // and dont have Volunteer contact type then
+        // and does not have the Volunteer contact type then
         // redirect to the volunteer registration form.
         $volunteer_registration_form_path = sprintf(
             '/volunteer-registration/#?email=%1$s&phone=%2$s',
@@ -147,8 +143,7 @@ function goonj_handle_user_identification_form() {
             $phone,
         );
 
-
-        if ( empty( $volunteerContacts ) ) {
+        if ( empty( $foundContacts ) ) {
             // We are currently hardcoding the path of the volunteer registration page.
             // If this path changes, then this code needs to be updated.
             wp_redirect( $volunteer_registration_form_path );
