@@ -9,7 +9,7 @@ function goonj_enqueue_scripts() {
         wp_get_theme()->get('Version')
     );
     wp_enqueue_script(
-        'goonj-style',
+        'goonj-script',
         get_template_directory_uri() . '/main.js',
         array(),
         wp_get_theme()->get('Version')
