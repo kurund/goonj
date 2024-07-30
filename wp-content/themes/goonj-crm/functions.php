@@ -8,6 +8,12 @@ function goonj_enqueue_scripts() {
         array(),
         wp_get_theme()->get('Version')
     );
+    wp_enqueue_script(
+        'goonj-style',
+        get_template_directory_uri() . '/main.js',
+        array(),
+        wp_get_theme()->get('Version')
+    );
 }
 
 
@@ -138,9 +144,10 @@ function goonj_handle_user_identification_form() {
         // and does not have the Volunteer contact type then
         // redirect to the volunteer registration form.
         $volunteer_registration_form_path = sprintf(
-            '/volunteer-registration/#?email=%1$s&phone=%2$s',
+            '/volunteer-registration/#?email=%s&phone=%s&message=%s',
             $email,
             $phone,
+            'not-inducted-volunteer'
         );
 
         if ( empty( $foundContacts ) ) {
@@ -199,3 +206,8 @@ function goonj_is_volunteer_inducted( $volunteer ) {
 
     return ! empty( $foundCompletedInductionActivities );
 }
+
+function goonj_custom_message_placeholder() {
+    return '<div id="custom-message" class="ml-24"></div>';
+}
+add_shortcode('goonj_volunteer_message', 'goonj_custom_message_placeholder');
