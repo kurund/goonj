@@ -27,8 +27,8 @@ jobs:
       run: npm ci
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps  
-    - name: Install GitHub Actions Reporter
-      run: npm install --save-dev @estruyf/github-actions-reporter
+    # - name: Install GitHub Actions Reporter
+    #   run: npm install --save-dev @estruyf/github-actions-reporter
     - name: Run Playwright tests
       run: npx playwright test
     - name: Install 7-Zip
@@ -45,8 +45,8 @@ jobs:
         name: playwright-report
         path: ./playwright-protected/playwright-report.7z
         retention-days: 7
-    - name: Upload Report Summary
-      if: always()
-      run: |
-        echo "#### Playwright Test Report" >> $GITHUB_STEP_SUMMARY
-        echo "[Download protected report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+    # - name: Upload Report Summary
+    #   if: always()
+    #   run: |
+    #     echo "#### Playwright Test Report" >> $GITHUB_STEP_SUMMARY
+    #     echo "[Download protected report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
