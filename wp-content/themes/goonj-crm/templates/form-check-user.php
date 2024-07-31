@@ -17,12 +17,12 @@ $message = get_query_var('goonj_pending_induction_message', '');
 		<input type="hidden" name="action" value="goonj-check-user" />
 		<?php if (!$message) : ?>
 			<div class="d-grid">
-				<label for="email">Email</label>
+				<label class="font-sans" for="email">Email</label>
 				<input type="email" id="email" name="email" required value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
 			</div>
 			<br>
 			<div class="d-grid">
-				<label for="phone">Phone Number</label>
+				<label class="font-sans" for="phone">Phone Number</label>
 				<input type="tel" id="phone" name="phone" required value="<?php echo isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : ''; ?>">
 			</div>
 			<br>
