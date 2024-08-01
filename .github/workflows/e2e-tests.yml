@@ -61,6 +61,7 @@ jobs:
                 - **Duration:** ${(stats.duration / 1000).toFixed(2)} seconds
                 - **Start Time:** ${new Date(stats.startTime).toLocaleString()}
               `;
+              
               console.log(summary); // For debugging
               core.summary.addRaw(summary).write();
             } catch (error) {
