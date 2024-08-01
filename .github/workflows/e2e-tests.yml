@@ -35,7 +35,7 @@ jobs:
     - uses: daun/playwright-report-summary@v3
       if: always()
       with:
-        report-file: results.json
+        report-file: ./playwright-report/results.json
         comment-title: 'Playwright Test Results'
         icon-style: 'octicons'
     # - name: Install xunit-viewer
