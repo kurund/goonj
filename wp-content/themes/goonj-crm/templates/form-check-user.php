@@ -18,12 +18,12 @@ $message = get_query_var('goonj_pending_induction_message', '');
 		<?php if (!$message) : ?>
 			<div class="d-grid">
 				<label class="font-sans" for="email">Email</label>
-				<input type="email" id="email" name="email" required value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
+				<input type="email" id="email" name="email" required value="<?php echo isset($_POST['email']) ? esc_attr(sanitize_email($_POST['email'])) : ''; ?>">
 			</div>
 			<br>
 			<div class="d-grid">
 				<label class="font-sans" for="phone">Phone Number</label>
-				<input type="tel" id="phone" name="phone" required value="<?php echo isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : ''; ?>">
+				<input type="tel" id="phone" name="phone" required value="<?php echo isset($_POST['phone']) ? esc_attr(sanitize_text_field($_POST['phone'])) : ''; ?>">
 			</div>
 			<br>
 			<p class="login-submit">
