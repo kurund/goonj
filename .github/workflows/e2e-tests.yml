@@ -27,17 +27,37 @@ jobs:
       run: npm ci
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps  
-    # - name: Install GitHub Actions Reporter
-    #   run: npm install --save-dev @estruyf/github-actions-reporter
     - name: Run Playwright tests
       # run: npx playwright test
       run: npx playwright test play-wright/e2e/volunteer-registration.spec.js
-    - uses: daun/playwright-report-summary@v3
+    # - uses: daun/playwright-report-summary@v3
+    #   if: always()
+    #   with:
+    #     report-file: ./playwright-report/results.json
+    - name: Parse and Display JSON Summary
+      uses: actions/github-script@v6
       if: always()
       with:
-        report-file: ./playwright-report/results.json
-        comment-title: 'Playwright Test Results'
-        icon-style: 'octicons'
+        script: |
+          const fs = require('fs');
+          const path = './playwright-report/results.json';
+          if (fs.existsSync(path)) {
+            const results = JSON.parse(fs.readFileSync(path, 'utf8'));
+            const total = results.suites.reduce((acc, suite) => acc + suite.tests.length, 0);
+            const passed = results.suites.reduce((acc, suite) => acc + suite.tests.filter(test => test.status === 'passed').length, 0);
+            const failed = results.suites.reduce((acc, suite) => acc + suite.tests.filter(test => test.status === 'failed').length, 0);
+            const skipped = results.suites.reduce((acc, suite) => acc + suite.tests.filter(test => test.status === 'skipped').length, 0);
+            const summary = `
+              ## Playwright Test Summary
+              - **Total Tests:** ${total}
+              - **Passed:** ${passed}
+              - **Failed:** ${failed}
+              - **Skipped:** ${skipped}
+            `;
+            core.summary.addRaw(summary).write();
+          } else {
+            core.setFailed('results.json file not found.');
+          }
     # - name: Install xunit-viewer
     #   run: npm install -g xunit-viewer
     # - name: Generate XUnit report summary
