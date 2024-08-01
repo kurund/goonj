@@ -41,20 +41,31 @@ jobs:
         script: |
           const fs = require('fs');
           const path = './playwright-report/results.json';
+          
           if (fs.existsSync(path)) {
-            const results = JSON.parse(fs.readFileSync(path, 'utf8'));
-            const total = results.suites.reduce((acc, suite) => acc + suite.tests.length, 0);
-            const passed = results.suites.reduce((acc, suite) => acc + suite.tests.filter(test => test.status === 'passed').length, 0);
-            const failed = results.suites.reduce((acc, suite) => acc + suite.tests.filter(test => test.status === 'failed').length, 0);
-            const skipped = results.suites.reduce((acc, suite) => acc + suite.tests.filter(test => test.status === 'skipped').length, 0);
-            const summary = `
-              ## Playwright Test Summary
-              - **Total Tests:** ${total}
-              - **Passed:** ${passed}
-              - **Failed:** ${failed}
-              - **Skipped:** ${skipped}
-            `;
-            core.summary.addRaw(summary).write();
+            try {
+              const results = JSON.parse(fs.readFileSync(path, 'utf8'));
+              
+              const stats = results.stats || {};
+              const suites = results.suites || [];
+              
+              const totalTests = suites.reduce((acc, suite) => acc + suite.specs.reduce((acc, spec) => acc + spec.tests.length, 0), 0);
+              const passedTests = suites.reduce((acc, suite) => acc + suite.specs.reduce((acc, spec) => acc + spec.tests.filter(test => test.results.every(result => result.status === 'passed')).length, 0), 0);
+              const failedTests = suites.reduce((acc, suite) => acc + suite.specs.reduce((acc, spec) => acc + spec.tests.filter(test => test.results.some(result => result.status === 'failed')).length, 0), 0);
+
+              const summary = `
+                ## Playwright Test Summary
+                - **Total Tests:** ${totalTests}
+                - **Passed:** ${passedTests}
+                - **Failed:** ${failedTests}
+                - **Duration:** ${(stats.duration / 1000).toFixed(2)} seconds
+                - **Start Time:** ${new Date(stats.startTime).toLocaleString()}
+              `;
+              console.log(summary); // For debugging
+              core.summary.addRaw(summary).write();
+            } catch (error) {
+              core.setFailed(`Error parsing results.json: ${error.message}`);
+            }
           } else {
             core.setFailed('results.json file not found.');
           }
