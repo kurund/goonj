@@ -178,10 +178,10 @@ function goonjcustom_civicrm_pageRun( &$page ) {
 					}
 
 					if (isInductionActivity || isCollectionCampActivity) {
-					  var fieldsToRemove = [];
+					  var fieldsToHide = [];
 
 					  if (isInductionActivity) {
-						  fieldsToRemove = [
+						  fieldsToHide = [
 							  ".crm-activity-form-block-subject",
 							  ".crm-activity-form-block-campaign_id",
 							  ".crm-activity-form-block-engagement_level",
@@ -193,7 +193,7 @@ function goonjcustom_civicrm_pageRun( &$page ) {
 							  ".crm-activity-form-block-schedule_followup",
 						  ];
 					  } else if (isCollectionCampActivity) {
-						  fieldsToRemove = [
+						  fieldsToHide = [
 							  ".crm-activity-form-block-subject",
 							  ".crm-activity-form-block-campaign_id",
 							  ".crm-activity-form-block-engagement_level",
@@ -210,8 +210,8 @@ function goonjcustom_civicrm_pageRun( &$page ) {
 						  ];
 					  }
 
-						fieldsToRemove.forEach(function(field) {
-							$(field).remove();
+						fieldsToHide.forEach(function(field) {
+							$(field).css("display", "none");
 						});
 
 					  if (isInductionActivity) {
