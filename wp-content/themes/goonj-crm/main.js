@@ -11,6 +11,11 @@ document.addEventListener('DOMContentLoaded', function () {
 					<p class="fw-600 fz-16 mb-6">You are not registered as a volunteer with us.</p>
 					<p class="fw-400 fz-16 mt-0 mb-24">To set up a collection camp, please take a moment to fill out the volunteer registration form below. We can't wait to have you on board!</p>
 				`;
+			} else if (message === 'individual-user') {
+				messageDiv.innerHTML = `
+					<p class="fw-600 fz-16 mb-6">You are not registered as a volunteer with us.</p>
+					<p class="fw-400 fz-16 mt-0 mb-24">To set up a collection camp, please take a moment to fill out the volunteer registration form below. We can't wait to have you on board!</p>
+				`;
 			}
 		}
 	}
