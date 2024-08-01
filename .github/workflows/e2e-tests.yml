@@ -32,14 +32,14 @@ jobs:
     - name: Run Playwright tests
       # run: npx playwright test
       run: npx playwright test play-wright/e2e/volunteer-registration.spec.js
-    - name: Install junit-viewer
-      run: npm install -g junit-viewer
+    - name: Install xunit-viewer
+      run: npm install -g xunit-viewer
     - name: Generate XUnit report summary
       run: |
         mkdir -p ./playwright-report
         # Check if the XML file exists
         if [ -f ./playwright-report/results.xml ]; then
-          junit-viewer --results=./playwright-report/results.xml --output=./playwright-report/report-summary.md
+          xunit-viewer --results=./playwright-report/results.xml --output=./playwright-report/report-summary.md
         else
           echo "Results XML file not found"
           exit 1
