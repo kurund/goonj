@@ -28,78 +28,11 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps  
     - name: Run Playwright tests
-      # run: npx playwright test
-      run: npx playwright test play-wright/e2e/volunteer-registration.spec.js
-    # - uses: daun/playwright-report-summary@v3
-    #   if: always()
-    #   with:
-    #     report-file: ./playwright-report/results.json
-    - name: Parse and Display JSON Summary
-      uses: actions/github-script@v6
+      run: npx playwright test
+    - uses: daun/playwright-report-summary@v3
       if: always()
       with:
-        script: |
-          const fs = require('fs');
-          const path = './playwright-report/results.json';
-          
-          if (fs.existsSync(path)) {
-            try {
-              const results = JSON.parse(fs.readFileSync(path, 'utf8'));
-              
-              const stats = results.stats || {};
-              const suites = results.suites || [];
-              
-              const totalTests = suites.reduce((acc, suite) => acc + suite.specs.reduce((acc, spec) => acc + spec.tests.length, 0), 0);
-              const passedTests = suites.reduce((acc, suite) => acc + suite.specs.reduce((acc, spec) => acc + spec.tests.filter(test => test.results.every(result => result.status === 'passed')).length, 0), 0);
-              const failedTests = suites.reduce((acc, suite) => acc + suite.specs.reduce((acc, spec) => acc + spec.tests.filter(test => test.results.some(result => result.status === 'failed')).length, 0), 0);
-
-              const summary = `
-                ## Playwright Test Summary
-                - **Total Tests:** ${totalTests}
-                - **Passed:** ${passedTests}
-                - **Failed:** ${failedTests}
-                - **Duration:** ${(stats.duration / 1000).toFixed(2)} seconds
-                - **Start Time:** ${new Date(stats.startTime).toLocaleString()}
-              `;
-              
-              console.log(summary); // For debugging
-              core.summary.addRaw(summary).write();
-            } catch (error) {
-              core.setFailed(`Error parsing results.json: ${error.message}`);
-            }
-          } else {
-            core.setFailed('results.json file not found.');
-          }
-    # - name: Install xunit-viewer
-    #   run: npm install -g xunit-viewer
-    # - name: Generate XUnit report summary
-    #   run: |
-    #     mkdir -p ./playwright-report
-    #     # Check if the XML file exists
-    #     if [ -f ./playwright-report/results.xml ]; then
-    #       xunit-viewer --results=./playwright-report/results.xml --output=./playwright-report/report-summary.md.html
-    #     else
-    #       echo "Results XML file not found"
-    #       exit 1
-    #     fi
-    # - name: Upload XUnit report summary
-    #   if: always()
-    #   run: |
-    #     echo "## Playwright Test Report" >> $GITHUB_STEP_SUMMARY
-    #     if [ -f ./playwright-report/report-summary.md.html ]; then
-    #       cat ./playwright-report/report-summary.md.html >> $GITHUB_STEP_SUMMARY
-    #     else
-    #       echo "Summary report not found, skipping summary inclusion."
-    #     fi
-    # - name: Generate JUnit report summary
-    #   run: |
-    #     mkdir -p ./playwright-report
-    #     junit-viewer --results=./playwright-report/results.xml --output=./playwright-report/report-summary.md
-    # - name: Upload JUnit report summary
-    #   if: always()
-    #   run: |
-    #     echo "## Playwright Test Report" >> $GITHUB_STEP_SUMMARY
-    #     cat ./playwright-report/report-summary.md >> $GITHUB_STEP_SUMMARY 
+        report-file: ./playwright-report/results.json
     - name: Install 7-Zip
       run: sudo apt-get install p7zip-full
     - name: Password protect playwright report
@@ -114,8 +47,3 @@ jobs:
         name: playwright-report
         path: ./playwright-protected/playwright-report.7z
         retention-days: 7
-    # - name: Upload Report Summary
-    #   if: always()
-    #   run: |
-    #     echo "#### Playwright Test Report" >> $GITHUB_STEP_SUMMARY
-    #     echo "[Download protected report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
