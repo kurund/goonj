@@ -32,15 +32,15 @@ jobs:
     - name: Run Playwright tests
       # run: npx playwright test
       run: npx playwright test
-    - name: Setup Pages
-      uses: actions/configure-pages@v2
-    - name: Upload JUnit Report to GitHub Pages
-      uses: actions/upload-pages-artifact@v1
-      with:
-        path: ./playwright-report/results.xml
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v1
+    - name: Install junit-viewer
+      run: npm install -g junit-viewer
+    - name: Generate JUnit report summary
+      run: junit-viewer --results=./playwright-report/results.xml --output=./playwright-report/report-summary.md
+    - name: Upload JUnit report summary
+      if: always()
+      run: |
+        echo "## Playwright Test Report" >> $GITHUB_STEP_SUMMARY
+        cat ./playwright-report/report-summary.md >> $GITHUB_STEP_SUMMARY 
     - name: Install 7-Zip
       run: sudo apt-get install p7zip-full
     - name: Password protect playwright report
