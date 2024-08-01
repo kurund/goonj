@@ -135,13 +135,11 @@ function goonj_handle_user_identification_form() {
             'phone' => $phone,
             'is_deleted' => 0,
             'contact_type' => 'Individual',
-            'contact_sub_type' => 'Volunteer'
         ]);
 
         $foundContacts = $contactResult['values'];
 
         // If the user does not exist in the Goonj database 
-        // and does not have the Volunteer contact type then
         // redirect to the volunteer registration form.
         $volunteer_registration_form_path = sprintf(
             '/volunteer-registration/#?email=%s&phone=%s&message=%s',
@@ -158,7 +156,11 @@ function goonj_handle_user_identification_form() {
         }
 
         $contact = $foundContacts[0];
-
+        // Check if the contact is a volunteer
+        if ( empty( $contact['contact_sub_type'] ) || !in_array( 'Volunteer', $contact['contact_sub_type'] ) ) {
+            wp_redirect( '/volunteer-form/#?Individual1=' . $contact['id'] );
+            exit;
+        }
 
         // If we are here, then it means Volunteer exists in our system.
         // Now we need to check if the volunteer is inducted or not.
