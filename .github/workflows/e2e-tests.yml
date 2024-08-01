@@ -31,7 +31,7 @@ jobs:
     #   run: npm install --save-dev @estruyf/github-actions-reporter
     - name: Run Playwright tests
       # run: npx playwright test
-      run: npx playwright test --reporter=junit
+      run: npx playwright test
     - name: Setup Pages
       uses: actions/configure-pages@v2
     - name: Upload JUnit Report to GitHub Pages
