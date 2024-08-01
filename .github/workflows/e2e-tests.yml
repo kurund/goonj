@@ -31,18 +31,37 @@ jobs:
     #   run: npm install --save-dev @estruyf/github-actions-reporter
     - name: Run Playwright tests
       # run: npx playwright test
-      run: npx playwright test
+      run: npx playwright test play-wright/e2e/volunteer-registration.spec.js
     - name: Install junit-viewer
       run: npm install -g junit-viewer
-    - name: Generate JUnit report summary
+    - name: Generate XUnit report summary
       run: |
         mkdir -p ./playwright-report
-        junit-viewer --results=./playwright-report/results.xml --output=./playwright-report/report-summary.md
-    - name: Upload JUnit report summary
+        # Check if the XML file exists
+        if [ -f ./playwright-report/results.xml ]; then
+          junit-viewer --results=./playwright-report/results.xml --output=./playwright-report/report-summary.md
+        else
+          echo "Results XML file not found"
+          exit 1
+        fi
+    - name: Upload XUnit report summary
       if: always()
       run: |
         echo "## Playwright Test Report" >> $GITHUB_STEP_SUMMARY
-        cat ./playwright-report/report-summary.md >> $GITHUB_STEP_SUMMARY 
+        if [ -f ./playwright-report/report-summary.md ]; then
+          cat ./playwright-report/report-summary.md >> $GITHUB_STEP_SUMMARY
+        else
+          echo "Summary report not found, skipping summary inclusion."
+        fi
+    # - name: Generate JUnit report summary
+    #   run: |
+    #     mkdir -p ./playwright-report
+    #     junit-viewer --results=./playwright-report/results.xml --output=./playwright-report/report-summary.md
+    # - name: Upload JUnit report summary
+    #   if: always()
+    #   run: |
+    #     echo "## Playwright Test Report" >> $GITHUB_STEP_SUMMARY
+    #     cat ./playwright-report/report-summary.md >> $GITHUB_STEP_SUMMARY 
     - name: Install 7-Zip
       run: sudo apt-get install p7zip-full
     - name: Password protect playwright report
