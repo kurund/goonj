@@ -32,27 +32,33 @@ jobs:
     - name: Run Playwright tests
       # run: npx playwright test
       run: npx playwright test play-wright/e2e/volunteer-registration.spec.js
-    - name: Install xunit-viewer
-      run: npm install -g xunit-viewer
-    - name: Generate XUnit report summary
-      run: |
-        mkdir -p ./playwright-report
-        # Check if the XML file exists
-        if [ -f ./playwright-report/results.xml ]; then
-          xunit-viewer --results=./playwright-report/results.xml --output=./playwright-report/report-summary.md.html
-        else
-          echo "Results XML file not found"
-          exit 1
-        fi
-    - name: Upload XUnit report summary
+    - uses: daun/playwright-report-summary@v3
       if: always()
-      run: |
-        echo "## Playwright Test Report" >> $GITHUB_STEP_SUMMARY
-        if [ -f ./playwright-report/report-summary.md.html ]; then
-          cat ./playwright-report/report-summary.md.html >> $GITHUB_STEP_SUMMARY
-        else
-          echo "Summary report not found, skipping summary inclusion."
-        fi
+      with:
+        report-file: results.json
+        comment-title: 'Playwright Test Results'
+        icon-style: 'octicons'
+    # - name: Install xunit-viewer
+    #   run: npm install -g xunit-viewer
+    # - name: Generate XUnit report summary
+    #   run: |
+    #     mkdir -p ./playwright-report
+    #     # Check if the XML file exists
+    #     if [ -f ./playwright-report/results.xml ]; then
+    #       xunit-viewer --results=./playwright-report/results.xml --output=./playwright-report/report-summary.md.html
+    #     else
+    #       echo "Results XML file not found"
+    #       exit 1
+    #     fi
+    # - name: Upload XUnit report summary
+    #   if: always()
+    #   run: |
+    #     echo "## Playwright Test Report" >> $GITHUB_STEP_SUMMARY
+    #     if [ -f ./playwright-report/report-summary.md.html ]; then
+    #       cat ./playwright-report/report-summary.md.html >> $GITHUB_STEP_SUMMARY
+    #     else
+    #       echo "Summary report not found, skipping summary inclusion."
+    #     fi
     # - name: Generate JUnit report summary
     #   run: |
     #     mkdir -p ./playwright-report
