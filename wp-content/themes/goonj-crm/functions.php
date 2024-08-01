@@ -156,9 +156,8 @@ function goonj_handle_user_identification_form() {
         }
 
         $contact = $foundContacts[0];
-
         // Check if the contact is a volunteer
-        if ( empty( $contact['contact_sub_type'] ) ) {
+        if ( empty( $contact['contact_sub_type'] ) || !in_array( 'Volunteer', $contact['contact_sub_type'] ) ) {
             wp_redirect( '/volunteer-form/#?Individual1=' . $contact['id'] );
             exit;
         }
