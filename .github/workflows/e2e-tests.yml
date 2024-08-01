@@ -35,7 +35,9 @@ jobs:
     - name: Install junit-viewer
       run: npm install -g junit-viewer
     - name: Generate JUnit report summary
-      run: junit-viewer --results=./playwright-report/results.xml --output=./playwright-report/report-summary.md
+      run: |
+        mkdir -p ./playwright-report
+        junit-viewer --results=./playwright-report/results.xml --output=./playwright-report/report-summary.md
     - name: Upload JUnit report summary
       if: always()
       run: |
