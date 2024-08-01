@@ -39,7 +39,7 @@ jobs:
         mkdir -p ./playwright-report
         # Check if the XML file exists
         if [ -f ./playwright-report/results.xml ]; then
-          xunit-viewer --results=./playwright-report/results.xml --output=./playwright-report/report-summary.md
+          xunit-viewer --results=./playwright-report/results.xml --output=./playwright-report/report-summary.md.html
         else
           echo "Results XML file not found"
           exit 1
@@ -48,8 +48,8 @@ jobs:
       if: always()
       run: |
         echo "## Playwright Test Report" >> $GITHUB_STEP_SUMMARY
-        if [ -f ./playwright-report/report-summary.md ]; then
-          cat ./playwright-report/report-summary.md >> $GITHUB_STEP_SUMMARY
+        if [ -f ./playwright-report/report-summary.md.html ]; then
+          cat ./playwright-report/report-summary.md.html >> $GITHUB_STEP_SUMMARY
         else
           echo "Summary report not found, skipping summary inclusion."
         fi
