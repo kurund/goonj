@@ -11,8 +11,8 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 		$originalData = $triggerData->getOriginalData();
 		
 		// Extract fields
-		$startDate = isset($originalData['custom_73']) ? $originalData['custom_73'] : null;
-		$endDate = isset($originalData['custom_74']) ? $originalData['custom_74'] : null;
+		$startDate = $originalData['custom_73'] ?? null;
+		$endDate = $originalData['custom_74'] ?? null;
 	
 		$eventParams = [
 			'title' => 'Collection Camp Intent',
