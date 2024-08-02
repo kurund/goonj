@@ -217,3 +217,56 @@ function goonj_custom_message_placeholder() {
     return '<div id="custom-message" class="ml-24"></div>';
 }
 add_shortcode('goonj_volunteer_message', 'goonj_custom_message_placeholder');
+
+add_action('init', 'goonj_rewrite_rules');
+function goonj_rewrite_rules() {
+    add_rewrite_rule(
+        '^actions/collection-camp/([0-9]+)/?$',
+        'index.php?custom_action=collection-camp&collection_camp_id=$matches[1]',
+        'top'
+    );
+    add_rewrite_rule(
+        '^actions/dropping-center/([0-9]+)/?$',
+        'index.php?custom_action=dropping-center&dropping_center_id=$matches[1]',
+        'top'
+    );
+    add_rewrite_rule(
+        '^actions/processing-center/([0-9]+)/?$',
+        'index.php?custom_action=processing-center&processing_center_id=$matches[1]',
+        'top'
+    );
+}
+
+add_filter('query_vars', 'goonj_query_vars');
+function goonj_query_vars($query_vars) {
+    $query_vars[] = 'custom_action';
+    $query_vars[] = 'collection_camp_id';
+    $query_vars[] = 'dropping_center_id';
+    $query_vars[] = 'processing_center_id';
+    return $query_vars;
+}
+
+add_filter('template_include', 'goonj_template_include');
+function goonj_template_include($template) {
+    $custom_action = get_query_var('custom_action');
+
+    if ($custom_action) {
+        switch ($custom_action) {
+            case 'collection-camp':
+                $new_template = locate_template('templates/actions/collection-camp.php');
+                break;
+            case 'dropping-center':
+                $new_template = locate_template('templates/actions/dropping-center.php');
+                break;
+            case 'processing-center':
+                $new_template = locate_template('templates/actions/processing-center.php');
+                break;
+        }
+
+        if ($new_template) {
+            return $new_template;
+        }
+    }
+
+    return $template;
+}
