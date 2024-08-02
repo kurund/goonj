@@ -1,25 +1,33 @@
 <?php
-Civi::log()->debug('Debug message =');
-Civi::log()->error('Error message fsdf');
-var_dump("hello");
 class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirules_Action {
-    
-    /**
-     * Method processAction to execute the action
+	/**
+	 * Method processAction to execute the action
 	 *
-     * @param CRM_Civirules_TriggerData_TriggerData $triggerData
-     * @access public
+	 * @param CRM_Civirules_TriggerData_TriggerData $triggerData
+	 * @access public
 	 */
-    public function processAction( CRM_Civirules_TriggerData_TriggerData $triggerData ) {
-		Civi::log()->debug('Debug message here');
-		Civi::log()->error('Error message here');
-        ob_start();
-        var_dump('fdsaf');
-        $op = ob_get_clean();
-        error_log("Error" . $op);
-		die;
+	public function processAction(CRM_Civirules_TriggerData_TriggerData $triggerData) {
+		// Get the contact ID from the trigger data
 		$contactId = $triggerData->getContactId();
+		
+		// Event ID to which contacts will be added.
+		$eventId = 39;
+		
+		$params = [
+			'event_id' => $eventId,
+			'contact_id' => $contactId,
+			'status_id' => 1 //Status ID for 'Attending'
+		];
 
+		// Call the CiviCRM API to create the event participant
+		try {
+			$result = civicrm_api3('Participant', 'create', $params);
+			// Log success
+			error_log("Participant added to event. Result: " . print_r($result, TRUE));
+		} catch (CiviCRM_API3_Exception $e) {
+			// Log error
+			error_log("Error adding participant: " . $e->getMessage());
+		}
 	}
 
 	/**
