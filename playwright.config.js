@@ -27,7 +27,6 @@ module.exports = defineConfig({
   // reporter: 'html',
   reporter: [
     ['html', { outputFolder: './playwright-report', open: 'never' }],
-    ['junit', { outputFile: './playwright-report/results.xml' }],
     ['json', { outputFile: './playwright-report/results.json' }]
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
