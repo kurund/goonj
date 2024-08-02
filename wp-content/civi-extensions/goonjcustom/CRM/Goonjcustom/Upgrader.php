@@ -26,7 +26,7 @@ class CRM_Goonjcustom_Upgrader extends CRM_Extension_Upgrader_Base {
   }
 
   public function upgrade_1003(): bool {
-    $this->ctx->log->info('Applying update 1002');
+    $this->ctx->log->info('Applying update 1003');
     $this->executeSqlFile('sql/createEventForContact.sql');
     return TRUE;
   }
