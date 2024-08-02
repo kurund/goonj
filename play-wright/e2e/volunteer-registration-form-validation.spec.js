@@ -5,9 +5,9 @@ import { VolunteerRegistrationPage} from '../pages/volunteer-registration.page.j
 
 test('check mandatory field validation for registration form fields', async ({ page }) => {
   const volunteerRegistrationPage = new VolunteerRegistrationPage(page);
-  const volunteerUrl = volunteerRegistrationPage.getAppendedUrl('/volunteer-registration/');
-  await page.goto(volunteerUrl);
-  await page.waitForURL(volunteerUrl);
+  const volunteerPageUrl  = volunteerRegistrationPage.getAppendedUrl('/volunteer-registration/');
+  await page.goto(volunteerPageUrl);
+  await page.waitForURL(volunteerPageUrl);
   await volunteerRegistrationPage.handleDialogMessage('Please fill all required fields.'); // Registering dialog message 
   await volunteerRegistrationPage.fillAndClearField('enterFirstName', userDetails.firstName);
   await volunteerRegistrationPage.fillAndClearField('enterLastName', userDetails.lastName);
