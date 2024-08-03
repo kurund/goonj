@@ -91,7 +91,52 @@ exports.VolunteerRegistrationPage =  class VolunteerRegistrationPage {
   async selectVolunteerHours(hours) {
     await this.selectDropdownOption('#select2-chosen-8', '#s2id_autogen8_search', hours);
   }
+  
+  async selectAndClearDropdownOption(dropdownSelector, inputField, option) {
+    const closeIconSelector = `${dropdownSelector} + abbr.select2-search-choice-close`;
+    await this.selectDropdownOption(dropdownSelector, inputField, option);
+    await this.clickSubmitButton();
+    await this.page.click(closeIconSelector);
+  }
 
+  async selectAndClearMultipleDropdownOption(dropdownSelector, inputField, option) {
+    const closeIconSelector = `ul.select2-choices .select2-search-choice-close`
+    await this.selectDropdownOption(dropdownSelector, inputField, option);
+    await this.clickSubmitButton();
+    await this.page.click(closeIconSelector);
+  }
+
+  async selectTitleAndClear(title) {
+    await this.selectAndClearDropdownOption('#select2-chosen-2', '#s2id_autogen2_search', title);
+  }
+
+  async selectCountryAndClear(country) {
+    await this.selectAndClearDropdownOption('#select2-chosen-4', '#s2id_autogen4_search', country);
+  }
+
+  async selectGenderAndClear(gender) {
+    await this.selectAndClearDropdownOption('#select2-chosen-3', '#s2id_autogen3_search', gender);
+  }
+
+  async selectStateAndClear(state) {
+    await this.selectAndClearDropdownOption('#select2-chosen-1', '#s2id_autogen1_search', state);
+  }
+
+  async selectActivityInterestedAndClear(activity) {
+    await this.selectAndClearMultipleDropdownOption('#s2id_autogen5', '#s2id_autogen5', activity);
+  }
+
+  async selectVoluntarySkillsAndClear(skill) {
+    await this.selectAndClearMultipleDropdownOption('#s2id_autogen7', '#s2id_autogen7', skill);
+  }
+
+  async selectVolunteerMotivationAndClear(motivation) {
+    await this.selectAndClearMultipleDropdownOption('#s2id_autogen6', '#s2id_autogen6', motivation);
+  }
+
+  async selectVolunteerHoursAndClear(hours) {
+    await this.selectAndClearDropdownOption('#select2-chosen-8', '#s2id_autogen8_search', hours);
+  }
 
   async selectRadioButton(buttonOption) {
     // Find the label with the specific text and click the associated radio button
@@ -114,8 +159,14 @@ exports.VolunteerRegistrationPage =  class VolunteerRegistrationPage {
   {
     await this.otherSkills.fill(skills)
   }
-
+  
   getAppendedUrl(stringToAppend) {
     return this.url + stringToAppend;
+  }
+
+  async fillAndClearField(fieldName, value, clearValue = '') {
+    await this[fieldName](value);
+    await this.clickSubmitButton();
+    await this[fieldName](clearValue);
   }
 }
