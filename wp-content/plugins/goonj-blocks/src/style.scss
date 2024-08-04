@@ -1,0 +1,24 @@
+/**
+ * The following styles get applied both on the front of your site
+ * and in the editor.
+ *
+ * Replace them with your own styles or remove the file completely.
+ */
+
+.wp-block-gb-goonj-blocks {
+	display: flex;
+	justify-content: space-between;
+	width: 380px;
+}
+
+.wp-block-gb-action-button {
+	background-color: #d64631;
+	color: #fff;
+	padding: 16px 24px;
+	border-radius: 4px;
+	text-decoration: none;
+	font-size: 16px;
+	line-height: 1;
+	border: 1px solid rgba(0,0,0,.3);
+	font-family: 'Open Sans';
+}
