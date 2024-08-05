@@ -264,8 +264,8 @@ function goonj_check_action_target_exists() {
 		civicrm_initialize();
 	}
 
-	// Determine the entity type based on the target.
-	$entity_type = '';
+	$is_404 = false;
+
 	switch ( $target ) {
 		case 'collection-camp':
 			$result = \Civi\Api4\Event::get( false )
@@ -284,7 +284,6 @@ function goonj_check_action_target_exists() {
 			// TBA.
 			break;
 		default:
-			// If the target is invalid, set 404.
 			$is_404 = true;
 	}
 
