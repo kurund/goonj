@@ -29,7 +29,7 @@ $message = get_query_var('goonj_pending_induction_message', '');
             </div>
             <br>
             <p class="login-submit">
-                <input type="submit" class="button button-primary w-520" value="Submit">
+                <input type="submit" class="button button-primary w-520" value="Continue">
             </p>
         <?php endif; ?>
     </form>
