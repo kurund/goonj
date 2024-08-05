@@ -1,5 +1,4 @@
 <?php
-
 // Retrieve the recentCamp data from the session
 $recentCampData = $_SESSION['recentCampData'] ?? null;
 $contactId = $_SESSION['contactId'] ?? null;
