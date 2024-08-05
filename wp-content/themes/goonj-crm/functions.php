@@ -102,7 +102,7 @@ function goonj_check_user_action() {
     if (isset($_GET['message'])) {
         if ($_GET['message'] === 'waiting-induction') {
             $message = '<p class="fw-600 fz-16 mb-6">Your induction is pending</p>
-                        <p class="fw-400 fz-16 mt-0 mb-24">Just one more step to go before you can start your collection camp. Please finish your induction to move forward.</p>
+                        <p class="fw-400 fz-16 mt-0 mb-24">We noticed that  you\'ve already submitted your volunteer registration form. Just one more step to go before you can start your collection camp. Please finish your induction to move forward.</p>
                         <p class="fw-400 fz-16 mt-0 mb-24">
                             Please reach out to <a href="mailto:mail@goonj.org">mail@goonj.org</a> in case there are any queries.
                         </p>';
