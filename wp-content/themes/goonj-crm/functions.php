@@ -245,3 +245,68 @@ function goonj_query_vars( $vars ) {
 	$vars[] = 'id';
 	return $vars;
 }
+
+add_action( 'template_redirect', 'goonj_check_action_target_exists' );
+function goonj_check_action_target_exists() {
+	global $wp_query;
+
+	if (
+		! is_page( 'actions' ) ||
+		! get_query_var( 'target' ) ||
+		! get_query_var( 'id' )
+	) {
+		return;
+	}
+
+	$target = get_query_var( 'target' );
+	$id = intval( get_query_var( 'id' ) );
+
+	// Load CiviCRM.
+	if ( function_exists( 'civicrm_initialize' ) ) {
+		civicrm_initialize();
+	}
+
+	$is_404 = false;
+
+	$event_fields = array(
+		'id',
+		'title',
+		'summary',
+		'description',
+		'start_date',
+		'end_date',
+	);
+
+	switch ( $target ) {
+		case 'collection-camp':
+			$result = \Civi\Api4\Event::get( false )
+				->selectRowCount()
+				->addSelect( ...$event_fields )
+				->addWhere( 'id', '=', $id )
+				->setLimit( 1 )
+				->execute();
+
+			if ( $result->count() === 0 ) {
+				$is_404 = true;
+			} else {
+				$wp_query->set( 'action_target', $result->first() );
+			}
+			break;
+		case 'dropping-center':
+			// TBA.
+			break;
+		case 'processing-center':
+			// TBA.
+			break;
+		default:
+			$is_404 = true;
+	}
+
+	if ( $is_404 ) {
+		$wp_query->set_404();
+		status_header( 404 );
+		nocache_headers();
+		include get_query_template( '404' );
+		exit;
+	}
+}
