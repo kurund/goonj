@@ -13,8 +13,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				`;
 			} else if (message === 'past-collection-data') {
 				messageDiv.innerHTML = `
-					<p class="fw-600 fz-16 mb-6">Please review your collection camp details below.</p>
-					<p class="fw-400 fz-16 mt-0 mb-24">Confirm if the location, time, and contact information remain the same as previously provided.</p>
+					<p class="fw-600 fz-16 mb-6">Goonj Collection Camp</p>
+					<p class="fw-400 fz-16 mt-0 mb-24">It seems like you have created collection camps in the past. Would you like to duplicate the location details from your last collection camp?</p>
 				`;
 			}
 		}
