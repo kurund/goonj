@@ -22,11 +22,15 @@ $noDetailsRedirectUrl = get_home_url() . "/collection-camp-form/#?" . http_build
 ?>
 
 <div class="ml-25">
-	<button class="button button-primary w-520 mb-12 border-none font-sans fz-16" onclick="window.location.href='<?php echo esc_url($redirectUrl); ?>';">
-		Yes, use details from last camp
+	<button class="button button-primary w-520 mb-12 border-none font-sans fz-16">
+		<a href="<?php echo esc_url($redirectUrl); ?>" class="text-white text-decoration-none">
+			Yes, use details from last camp
+		</a>
 	</button>
-	<button class="button button-primary w-520 border-none font-sans fz-16" onclick="window.location.href='<?php echo esc_url($noDetailsRedirectUrl); ?>';">
-		No, the details are different
+	<button class="button button-primary w-520 border-none font-sans fz-16">
+		<a href="<?php echo esc_url($noDetailsRedirectUrl); ?>" class="text-white text-decoration-none">
+			No, the details are different
+		</a>
 	</button>
 </div>
 
