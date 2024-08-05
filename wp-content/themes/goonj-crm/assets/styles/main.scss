@@ -112,6 +112,7 @@ form input {
 .button-primary {
     background: variables.$theme-primary !important;
     color: #fff;
+    border: none !important;
     height: 45px !important;
     cursor: pointer;
     &:active {
