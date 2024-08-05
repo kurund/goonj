@@ -294,3 +294,22 @@ form input {
 .font-sans {
     font-family: Open Sans !important;
 }
+
+@media (max-width: 768px) {
+    .login-submit {
+        display: flex;
+        justify-content: center;
+    }
+    .button-primary {
+        width: 100%;
+        max-width: 300px;
+    }
+    .mobile-margins-l24-r30 {
+        margin-left: 24px !important;
+        margin-right: 30px !important;
+    }
+    .mobile-margin-left-30 {
+        margin-left: 30px !important;
+    }
+
+}
