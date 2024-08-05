@@ -3,6 +3,11 @@
 Template Name: Collection Landing Page
 */
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    wp_redirect(get_home_url() . "/collection-camp");
+    exit;
+}
+
 ?>
 
 <div class="text-center">
@@ -19,6 +24,11 @@ Template Name: Collection Landing Page
             If you are in any other city besides the cities mentioned above, we would request you to facilitate the crucial aspect of reaching the collected material to the nearest Goonj office. For list of Goonj offices, please refer - <a href="https://goonj.org/our-offices/" target="_blank">https://goonj.org/our-offices/</a>
         </li>
     </ol>
+    <form method="post">
+        <p class="login-submit">
+            <input type="submit" class="button button-primary w-520 mt-36" value="Continue">
+        </p>
+    </form>
 </div>
 
 <?php
