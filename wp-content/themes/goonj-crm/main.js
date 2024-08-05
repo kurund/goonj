@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	var hash = window.location.hash.substring(1); // Remove the '#' 
 	var params = new URLSearchParams(hash);
 	var message = params.get('message');
+
 	if (message) {
 		var messageDiv = document.getElementById('custom-message');
 		if (messageDiv) {
