@@ -195,8 +195,8 @@ function goonj_handle_user_identification_form() {
 		$collectionCampResult = civicrm_api3('Activity', 'get', [
 			'sequential' => 1,
 			'contact_id' => $contact['id'],
-			'activity_type_id' => ['IN' => [61]], // ID for "Collection Camp Intent"
-			'status_id' => ['IN' => [10]], // Status ID for "Under Authorization"
+			'activity_type_id' => 61, // ID for "Collection Camp Intent"
+			'status_id' => 10, // Status ID for "Under Authorization"
 			'order_by' => 'created_date DESC',
 			'limit' => 1,
 		]);
