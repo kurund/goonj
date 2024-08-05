@@ -245,3 +245,55 @@ function goonj_query_vars( $vars ) {
 	$vars[] = 'id';
 	return $vars;
 }
+
+add_action( 'template_redirect', 'goonj_check_action_target_exists' );
+function goonj_check_action_target_exists() {
+	if (
+		! is_page( 'actions' ) ||
+		! get_query_var( 'target' ) ||
+		! get_query_var( 'id' )
+	) {
+		return;
+	}
+
+	$target = get_query_var( 'target' );
+	$id = intval( get_query_var( 'id' ) );
+
+	// Load CiviCRM.
+	if ( function_exists( 'civicrm_initialize' ) ) {
+		civicrm_initialize();
+	}
+
+	// Determine the entity type based on the target.
+	$entity_type = '';
+	switch ( $target ) {
+		case 'collection-camp':
+			$result = \Civi\Api4\Event::get( false )
+				->selectRowCount()
+				->addSelect( 'id' )
+				->addWhere( 'id', '=', $id )
+				->setLimit( 1 )
+				->execute();
+
+			$is_404 = $result->count() === 0;
+			break;
+		case 'dropping-center':
+			// TBA.
+			break;
+		case 'processing-center':
+			// TBA.
+			break;
+		default:
+			// If the target is invalid, set 404.
+			$is_404 = true;
+	}
+
+	if ( $is_404 ) {
+		global $wp_query;
+		$wp_query->set_404();
+		status_header( 404 );
+		nocache_headers();
+		include get_query_template( '404' );
+		exit;
+	}
+}
