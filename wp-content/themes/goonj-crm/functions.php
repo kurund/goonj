@@ -194,14 +194,6 @@ function goonj_handle_user_identification_form() {
 		// Fetch the most recent collection camp activity based on the creation date
 		$collectionCampResult = civicrm_api3('Activity', 'get', [
 			'sequential' => 1,
-			'return' => [
-				'Collection_Camp_Intent.District',
-				'Collection_Camp_Intent.State',
-				'Collection_Camp_Intent.Start_Date',
-				'Collection_Camp_Intent.End_Date',
-				'Collection_Camp_Intent.Location_Area_of_camp',
-				'created_date'
-			],
 			'contact_id' => $contact['id'],
 			'activity_type_id' => ['IN' => [61]], // ID for "Collection Camp Intent"
 			'status_id' => ['IN' => [10]], // Status ID for "Under Authorization"
