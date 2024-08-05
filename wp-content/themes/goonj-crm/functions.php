@@ -204,16 +204,13 @@ function goonj_handle_user_identification_form() {
 		// Recent camp data
 		$recentCamp = end($collectionCampResult['values']);
 
-		if ($recentCamp) {
-			$redirect_url = get_home_url() . "/collection-camp-form/#?" . http_build_query([
-				'source_contact_id' => $contact['id'],
-				'Collection_Camp_Intent.District' => $recentCamp['custom_72'] ?? '',
-				'Collection_Camp_Intent.State' => $recentCamp['custom_71'] ?? '',
-				'Collection_Camp_Intent.Start_Date' => $recentCamp['custom_73'] ?? '',
-				'Collection_Camp_Intent.End_Date' => $recentCamp['custom_74'] ?? '',
-				'Collection_Camp_Intent.Location_Area_of_camp' => $recentCamp['custom_69'] ?? '',
-				'message' => 'past-collection-data'
-			]);
+		if (!empty($recentCamp)) {
+			// Save the recentCamp data to the session
+			$_SESSION['recentCampData'] = $recentCamp;
+			$_SESSION['contactId'] = $contact['id'];
+			
+			wp_redirect(get_home_url() . "/collection-camp-in-past/#?source_contact_id=" . $contact['id'] . '&message=past-collection-data' );
+			exit;
 		} else {
 			$redirect_url = get_home_url() . "/collection-camp-form/#?source_contact_id=" . $contact['id'];
 		}
@@ -271,3 +268,12 @@ function goonj_query_vars( $vars ) {
 	$vars[] = 'id';
 	return $vars;
 }
+
+
+function goonj_collection_camp_past_data() {
+	ob_start();
+	get_template_part('templates/collection-camp-data');
+	return ob_get_clean();
+}
+
+add_shortcode('goonj_collection_camp_past', "goonj_collection_camp_past_data");
