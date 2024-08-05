@@ -217,3 +217,11 @@ function goonj_custom_message_placeholder() {
     return '<div id="custom-message" class="ml-24"></div>';
 }
 add_shortcode('goonj_volunteer_message', 'goonj_custom_message_placeholder');
+
+function goonj_collection_camp_landing_page() {
+    ob_start();
+    get_template_part('templates/collection-landing-page');
+    return ob_get_clean();
+}
+add_shortcode('goonj_collection_landing_page', 'goonj_collection_camp_landing_page');
+
