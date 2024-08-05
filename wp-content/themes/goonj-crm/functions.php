@@ -248,6 +248,8 @@ function goonj_query_vars( $vars ) {
 
 add_action( 'template_redirect', 'goonj_check_action_target_exists' );
 function goonj_check_action_target_exists() {
+	global $wp_query;
+
 	if (
 		! is_page( 'actions' ) ||
 		! get_query_var( 'target' ) ||
@@ -266,16 +268,29 @@ function goonj_check_action_target_exists() {
 
 	$is_404 = false;
 
+	$event_fields = array(
+		'id',
+		'title',
+		'summary',
+		'description',
+		'start_date',
+		'end_date',
+	);
+
 	switch ( $target ) {
 		case 'collection-camp':
 			$result = \Civi\Api4\Event::get( false )
 				->selectRowCount()
-				->addSelect( 'id' )
+				->addSelect( ...$event_fields )
 				->addWhere( 'id', '=', $id )
 				->setLimit( 1 )
 				->execute();
 
-			$is_404 = $result->count() === 0;
+			if ( $result->count() === 0 ) {
+				$is_404 = true;
+			} else {
+				$wp_query->set( 'action_target', $result->first() );
+			}
 			break;
 		case 'dropping-center':
 			// TBA.
@@ -288,7 +303,6 @@ function goonj_check_action_target_exists() {
 	}
 
 	if ( $is_404 ) {
-		global $wp_query;
 		$wp_query->set_404();
 		status_header( 404 );
 		nocache_headers();
