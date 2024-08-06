@@ -318,6 +318,29 @@ form input {
         margin-right: 30px !important;
     }
 
+.border-none {
+    border: none !important;
+}
+.text-decoration-none {
+    text-decoration: none !important;
+}
+.text-white {
+    color: #ffffff !important;
+}
+.text-light-red {
+    color: #D64631 !important;
+}
+.bg-white {
+    background-color: #ffffff !important
+}
+.red-border {
+    border: 1px solid #D64631 !important;
+}
+.br-4 {
+    border-radius: 4px;
+}
+.m-auto {
+    margin: auto !important;
 }
 .contact-info {
     font-size: 16px;
