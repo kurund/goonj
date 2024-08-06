@@ -195,7 +195,6 @@ function goonjcustom_civicrm_pageRun( &$page ) {
 					  } else if (isCollectionCampActivity) {
 						  fieldsToHide = [
 							  ".crm-activity-form-block-subject",
-							  ".crm-activity-form-block-campaign_id",
 							  ".crm-activity-form-block-engagement_level",
 							  ".crm-activity-form-block-duration",
 							  ".crm-activity-form-block-priority_id",
@@ -225,4 +224,39 @@ function goonjcustom_civicrm_pageRun( &$page ) {
 		  ',
 		)
 	);
+}
+
+function goonjcustom_civicrm_tabset($tabsetName, &$tabs, $context) {
+	if ($tabsetName !== 'civicrm/event/manage' || empty($context)) {
+		return;
+	}
+
+	$url = CRM_Utils_System::url(
+		'civicrm/event/manage/qr',
+		"reset=1&snippet=5&force=1&id=$eventID&action=update&component=event"
+	);
+
+	$tabsToRemove = [
+		'event' => [
+			'manage' => [
+				'fee',
+				'registration',
+				'friend',
+				'pcp',
+			],
+		],
+	];
+
+	foreach ($tabsToRemove['event']['manage'] as $toRemove) {
+		unset($tabs[$toRemove]);
+	}
+
+	// Add a new QR tab along with URL.
+	$tabs['qr'] = [
+		'title' => ts('QR Codes'),
+		'link' => $url,
+		'valid' => 1,
+		'active' => 1,
+		'current' => false,
+	];
 }
