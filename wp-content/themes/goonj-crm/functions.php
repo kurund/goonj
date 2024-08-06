@@ -95,7 +95,7 @@ function goonj_custom_password_reset_redirection( $errors, $user ) {
 	}
 }
 
-add_shortcode('goonj_check_user_form', 'goonj_check_user_action');
+add_shortcode( 'goonj_check_user_form', 'goonj_check_user_action' );
 
 function goonj_check_user_action() {
 	ob_start();
