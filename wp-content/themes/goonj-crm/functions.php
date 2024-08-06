@@ -95,25 +95,37 @@ function goonj_custom_password_reset_redirection( $errors, $user ) {
     }
 }
 
-add_shortcode( 'goonj_check_user_form', 'goonj_check_user_action' );
+add_shortcode('goonj_check_user_form', 'goonj_check_user_action');
+
 function goonj_check_user_action() {
     ob_start();
     $message = '';
     if (isset($_GET['message'])) {
         if ($_GET['message'] === 'waiting-induction') {
-            $message = '<p class="fw-600 fz-16 mb-6">Your induction is pending</p>
-                        <p class="fw-400 fz-16 mt-0 mb-24">We noticed that  you\'ve already submitted your volunteer registration form. Just one more step to go before you can start your collection camp. Please finish your induction to move forward.</p>
-                        <p class="fw-400 fz-16 mt-0 mb-24">
-                            Please reach out to <a href="mailto:mail@goonj.org">mail@goonj.org</a> in case there are any queries.
-                        </p>';
+            $message = '
+                <p class="fw-600 fz-16 mb-6">Your induction is pending</p>
+                <p class="fw-400 fz-16 mt-0 mb-24">
+                    We noticed that you\'ve already submitted your volunteer registration form. Just one more step to go before you can start your collection camp. Please finish your induction to move forward.
+                </p>
+                <div class="contact-info">
+                    <p>
+                        <img src="' . get_template_directory_uri() . '/wp-content/themes/goonj-crm/images/email-icon.png" alt="Email Icon" class="icon">
+                        <a href="mailto:mail@goonj.org">mail@goonj.org</a>
+                    </p>
+                    <p>
+                        <img src="' . get_template_directory_uri() . '/wp-content/themes/goonj-crm/images/phone-icon.png" alt="Phone Icon" class="icon">
+                        <a href="tel:01141401216">011-41401216</a>
+                    </p>
+                </div>';
         }
     }
 
     // Pass the message to the template
     set_query_var('goonj_pending_induction_message', $message);
-    get_template_part( 'templates/form', 'check-user' );
+    get_template_part('templates/form', 'check-user');
     return ob_get_clean();
 }
+
 
 add_action('wp', 'goonj_handle_user_identification_form');
 function goonj_handle_user_identification_form() {
