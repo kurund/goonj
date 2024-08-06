@@ -191,7 +191,30 @@ function goonj_handle_user_identification_form() {
 		}
 
 		// If we are here, then it means the user exists as an inducted volunteer.
-		wp_redirect(get_home_url() . "/collection-camp-form/#?source_contact_id=" . $contact['id'] );
+		// Fetch the most recent collection camp activity based on the creation date
+		$collectionCampResult = civicrm_api3('Activity', 'get', [
+			'sequential' => 1,
+			'contact_id' => $contact['id'],
+			'activity_type_id' => 61, // ID for "Collection Camp Intent"
+			'status_id' => 10, // Status ID for "Under Authorization"
+			'order_by' => 'created_date DESC',
+			'limit' => 1,
+		]);
+
+		// Recent camp data
+		$recentCamp = end($collectionCampResult['values']);
+
+		if (!empty($recentCamp)) {
+			// Save the recentCamp data to the session
+			$_SESSION['recentCampData'] = $recentCamp;
+			$_SESSION['contactId'] = $contact['id'];
+			
+			wp_redirect(get_home_url() . "/collection-camp-in-past/#?source_contact_id=" . $contact['id'] . '&message=past-collection-data' );
+			exit;
+		} else {
+			$redirect_url = get_home_url() . "/collection-camp-form/#?source_contact_id=" . $contact['id'];
+		}
+		wp_redirect($redirect_url);
 		exit;
 	} catch (CiviCRM_API3_Exception $e) {
 		$error = $e->getMessage();
@@ -309,4 +332,11 @@ function goonj_check_action_target_exists() {
 		include get_query_template( '404' );
 		exit;
 	}
+}
+
+add_shortcode( 'goonj_collection_camp_past', 'goonj_collection_camp_past_data' );
+function goonj_collection_camp_past_data() {
+	ob_start();
+	get_template_part( 'templates/collection-camp-data' );
+	return ob_get_clean();
 }
