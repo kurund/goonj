@@ -98,11 +98,11 @@ function goonj_custom_password_reset_redirection( $errors, $user ) {
 add_shortcode('goonj_check_user_form', 'goonj_check_user_action');
 
 function goonj_check_user_action() {
-    ob_start();
-    $message = '';
-    if (isset($_GET['message'])) {
-        if ($_GET['message'] === 'waiting-induction') {
-            $message = '
+	ob_start();
+	$message = '';
+	if (isset($_GET['message'])) {
+		if ($_GET['message'] === 'waiting-induction') {
+			$message = '
                 <p class="fw-600 fz-20 mb-6">Your induction is pending</p>
                 <p class="fw-400 fz-16 mt-0 mb-24">
                     We noticed that you\'ve already submitted your volunteer registration form. Just one more step to go before you can start your collection camp. Please finish your induction to move forward.
@@ -117,9 +117,8 @@ function goonj_check_user_action() {
                     <a href="tel:01141401216" class="contact-link">011-41401216</a>
                 </div>
             </div>';
-        }
-    }
-
+		}
+	}
 
     // Pass the message to the template
     set_query_var('goonj_pending_induction_message', $message);
