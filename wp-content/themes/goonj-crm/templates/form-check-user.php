@@ -7,8 +7,8 @@
 $message = get_query_var('goonj_pending_induction_message', '');
 ?>
 
-<div class="text-center">
-    <form class="logged-out wp-block-loginout mobile-margins-l30-r30" action="<?php echo home_url(); ?>" method="POST">
+<div class="text-center w-xl-520 m-auto">
+    <form class="logged-out wp-block-loginout ml-30 mr-30 ml-md-0 mr-md-0" action="<?php echo home_url(); ?>" method="POST">
         <?php if ($message) : ?>
             <div class="message">
                 <?php echo $message; ?>
@@ -29,7 +29,7 @@ $message = get_query_var('goonj_pending_induction_message', '');
             </div>
             <br>
             <p class="login-submit">
-                <input type="submit" class="button button-primary w-520" value="Continue">
+                <input type="submit" class="button button-primary w-100p" value="Continue">
             </p>
         <?php endif; ?>
     </form>
