@@ -275,7 +275,7 @@ function goonj_collection_camp_landing_page() {
     get_template_part('templates/collection-landing-page');
     return ob_get_clean();
 }
-add_shortcode('goonj_collection_landing_page', 'goonj_collection_camp_landing_page');
+add_shortcode( 'goonj_collection_landing_page', 'goonj_collection_camp_landing_page' );
 
 add_action( 'init', 'goonj_custom_rewrite_rules' );
 function goonj_custom_rewrite_rules() {
