@@ -16,7 +16,7 @@ $message = get_query_var('goonj_pending_induction_message', '');
         <?php endif; ?>
         <input type="hidden" name="action" value="goonj-check-user" />
         <?php if (!$message) : ?>
-				<h2 class="mt-0 mb-6 font-sans fw-400">Goonj Collection Camp</h2>
+				<h2 class="mt-0 mb-6 font-sans fw-600">Goonj Collection Camp</h2>
 				 <p class="mb-24 mt-0 font-sans">Please fill the following fields to continue</p>
             <div class="d-grid">
                 <label class="font-sans" for="email">Email</label>
