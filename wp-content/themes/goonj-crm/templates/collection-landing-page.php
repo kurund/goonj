@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </ol>
     <form method="post">
         <p class="login-submit">
-            <input type="submit" class="button button-primary w-1000 mt-36" value="Continue">
+            <input type="submit" class="button button-primary w-100p mt-36" value="Continue">
         </p>
     </form>
 </div>
