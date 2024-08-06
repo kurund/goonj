@@ -9,8 +9,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <div class="text-center">
-    <h2 class="font-sans fw-600 mb-6">Goonj Collection Camp</h2>
-    <p class="font-sans fw-400 mt-0 mb-24">Please go through the details below</p>
+    <h2 class="font-sans fz-20 fw-600 mb-6">Goonj Collection Camp</h2>
+    <p class="font-sans fz-16 fw-400 mt-0 mb-24">Please go through the details below</p>
     <ol>
         <li class="font-sans mb-6 fz-16">
             Before organising the collection drives, kindly go through our guidelines here - <a href="https://rb.gy/9nfbus" target="_blank">https://rb.gy/9nfbus</a>. Understanding all the guidelines beforehand is important to avoid any inconvenience later.
