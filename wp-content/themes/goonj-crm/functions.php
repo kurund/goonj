@@ -103,20 +103,23 @@ function goonj_check_user_action() {
     if (isset($_GET['message'])) {
         if ($_GET['message'] === 'waiting-induction') {
             $message = '
-                <p class="fw-600 fz-16 mb-6">Your induction is pending</p>
+                <p class="fw-600 fz-20 mb-6">Your induction is pending</p>
                 <p class="fw-400 fz-16 mt-0 mb-24">
                     We noticed that you\'ve already submitted your volunteer registration form. Just one more step to go before you can start your collection camp. Please finish your induction to move forward.
                 </p>
-                    <p>
-                        <img src="' . get_template_directory_uri() . '/wp-content/themes/goonj-crm/images/email-icon.png" alt="email-icon">
-                        <a href="mailto:mail@goonj.org">mail@goonj.org</a>
-                    </p>
-                    <p>
-                        <img src="' . get_template_directory_uri() . '/wp-content/themes/goonj-crm/images/phone-icon.png" alt="email-icon">
-                        <a href="tel:01141401216">011-41401216</a>
-                    </p>';
+                <div class="contact-info">
+                <div class="contact-item">
+                    <img src="' . get_template_directory_uri() . '/images/email-icon.png" alt="Email Icon" class="icon">
+                    <a href="mailto:mail@goonj.org" class="contact-link">mail@goonj.org</a>
+                </div>
+                <div class="contact-item">
+                    <img src="' . get_template_directory_uri() . '/images/phone-icon.png" alt="Phone Icon" class="icon">
+                    <a href="tel:01141401216" class="contact-link">011-41401216</a>
+                </div>
+            </div>';
         }
     }
+
 
     // Pass the message to the template
     set_query_var('goonj_pending_induction_message', $message);

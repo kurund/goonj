@@ -307,6 +307,7 @@ form input {
     .mobile-margins-l24-r30 {
         margin-left: 24px !important;
         margin-right: 30px !important;
+        margin-bottom: 30px !important;
     }
     .mobile-margin-left-30 {
         margin-left: 30px !important;
@@ -318,3 +319,29 @@ form input {
     }
 
 }
+.contact-info {
+    font-size: 16px;
+    margin-bottom: 24px;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.contact-item .icon {
+    margin-right: 10px;
+    width: 20px;
+    height: 16px; 
+}
+
+.contact-link {
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    text-decoration: underline;
+    color: inherit;
+}
+
+
+
