@@ -15,7 +15,7 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 		$endDate = $originalData['custom_74'] ?? null;
 	
 		$eventParams = [
-			'title' => 'Collection Camp Intent',
+			'title' => 'Collection Camp',
 			'event_type_id' => 7,
 			'start_date' => $startDate,
 			'end_date' => $endDate,

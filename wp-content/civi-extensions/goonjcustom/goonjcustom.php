@@ -195,7 +195,6 @@ function goonjcustom_civicrm_pageRun( &$page ) {
 					  } else if (isCollectionCampActivity) {
 						  fieldsToHide = [
 							  ".crm-activity-form-block-subject",
-							  ".crm-activity-form-block-campaign_id",
 							  ".crm-activity-form-block-engagement_level",
 							  ".crm-activity-form-block-duration",
 							  ".crm-activity-form-block-priority_id",
