@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 ?>
-<div class="text-center">
+<div class="text-center ml-30 mr-30">
     <h2 class="font-sans fz-20 fw-600 mb-6">Goonj Collection Camp</h2>
     <p class="font-sans fz-16 fw-400 mt-0 mb-24">Please go through the details below</p>
     <ol>
