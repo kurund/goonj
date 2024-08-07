@@ -361,3 +361,18 @@ form input {
   color: #D64631 !important;
 }
 
+.required-indicator {
+  color: #D64631;
+}
+
+.errorMessage {
+  color: #D64631;
+  margin-top: 2px;
+  font-size: 0.875rem;
+}
+
+.input-error {
+  border-color: #D64631 !important;
+}
+
+
