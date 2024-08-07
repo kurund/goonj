@@ -9,10 +9,11 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 	public function processAction(CRM_Civirules_TriggerData_TriggerData $triggerData) {
 		$contactId = $triggerData->getContactId();
 		$originalData = $triggerData->getOriginalData();
-		
+
 		// Extract fields
 		$startDate = $originalData['custom_73'] ?? null;
 		$endDate = $originalData['custom_74'] ?? null;
+		$contactId = $originalData['contact_id'] ?? null;
 	
 		$eventParams = [
 			'title' => 'Collection Camp',
@@ -21,7 +22,8 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 			'end_date' => $endDate,
 			'is_active' => 1,
 			'is_public' => 1,
-			'default_role_id' => 1
+			'default_role_id' => 1,
+			'created_id' => $contactId,
 		];
 	
 		try {
