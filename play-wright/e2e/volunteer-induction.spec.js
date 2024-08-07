@@ -12,7 +12,6 @@ test.describe('Volunteer Induction Tests', () => {
     await page.waitForTimeout(2000);
     await userLogin(page);
     await searchAndVerifyContact(page, userDetails, contactType);
-    // await page.locator('a.view-contact').click({ force: true });
   });
 
   test('schedule induction and update induction status as completed', async ({ page }) => {
