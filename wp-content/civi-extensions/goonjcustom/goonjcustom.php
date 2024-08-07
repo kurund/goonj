@@ -78,7 +78,7 @@ function goonjcustom_evaluate_tokens( \Civi\Token\Event\TokenValueEvent $e ) {
 
 		$processingCenters = \Civi\Api4\EckEntity::get( 'Processing_Center', false )
 		->addSelect( '*', 'custom.*' )
-		->addWhere( 'Processing_Center.State', 'IN', array( $stateId ) )
+		->addWhere( 'Processing_Center.Associated_States', 'IN', array( $stateId ) )
 		->execute();
 
 		$inductionDetailsMarkup = 'The next step in your volunteering journey is to get inducted with Goonj.';
