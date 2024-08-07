@@ -24,7 +24,11 @@ module.exports = defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 12 : 9,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  // reporter: 'html',
+  reporter: [
+    ['html', { outputFolder: './playwright-report', open: 'never' }],
+    ['json', { outputFile: './playwright-report/results.json' }]
+  ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
@@ -47,7 +51,6 @@ module.exports = defineConfig({
     //   name: 'firefox',
     //   use: { ...devices['Desktop Firefox'] },
     // },
-
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },

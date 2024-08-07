@@ -23,6 +23,15 @@
         }
     }
 
+    @each $name, $value in variables.$spacers {
+        .ml-md-#{$name} {
+            margin-left: $value !important;
+        }
+        .mr-md-#{$name} {
+            margin-right: $value !important;
+        }
+    }
+
     .crm-container {
         padding: 24px;
 
