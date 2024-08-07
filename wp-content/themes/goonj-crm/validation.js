@@ -15,12 +15,14 @@ document.addEventListener("DOMContentLoaded", function () {
           showError(emailInput, "The e-mail address entered is invalid.");
       }
 
-      // Validate phone number
+      // Phone validation code commented out for now. Uncomment when needed.
+      /*
       const phoneValue = phoneInput.value;
       if (!/^\d{10}$/.test(phoneValue)) {
           valid = false;
           showError(phoneInput, "Phone number must be exactly 10 digits.");
       }
+      */
 
       if (!valid) {
           event.preventDefault();
