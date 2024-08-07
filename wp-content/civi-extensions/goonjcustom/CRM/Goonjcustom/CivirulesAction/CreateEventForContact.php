@@ -25,7 +25,6 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 			'is_public' => 1,
 			'default_role_id' => 1,
 			'created_id' => $contactId,
-			'is_map' => 1,
 			'custom_68' => $activityId,
 		];
 	
