@@ -14,6 +14,7 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 		$startDate = $originalData['custom_73'] ?? null;
 		$endDate = $originalData['custom_74'] ?? null;
 		$contactId = $originalData['contact_id'] ?? null;
+		$activityId = $originalData['activity_id'] ?? null;
 	
 		$eventParams = [
 			'title' => 'Collection Camp',
@@ -24,6 +25,8 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 			'is_public' => 1,
 			'default_role_id' => 1,
 			'created_id' => $contactId,
+			'is_map' => 1,
+			'custom_68' => $activityId,
 		];
 	
 		try {
