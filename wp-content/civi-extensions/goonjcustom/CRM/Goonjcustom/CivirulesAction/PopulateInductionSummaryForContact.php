@@ -43,6 +43,22 @@ class CRM_Goonjcustom_CivirulesAction_PopulateInductionSummaryForContact extends
 	 * @param CRM_Civirules_TriggerData_TriggerData $triggerData
 	 * @access public
 	 */
+
+    private function fetchLocationTitle($locationId)
+     {
+        global $wpdb;
+ 
+        $query = $wpdb->prepare("SELECT title FROM civicrm_eck_processing_center WHERE id = %d", $locationId);
+ 
+        $title = $wpdb->get_var($query);
+ 
+        if ($title !== null) {
+            return $title;
+        } else {
+            throw new Exception('Location not found');
+        }
+    }
+ 
 	public function processAction(CRM_Civirules_TriggerData_TriggerData $triggerData)
 	{
 
@@ -62,7 +78,7 @@ class CRM_Goonjcustom_CivirulesAction_PopulateInductionSummaryForContact extends
 		// Get the activity details including status, date, assignee, and location.
 		$activity = civicrm_api3('Activity', 'getsingle', [
 			'id' => $activityId,
-			'return' => ['details', 'status_id', 'activity_date_time', 'location', 'target_contact_id'],
+			'return' => ['details', 'status_id', 'activity_date_time', 'custom_60', 'target_contact_id'],
 		]);
 
 		// Fetch the assignee details using ActivityContact API.
@@ -89,11 +105,21 @@ class CRM_Goonjcustom_CivirulesAction_PopulateInductionSummaryForContact extends
 			'value' => $activity['status_id'],
 		]);
 
+        // Fetch location title if custom_60 is set
+        $locationTitle = '';
+        if (!empty($activity['custom_60'])) {
+            try {
+                $locationTitle = $this->fetchLocationTitle($activity['custom_60']);
+            } catch (Exception $e) {
+                error_log($e->getMessage());
+            }
+        }
+
 		$inductionValues = [
 			'Induction_details' => $activity['details'],
 			'Induction_status' => $status['label'],
 			'Induction_date' => $activity['activity_date_time'],
-			'Induction_Location' => $activity['location'],
+			'Induction_Location' => $locationTitle,
 			'Induction_assignee' => $activityAssigneeNames,
 		];
 
