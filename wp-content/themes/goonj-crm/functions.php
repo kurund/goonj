@@ -383,3 +383,161 @@ function goonj_collection_camp_past_data() {
 	get_template_part( 'templates/collection-camp-data' );
 	return ob_get_clean();
 }
+
+add_action('after_setup_theme', 'goonj_setup_cron_job');
+function goonj_setup_cron_job() {
+    if (!wp_next_scheduled('goonj_cron_job')) {
+        wp_schedule_event(time(), 'daily', 'goonj_cron_job');
+    }
+}
+
+// Clear the cron job schedule on theme deactivation
+add_action('switch_theme', 'goonj_clear_cron_job');
+function goonj_clear_cron_job() {
+    $timestamp = wp_next_scheduled('goonj_cron_job');
+    if ($timestamp) {
+        wp_unschedule_event($timestamp, 'goonj_cron_job');
+    }
+}
+
+// Define the cron job function
+add_action('goonj_cron_job', 'goonj_execute_cron_job');
+function goonj_execute_cron_job() {
+    try {
+        if (function_exists('civicrm_initialize')) {
+            civicrm_initialize();
+        }
+
+        // $currentDate = date('Y-m-d');
+        $currentDate = '2024-08-30';
+
+        $contacts = \Civi\Api4\Contact::get(TRUE)
+            ->addSelect('id', 'display_name', 'Volunteer_Induction_Summary.Induction_status', 'Volunteer_Induction_Summary.Induction_assignee', 'Volunteer_Induction_Summary.Induction_date')
+            ->addWhere('Volunteer_Induction_Summary.Induction_status', '=', 'Scheduled')
+            ->addWhere('Volunteer_Induction_Summary.Induction_date', 'LIKE', '%' . $currentDate . '%')
+            ->setLimit(25)
+            ->execute();
+        $assignees_data = [];
+
+        // Collect display names of the assignees_data
+        foreach ($contacts as $contact) {
+            if (isset($contact['Volunteer_Induction_Summary.Induction_assignee']) && !empty($contact['Volunteer_Induction_Summary.Induction_assignee'])) {
+                $assignees_data[] = [
+                    'volunteer_id' => $contact['id'],
+                    'volunteer_display_name' => $contact['display_name'],
+                    'volunteer_induction_status' => $contact['Volunteer_Induction_Summary.Induction_status'],
+                    'assignee_display_name' => $contact['Volunteer_Induction_Summary.Induction_assignee'],
+                    'volunteer_induction_date' => $contact['Volunteer_Induction_Summary.Induction_date'],
+                ];
+            }
+        }
+
+        // Fetch the IDs for each assignee and update the assignees_data array
+        $assigneeIds = \Civi\Api4\Contact::get(TRUE)
+            ->addSelect('id', 'display_name')
+            ->addWhere('display_name', 'IN', array_column($assignees_data, 'assignee_display_name'))
+            ->execute();
+
+        foreach ($assignees_data as &$assignee) {
+            foreach ($assigneeIds as $idInfo) {
+                if ($assignee['assignee_display_name'] == $idInfo['display_name']) {
+                    $assignee['assignee_id'] = $idInfo['id'];
+                    break;
+                }
+            }
+        }
+
+        // Extract the IDs from the assignees_data to fetch emails
+        $ids = array_column($assignees_data, 'assignee_id');
+
+        // Fetch the emails associated with the assignee IDs
+        $assigneeEmails = \Civi\Api4\Email::get(TRUE)
+            ->addSelect('contact_id', 'email')
+            ->addWhere('contact_id', 'IN', $ids)
+            ->execute();
+
+        // Append emails to the corresponding assignee in the assignees_data array
+        foreach ($assignees_data as &$assignee) {
+            foreach ($assigneeEmails as $emailInfo) {
+                if ($assignee['assignee_id'] == $emailInfo['contact_id']) {
+                    $assignee['assignee_email'] = $emailInfo['email'];
+                    break;
+                }
+            }
+        }
+
+		// foreach ($assignees_data as $assignee) {
+        //     if (isset($assignee['assignee_email'])) {
+        //         $params = [
+        //             'contact_id' => $assignee['assignee_id'],
+        //             'subject' => "Induction Scheduled for Today",
+        //             'text' => "Dear " . $assignee['volunteer_display_name'] . ",\n\nThis is to inform you that there is an induction scheduled for today, " . $assignee['Volunteer_Induction_Summary.Induction_date']  . ".\n\nBest regards,\nYour Organization",
+        //             'from_name' => "Goonj",
+        //             'from_email' => "nishant.kumar@coloredcow.in",
+        //             'template_id' => 75, // Assuming you have a template ID
+        //             'create_activity' => TRUE,
+        //             'activity_details' => 'text', // You can change this to 'html' or 'html,text' depending on the message content
+        //         ];
+
+		// 		try {
+        //             civicrm_api3('Email', 'send', $params);
+        //         } catch (CiviCRM_API3_Exception $e) {
+        //             error_log('Goonj Cron Job: Error sending email to ' . $assignee['assignee_display_name'] . ' - ' . $e->getMessage());
+        //         }
+        //     }
+        // }
+		foreach ($assignees_data as $assignee) {
+			if (isset($assignee['assignee_email'])) {
+				$params = [
+					'contact_id' => $assignee['assignee_id'],
+					'template_id' => 76, // Ensure this template has the placeholders
+					'from_name' => "Goonj",
+					'from_email' => "nishant.kumar@coloredcow.in",
+					'merge_vars' => [
+						[
+							'name' => 'volunteer_display_name',
+							'value' => $assignee['volunteer_display_name'],
+						],
+						[
+							'name' => 'volunteer_induction_date',
+							'value' => $assignee['volunteer_induction_date'],
+						],
+					],
+					'create_activity' => TRUE,
+					'activity_details' => 'text', // Or 'html' depending on your needs
+				];
+		
+				try {
+					civicrm_api3('Email', 'send', $params);
+				} catch (CiviCRM_API3_Exception $e) {
+					error_log('Goonj Cron Job: Error sending email to ' . $assignee['assignee_display_name'] . ' - ' . $e->getMessage());
+				}
+			}
+		}
+		
+        echo "Assignees_dataEmails:\n";
+        print_r($assignees_data);
+
+        error_log('Goonj Cron Job: Job completed successfully');
+    } catch (CiviCRM_API3_Exception $e) {
+        error_log('Goonj Cron Job: API error - ' . $e->getMessage());
+    }
+}
+
+
+// Add a new hook in WordPress to listen for the CiviCRM job trigger
+add_action('civi_goonj_cron_job', 'goonj_execute_cron_job');
+
+// Define a simple PHP script to trigger the WordPress cron job
+function civi_trigger_goonj_cron_job() {
+    // Trigger the custom WordPress cron job
+    do_action('civi_goonj_cron_job');
+}
+
+// Register this function as a CiviCRM scheduled job
+add_action('init', function() {
+    if (isset($_GET['civi_cron']) && $_GET['civi_cron'] === 'goonj_cron_job') {
+        civi_trigger_goonj_cron_job();
+        exit('Goonj Cron Job Triggered');
+    }
+});
