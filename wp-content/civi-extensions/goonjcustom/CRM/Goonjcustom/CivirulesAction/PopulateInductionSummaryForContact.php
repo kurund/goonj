@@ -35,6 +35,20 @@ class CRM_Goonjcustom_CivirulesAction_PopulateInductionSummaryForContact extends
 
 		return reset($result['values']);
 	}
+    private function fetchLocationTitle($locationId)
+    {
+       global $wpdb;
+
+       $query = $wpdb->prepare("SELECT title FROM civicrm_eck_processing_center WHERE id = %d", $locationId);
+
+       $title = $wpdb->get_var($query);
+
+       if ($title !== null) {
+           return $title;
+       } else {
+           throw new Exception('Location not found');
+       }
+   }
 
 	/**
 	 * Method processAction to execute the action
@@ -44,21 +58,6 @@ class CRM_Goonjcustom_CivirulesAction_PopulateInductionSummaryForContact extends
 	 * @access public
 	 */
 
-    private function fetchLocationTitle($locationId)
-     {
-        global $wpdb;
- 
-        $query = $wpdb->prepare("SELECT title FROM civicrm_eck_processing_center WHERE id = %d", $locationId);
- 
-        $title = $wpdb->get_var($query);
- 
-        if ($title !== null) {
-            return $title;
-        } else {
-            throw new Exception('Location not found');
-        }
-    }
- 
 	public function processAction(CRM_Civirules_TriggerData_TriggerData $triggerData)
 	{
 
