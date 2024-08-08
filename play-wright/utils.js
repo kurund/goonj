@@ -86,9 +86,11 @@ export async function searchAndVerifyContact(page, userDetails, contactType) {
   await searchContactsPage.selectContactType(contactType);
   await searchContactsPage.clickSearchButton();
   await page.waitForTimeout(2000); // added wait as page was taking time to load
-  // Verify the contact is found in the table
-  const contactRowSelector = `table tbody tr:has(span[title="${userDetails.email}"])`;
-  await page.waitForTimeout(1000);
-  expect(contactRowSelector).toContain(userDetails.email);
-  await page.waitForTimeout(1000);
+  await page.locator('a.view-contact').click({force: true})
+  await page.waitForTimeout(1000)
+  const emailLocator = page.locator('div.crm-summary-row.profile-block-email-Primary .crm-content');
+  await page.waitForTimeout(1000)
+  const emailAddress = await emailLocator.innerText();
+  const userEmailAddress = userDetails.email.toLowerCase()
+  expect(emailAddress).toContain(userEmailAddress);
 }
