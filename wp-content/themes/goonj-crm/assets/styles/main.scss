@@ -356,3 +356,19 @@ form input {
 #bootstrap-theme .btn-primary {
     border-radius: 4px !important;
 }
+
+.required-indicator {
+  color: #D64631 !important;
+}
+
+.errorMessage {
+  color: #D64631;
+  margin-top: 2px;
+  font-size: 0.875rem;
+}
+
+.input-error {
+  border-color: #D64631 !important;
+}
+
+

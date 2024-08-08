@@ -14,6 +14,13 @@ function goonj_enqueue_scripts() {
 		array(),
 		wp_get_theme()->get('Version')
 	);
+	wp_enqueue_script(
+        'validation-script',
+        get_template_directory_uri() . '/validation.js',
+        array('jquery'),
+        wp_get_theme()->get('Version'),
+        true
+    );
 }
 
 
