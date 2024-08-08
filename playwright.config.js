@@ -1,5 +1,5 @@
 // @ts-check
-const { defineConfig, devices } = require('@playwright/test');
+import { defineConfig, devices } from '@playwright/test';
 
 /**
  * Read environment variables from file.
@@ -11,10 +11,10 @@ require('dotenv').config({path: '.env'});
 /**
  * @see https://playwright.dev/docs/test-configuration
  */
-module.exports = defineConfig({
+export default defineConfig({
   testDir: './play-wright/e2e',
   // Set default timeout for the test case
-  timeout: 600 * 1000,
+  timeout: 360 * 1000,
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -24,7 +24,6 @@ module.exports = defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 12 : 9,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  // reporter: 'html',
   reporter: [
     ['html', { outputFolder: './playwright-report', open: 'never' }],
     ['json', { outputFile: './playwright-report/results.json' }]
