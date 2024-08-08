@@ -260,3 +260,9 @@ function goonjcustom_civicrm_tabset($tabsetName, &$tabs, $context) {
 		'current' => false,
 	];
 }
+
+function goonjcustom_civicrm_trigger($job) {
+    if ($job->name == 'Daily Induction Email Notification') {
+        sendDailyInductionEmails();
+    }
+}
