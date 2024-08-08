@@ -1,4 +1,5 @@
 <?php
+
 class CRM_Goonjcustom_CivirulesAction_PopulateInductionSummaryForContact extends CRM_Civirules_Action
 {
     private function fetchCustomFieldsInGroup($customGroupId)
@@ -77,13 +78,13 @@ class CRM_Goonjcustom_CivirulesAction_PopulateInductionSummaryForContact extends
         }
     }
 
-/**
-	 * Method processAction to execute the action
-	 * This action it to populate contact's activity (induction type) details to showcase in volunteer activity summary page
-	 *
-	 * @param CRM_Civirules_TriggerData_TriggerData $triggerData
-	 * @access public
-	 */
+    /**
+         * Method processAction to execute the action
+         * This action it to populate contact's activity (induction type) details to showcase in volunteer activity summary page
+         *
+         * @param CRM_Civirules_TriggerData_TriggerData $triggerData
+         * @access public
+         */
 
     public function processAction(CRM_Civirules_TriggerData_TriggerData $triggerData)
     {
@@ -99,7 +100,7 @@ class CRM_Goonjcustom_CivirulesAction_PopulateInductionSummaryForContact extends
         }
 
         $customFields = $this->fetchCustomFieldsInGroup($customGroup['id']);
-        $useCustomGroup = 'Induction_Fields'; 
+        $useCustomGroup = 'Induction_Fields';
 
         $customFields2 = $this->fetchCustomFieldsByGroupName($useCustomGroup);
 
@@ -110,11 +111,11 @@ class CRM_Goonjcustom_CivirulesAction_PopulateInductionSummaryForContact extends
                 'details',
                 'status_id',
                 'activity_date_time',
-                'custom_' . $customFields2['Location']['id'], 
+                'custom_' . $customFields2['Location']['id'],
                 'target_contact_id'
             ],
         ]);
-        
+
 
 
         // Fetch the assignee details using ActivityContact API.
@@ -180,14 +181,14 @@ class CRM_Goonjcustom_CivirulesAction_PopulateInductionSummaryForContact extends
         return true;
     }
 
-/**
-	 * Method to return the url for additional form processing for action
-	 * and return false if none is needed
-	 *
-	 * @param int $ruleActionId
-	 * @return bool
-	 * @access public
-	 */
+    /**
+         * Method to return the url for additional form processing for action
+         * and return false if none is needed
+         *
+         * @param int $ruleActionId
+         * @return bool
+         * @access public
+         */
     public function getExtraDataInputUrl($ruleActionId)
     {
         return false;
