@@ -54,6 +54,7 @@ exports.VolunteerRegistrationPage =  class VolunteerRegistrationPage {
     await this.page.click(dropdownSelector);
     await this.page.waitForTimeout(1000)
     await this.page.fill(inputField, option);
+    await this.page.waitForTimeout(2000)
     const optionSelector = `.select2-result-label:text("${option}")`;
     await this.page.click(optionSelector);
     await this.page.keyboard.press('Tab');
