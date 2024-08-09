@@ -2,62 +2,27 @@
 
 class CRM_Goonjcustom_CivirulesAction_PopulateInductionSummaryForContact extends CRM_Civirules_Action
 {
-    private function fetchCustomFieldsInGroup($customGroupId)
-    {
-        $params = [
-            'sequential' => 1,
-            'custom_group_id' => $customGroupId,
-            'options' => ['limit' => 0], // No limit on results
-        ];
-        $result = civicrm_api3('CustomField', 'get', $params);
-
-        if ($result['is_error']) {
-            throw new Exception('Error fetching custom fields: ' . $result['error_message']);
-        }
-
-        return $result['values'];
-    }
-
-    private function fetchCustomGroupByName($customGroupName)
-    {
-        $params = [
-            'sequential' => 1,
-            'name' => $customGroupName,
-        ];
-        $result = civicrm_api3('CustomGroup', 'get', $params);
-
-        if ($result['is_error']) {
-            throw new Exception('Error fetching custom group: ' . $result['error_message']);
-        }
-
-        if (empty($result['values'])) {
-            throw new Exception('No custom group found with the name: ' . $customGroupName);
-        }
-
-        return reset($result['values']);
-    }
-
     private function fetchCustomFieldsByGroupName($customGroupName)
     {
-        $customGroup = \Civi\Api4\CustomGroup::get(TRUE)
+        $customGroupId = \Civi\Api4\CustomGroup::get(TRUE)
             ->addSelect('id')
             ->addWhere('name', '=', $customGroupName)
             ->setLimit(1)
             ->execute()
-            ->first();
+            ->first()['id'] ?? null;
 
-        if (!$customGroup) {
+        if (!$customGroupId) {
             throw new Exception("Custom group '$customGroupName' not found");
         }
 
         $customFields = \Civi\Api4\CustomField::get(TRUE)
-            ->addWhere('custom_group_id', '=', $customGroup['id'])
-            ->setLimit(25)
+            ->addWhere('custom_group_id', '=', $customGroupId)
+            ->setLimit(0) // No limit on the number of custom fields retrieved
             ->execute()
             ->indexBy('name');
 
-        if (empty($customFields)) {
-            throw new Exception('No custom fields found for group ID: ' . $customGroup['id']);
+        if (!$customFields) {
+            throw new Exception("No custom fields found for custom group ID: $customGroupId");
         }
 
         return $customFields;
@@ -79,13 +44,12 @@ class CRM_Goonjcustom_CivirulesAction_PopulateInductionSummaryForContact extends
     }
 
     /**
-         * Method processAction to execute the action
-         * This action it to populate contact's activity (induction type) details to showcase in volunteer activity summary page
-         *
-         * @param CRM_Civirules_TriggerData_TriggerData $triggerData
-         * @access public
-         */
-
+     * Method processAction to execute the action
+     * This action it to populate contact's activity (induction type) details to showcase in volunteer activity summary page
+     *
+     * @param CRM_Civirules_TriggerData_TriggerData $triggerData
+     * @access public
+     */
     public function processAction(CRM_Civirules_TriggerData_TriggerData $triggerData)
     {
         $activityId = $triggerData->getEntityId();
@@ -94,14 +58,12 @@ class CRM_Goonjcustom_CivirulesAction_PopulateInductionSummaryForContact extends
         }
 
         $customGroupName = 'Volunteer_Induction_Summary';
-        $customGroup = $this->fetchCustomGroupByName($customGroupName);
-        if (empty($customGroup)) {
+        $customFields = $this->fetchCustomFieldsByGroupName($customGroupName);
+        if (empty($customFields)) {
             return false;
         }
 
-        $customFields = $this->fetchCustomFieldsInGroup($customGroup['id']);
         $useCustomGroup = 'Induction_Fields';
-
         $customFields2 = $this->fetchCustomFieldsByGroupName($useCustomGroup);
 
         // Get the activity details including status, date, assignee, and location.
@@ -115,8 +77,6 @@ class CRM_Goonjcustom_CivirulesAction_PopulateInductionSummaryForContact extends
                 'target_contact_id'
             ],
         ]);
-
-
 
         // Fetch the assignee details using ActivityContact API.
         $assigneeContacts = civicrm_api3('ActivityContact', 'get', [
@@ -182,13 +142,13 @@ class CRM_Goonjcustom_CivirulesAction_PopulateInductionSummaryForContact extends
     }
 
     /**
-         * Method to return the url for additional form processing for action
-         * and return false if none is needed
-         *
-         * @param int $ruleActionId
-         * @return bool
-         * @access public
-         */
+     * Method to return the url for additional form processing for action
+     * and return false if none is needed
+     *
+     * @param int $ruleActionId
+     * @return bool
+     * @access public
+     */
     public function getExtraDataInputUrl($ruleActionId)
     {
         return false;
