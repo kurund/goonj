@@ -12,11 +12,15 @@ test('Add a volunteer to Lead Volunteer group', async ({ page }) => {
   await searchAndVerifyContact(page, userDetails, individualContactType)
   await volunteerProfilePage.volunteerProfileTabs('activities');
   await volunteerProfilePage.updateInductionForm('Induction', 'To be scheduled', 'Edit', 'Scheduled', 'save')
+  await page.waitForTimeout(3000)
   await volunteerProfilePage.updateInductionForm('Induction', 'Scheduled', 'Edit', 'Completed', 'save')
   await page.click('a:has-text("Volunteers")');
   await page.waitForTimeout(3000)
   await volunteerProfilePage.clickVolunteerSuboption('Active')
   await page.waitForTimeout(8000)
+  await page.fill('#contact-email-contact-id-01-email-0', userDetails.email)
+  await page.press('#contact-email-contact-id-01-email-0', 'Enter')
+  await page.waitForTimeout(2000)
   const emailSelector = 'td[data-field-name=""] span.ng-binding.ng-scope';
   const emailAddress = await page.$$eval(emailSelector, nodes =>
     nodes.map(n => n.innerText.trim())
