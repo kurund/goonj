@@ -14,7 +14,7 @@ require('dotenv').config({path: '.env'});
 module.exports = defineConfig({
   testDir: './play-wright/e2e',
   // Set default timeout for the test case
-  timeout: 600 * 1000,
+  timeout: 360 * 1000,
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -48,10 +48,10 @@ module.exports = defineConfig({
     //   name: 'chromium',
     //   use: { ...devices['Desktop Chrome'] },
     // },
-    // {
-    //   name: 'firefox',
-    //   use: { ...devices['Desktop Firefox'] },
-    // },
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
+    },
 
     {
       name: 'webkit',
