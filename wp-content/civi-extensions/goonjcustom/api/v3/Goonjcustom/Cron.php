@@ -26,9 +26,6 @@ function civicrm_api3_goonjcustom_cron($params) {
   $returnValues = [];
 
   try {
-    if (function_exists('civicrm_initialize')) {
-        civicrm_initialize();
-    }
 
     // $currentDate = date('Y-m-d');
     $currentDate = '2024-08-30';
@@ -39,6 +36,8 @@ function civicrm_api3_goonjcustom_cron($params) {
         ->addWhere('Volunteer_Induction_Summary.Induction_date', 'LIKE', '%' . $currentDate . '%')
         ->setLimit(25)
         ->execute();
+    error_log('check' . print_r($contacts, true));
+
     $assignees_data = [];
 
     // Collect display names of the assignees_data
@@ -88,37 +87,29 @@ function civicrm_api3_goonjcustom_cron($params) {
         }
     }
 
-    // foreach ($assignees_data as $assignee) {
-    //     if (isset($assignee['assignee_email'])) {
-    //         $params = [
-    //             'contact_id' => $assignee['assignee_id'],
-    //             'template_id' => 76, // Ensure this template has the placeholders
-    //             'from_name' => "Goonj",
-    //             'from_email' => "nishant.kumar@coloredcow.in",
-    //             'merge_vars' => [
-    //                 [
-    //                     'name' => 'volunteer_display_name',
-    //                     'value' => $assignee['volunteer_display_name'],
-    //                 ],
-    //                 [
-    //                     'name' => 'volunteer_induction_date',
-    //                     'value' => $assignee['volunteer_induction_date'],
-    //                 ],
-    //             ],
-    //             'create_activity' => TRUE,
-    //             'activity_details' => 'text', // Or 'html' depending on your needs
-    //         ];
+    foreach ($assignees_data as $assignee) {
+        if (isset($assignee['assignee_email'])) {
+            $params = [
+                'contact_id' => $assignee['assignee_id'],
+                'template_id' => 76, // Ensure this template has the placeholders
+                'from_name' => "Goonj",
+                'from_email' => "nishant.kumar@coloredcow.in",
+                'create_activity' => TRUE,
+                'activity_details' => 'text', // Or 'html' depending on your needs
+            ];
     
-    //         try {
-    //             civicrm_api3('Email', 'send', $params);
-    //         } catch (CiviCRM_API3_Exception $e) {
-    //             error_log('Goonj Cron Job: Error sending email to ' . $assignee['assignee_display_name'] . ' - ' . $e->getMessage());
-    //         }
-    //     }
-    // }
+            try {
+                civicrm_api3('Email', 'send', $params);
+            } catch (CiviCRM_API3_Exception $e) {
+                error_log('Goonj Cron Job: Error sending email to ' . $assignee['assignee_display_name'] . ' - ' . $e->getMessage());
+            }
+        }
+    }
     
     echo "Assignees_dataEmails:\n";
-    error_log($assignees_data);
+    // error_log($assignees_data);
+    error_log('check2' . print_r($assignees_data, true));
+
 
     error_log('Goonj Cron Job: Job completed successfully');
 } catch (CiviCRM_API3_Exception $e) {
