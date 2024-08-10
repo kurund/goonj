@@ -6,28 +6,29 @@ test('Add a volunteer to Lead Volunteer group', async ({ page }) => {
   const volunteerProfilePage = new VolunteerProfilePage(page);
   const individualContactType = 'Individual'
   const volunteerContactType = '- Volunteer'
+  let userEmailAddress = userDetails.email.toLowerCase()
   await submitVolunteerRegistrationForm(page, userDetails);
   await page.waitForTimeout(2000)
   await userLogin(page);
   await searchAndVerifyContact(page, userDetails, individualContactType)
-  page.locator('a.view-contact').click({force: true})
   await volunteerProfilePage.volunteerProfileTabs('activities');
-  await page.waitForTimeout(2000)
-  await volunteerProfilePage.clickActivitiesActionButton('Induction', 'Scheduled', 'Edit');
-  await page.waitForTimeout(4000)
-  await volunteerProfilePage.selectActivityStatusValue('Completed');
-  await page.waitForTimeout(2000)
-  await volunteerProfilePage.clickDialogButton('save');
+  await volunteerProfilePage.updateInductionForm('Induction', 'To be scheduled', 'Edit', 'Scheduled', 'save')
+  await page.waitForTimeout(3000)
+  await volunteerProfilePage.updateInductionForm('Induction', 'Scheduled', 'Edit', 'Completed', 'save')
   await page.click('a:has-text("Volunteers")');
   await page.waitForTimeout(3000)
   await volunteerProfilePage.clickVolunteerSuboption('Active')
+  await page.waitForTimeout(8000)
+  await page.fill('#contact-email-contact-id-01-email-0', userEmailAddress)
+  await page.press('#contact-email-contact-id-01-email-0', 'Enter')
   await page.waitForTimeout(2000)
-  const activeVolunteerRowSelector = `table tbody tr:has(span[title="${userDetails.email}"])`;
-  await page.waitForTimeout(1000)
-  expect(activeVolunteerRowSelector).toContain(userDetails.email)
-  await page.waitForTimeout(1000)
+  const emailSelector = 'td[data-field-name=""] span.ng-binding.ng-scope';
+  const emailAddress = await page.$$eval(emailSelector, nodes =>
+    nodes.map(n => n.innerText.trim())
+  );
+  // const userEmailAddress = userDetails.email.toLowerCase()
+  expect(emailAddress).toContain(userEmailAddress)
   await searchAndVerifyContact(page, userDetails, volunteerContactType)
-  page.locator('a.view-contact').click({force: true})
   await volunteerProfilePage.volunteerProfileTabs('groups');
   await page.waitForTimeout(1000)
   await volunteerProfilePage.selectAddToGroupOption('Lead Volunteers');
@@ -36,7 +37,7 @@ test('Add a volunteer to Lead Volunteer group', async ({ page }) => {
   await page.click('table#option11 a:has-text("Lead Volunteers")');
   await page.click('#searchForm summary:has-text("Find Contacts within this Group")');
   await searchAndVerifyContact(page, userDetails, volunteerContactType)
-  const leadVolunteerRowSelector = `table tbody tr:has(span[title="${userDetails.email}"])`;
+  const leadVolunteerRowSelector = `table tbody tr:has(span[title="${userEmailAddress}"])`;
   await page.waitForTimeout(1000)
-  expect(leadVolunteerRowSelector).toContain(userDetails.email)
+  expect(leadVolunteerRowSelector).toContain(userEmailAddress)
 });
