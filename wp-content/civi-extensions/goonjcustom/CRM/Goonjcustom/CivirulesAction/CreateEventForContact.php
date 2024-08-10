@@ -33,10 +33,6 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 
 			$addressData = $addressResult->first();
 			$addressId = $addressData['id'] ?? null;
-
-			if ($addressId === null) {
-				throw new Exception('Address ID not found.');
-			}
 		} catch (Exception $e) {
 			throw new Exception($e->getMessage());
 		}
@@ -50,10 +46,6 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 			// Fetch the location block ID from the result
 			$locBlockData = $locBlockResult->first();
 			$locBlockId = $locBlockData['id'] ?? null;
-
-			if ($locBlockId === null) {
-				throw new Exception('Location Block ID not found.');
-			}
 
 		} catch (Exception $e) {
 			throw new Exception($e->getMessage());
