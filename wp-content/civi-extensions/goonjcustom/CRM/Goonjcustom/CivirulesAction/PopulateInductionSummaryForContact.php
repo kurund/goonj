@@ -4,7 +4,7 @@ class CRM_Goonjcustom_CivirulesAction_PopulateInductionSummaryForContact extends
 {
     private function fetchCustomFieldsByGroupName($customGroupName)
     {
-        $customGroupId = \Civi\Api4\CustomGroup::get(TRUE)
+        $customGroupId = \Civi\Api4\CustomGroup::get(true)
             ->addSelect('id')
             ->addWhere('name', '=', $customGroupName)
             ->setLimit(1)
@@ -15,7 +15,7 @@ class CRM_Goonjcustom_CivirulesAction_PopulateInductionSummaryForContact extends
             throw new Exception("Custom group '$customGroupName' not found");
         }
 
-        $customFields = \Civi\Api4\CustomField::get(TRUE)
+        $customFields = \Civi\Api4\CustomField::get(true)
             ->addWhere('custom_group_id', '=', $customGroupId)
             ->setLimit(0) // No limit on the number of custom fields retrieved
             ->execute()
@@ -47,7 +47,7 @@ class CRM_Goonjcustom_CivirulesAction_PopulateInductionSummaryForContact extends
      * Method processAction to execute the action
      * This action it to populate contact's activity (induction type) details to showcase in volunteer activity summary page
      *
-     * @param CRM_Civirules_TriggerData_TriggerData $triggerData
+     * @param  CRM_Civirules_TriggerData_TriggerData $triggerData
      * @access public
      */
     public function processAction(CRM_Civirules_TriggerData_TriggerData $triggerData)
@@ -67,7 +67,8 @@ class CRM_Goonjcustom_CivirulesAction_PopulateInductionSummaryForContact extends
         $customFields2 = $this->fetchCustomFieldsByGroupName($useCustomGroup);
 
         // Get the activity details including status, date, assignee, and location.
-        $activity = civicrm_api3('Activity', 'getsingle', [
+        $activity = civicrm_api3(
+            'Activity', 'getsingle', [
             'id' => $activityId,
             'return' => [
                 'details',
@@ -76,31 +77,38 @@ class CRM_Goonjcustom_CivirulesAction_PopulateInductionSummaryForContact extends
                 'custom_' . $customFields2['Location']['id'],
                 'target_contact_id'
             ],
-        ]);
+            ]
+        );
 
         // Fetch the assignee details using ActivityContact API.
-        $assigneeContacts = civicrm_api3('ActivityContact', 'get', [
+        $assigneeContacts = civicrm_api3(
+            'ActivityContact', 'get', [
             'activity_id' => $activityId,
             'record_type_id' => 1, // Assignee role
-        ]);
+            ]
+        );
 
         $assignees = [];
         if (!empty($assigneeContacts['values'])) {
             foreach ($assigneeContacts['values'] as $assigneeContact) {
-                $assignee = civicrm_api3('Contact', 'getsingle', [
+                $assignee = civicrm_api3(
+                    'Contact', 'getsingle', [
                     'id' => $assigneeContact['contact_id'],
                     'return' => ['display_name'],
-                ]);
+                    ]
+                );
                 $assignees[] = $assignee['display_name'];
             }
         }
         $activityAssigneeNames = implode(', ', $assignees);
 
         // Fetch the activity status label
-        $status = civicrm_api3('OptionValue', 'getsingle', [
+        $status = civicrm_api3(
+            'OptionValue', 'getsingle', [
             'option_group_id' => 'activity_status',
             'value' => $activity['status_id'],
-        ]);
+            ]
+        );
 
         // Fetch location title using custom field dynamically
         $locationTitle = '';
@@ -145,7 +153,7 @@ class CRM_Goonjcustom_CivirulesAction_PopulateInductionSummaryForContact extends
      * Method to return the url for additional form processing for action
      * and return false if none is needed
      *
-     * @param int $ruleActionId
+     * @param  int $ruleActionId
      * @return bool
      * @access public
      */
