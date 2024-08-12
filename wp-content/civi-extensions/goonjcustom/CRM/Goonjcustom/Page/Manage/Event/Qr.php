@@ -29,7 +29,7 @@ class CRM_Goonjcustom_Page_Manage_Event_Qr extends CRM_Core_Page {
 		// `content_url` is a WordPress specific function.
 		// We should replace it with CiviCRM specific function.
 		// Otherwise this will limit this extension to WorPress-only.
-		$qrImageUrl = content_url("uploads/civicrm/goonjcustom/qrcodes/event_qr_$eventID.png");
+		$qrImageUrl = content_url( "uploads/civicrm/goonjcustom/qrcodes/event_qr_$eventID.png" );
 
 		$this->assign( 'qrImageUrl', $qrImageUrl );
 
@@ -58,10 +58,10 @@ class CRM_Goonjcustom_Page_Manage_Event_Qr extends CRM_Core_Page {
 	 * @param string $qrFilePath
 	 */
 	private function generateQrCode( $eventID, $qrFilePath ) {
-		// Define the URL or data to encode in the QR code
-		$url = "https://goonj-civicrm.test/actions/collection-camp/${eventID}";
+		$baseUrl = CRM_Core_Config::singleton()->userFrameworkBaseURL;
 
-		// Define QR code options
+		$url = "{$baseUrl}actions/collection-camp/{$eventID}";
+
 		$options = new QROptions(
 			array(
 				'version'    => 5,
@@ -71,15 +71,12 @@ class CRM_Goonjcustom_Page_Manage_Event_Qr extends CRM_Core_Page {
 			)
 		);
 
-		// Generate the QR code.
 		$qrcode = ( new QRCode( $options ) )->render( $url );
 
 		// Remove the base64 header and decode the image data.
 		$qrcode = str_replace( 'data:image/png;base64,', '', $qrcode );
 		$qrcode = base64_decode( $qrcode );
 
-
-		// Save the QR code image.
 		file_put_contents( $qrFilePath, $qrcode );
 
 		// TODO
