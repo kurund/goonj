@@ -10,7 +10,7 @@ on:
 jobs:
   checkout-and-test:
     if: github.event_name == 'schedule' || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'in review'))
-    timeout-minutes: 25
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     env:
       BASE_URL_ADMIN_SITE: ${{ secrets.GOONJ_STAGING_SITE_WPADMIN_URL }}
@@ -50,7 +50,8 @@ jobs:
 
     - name: Post report to Discord
       run: |
+        REPORT_CONTENT=$(jq -r '.summary' ./playwright-report/results.json) # Extract summary from results.json
         curl -H "Content-Type: application/json" \
         -X POST \
-        -d '{"content": "Playwright Test Report", "attachments": [{"id": 0, "filename": "./playwright-report/results.json", "content_type": "application/json", "url": "$(cat results.json)"}]}' \
+        -d "{\"content\": \"Playwright Test Report:\n\`\`\`$REPORT_CONTENT\`\`\`\"}" \
         "https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH"
