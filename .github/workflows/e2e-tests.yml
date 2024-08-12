@@ -48,9 +48,9 @@ jobs:
         path: ./playwright-protected/playwright-report.7z
         retention-days: 7
 
-     - name: Post report to Discord
-       run: |
-          curl -H "Content-Type: application/json" \
-          -X POST \
-          -d '{"content": "Playwright Test Report", "attachments": [{"id": 0, "filename": "./playwright-report/results.json", "content_type": "application/json", "url": "$(cat results.json)"}]}' \
-          "https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH"
+    - name: Post report to Discord
+      run: |
+        curl -H "Content-Type: application/json" \
+        -X POST \
+        -d '{"content": "Playwright Test Report", "attachments": [{"id": 0, "filename": "./playwright-report/results.json", "content_type": "application/json", "url": "$(cat results.json)"}]}' \
+        "https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH"
