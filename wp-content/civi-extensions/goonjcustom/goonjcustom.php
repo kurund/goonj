@@ -167,7 +167,6 @@ function goonjcustom_civicrm_pageRun( &$page ) {
 					var urlParams = new URLSearchParams(settings.url);
 					var activityTypeId57 = "57";
 					var activityTypeId61 = "61";
-					var activityViewTypeId61 = "61";
 
 					if ((urlParams.get("atype") === activityTypeId57 && urlParams.get("action") === "view") ||
 						(urlParams.get("subType") === activityTypeId57 && urlParams.get("action") === "2")) {
@@ -179,7 +178,7 @@ function goonjcustom_civicrm_pageRun( &$page ) {
 						isCollectionCampActivity = true;
 					}
 
-					if (urlParams.get("subType") === activityViewTypeId61 && urlParams.get("action") === "view") {
+					if (urlParams.get("subType") === activityTypeId61 && urlParams.get("action") === "view") {
 						isActivityViewType61 = true;
 					}
 
