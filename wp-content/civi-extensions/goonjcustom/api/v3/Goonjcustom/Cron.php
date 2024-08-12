@@ -49,6 +49,10 @@ function civicrm_api3_goonjcustom_cron($params) {
 
     }
     
+    error_log('Goonj Cron Job: Job completed successfully');
+} catch (CiviCRM_API3_Exception $e) {
+    error_log('Goonj Cron Job: API error - ' . $e->getMessage());
+}
     error_log('check');
   return civicrm_api3_create_success($returnValues, $params, 'Goonjcustom', 'cron');
 
