@@ -49,7 +49,7 @@ jobs:
         retention-days: 7
 
      - name: Post report to Discord
-        run: |
+       run: |
           curl -H "Content-Type: application/json" \
           -X POST \
           -d '{"content": "Playwright Test Report", "attachments": [{"id": 0, "filename": "./playwright-report/results.json", "content_type": "application/json", "url": "$(cat results.json)"}]}' \
