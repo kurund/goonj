@@ -163,6 +163,7 @@ function goonjcustom_civicrm_pageRun( &$page ) {
 				  $(document).ajaxComplete(function(event, xhr, settings) {
 					var isInductionActivity = false;
 					var isCollectionCampActivity = false;
+					var isActivityViewType61 = false;
 					var urlParams = new URLSearchParams(settings.url);
 					var activityTypeId57 = "57";
 					var activityTypeId61 = "61";
@@ -177,7 +178,11 @@ function goonjcustom_civicrm_pageRun( &$page ) {
 						isCollectionCampActivity = true;
 					}
 
-					if (isInductionActivity || isCollectionCampActivity) {
+					if (urlParams.get("subType") === activityTypeId61 && urlParams.get("action") === "view") {
+						isActivityViewType61 = true;
+					}
+
+					if (isInductionActivity || isCollectionCampActivity || isActivityViewType61) {
 					  var fieldsToHide = [];
 
 					  if (isInductionActivity) {
@@ -206,6 +211,17 @@ function goonjcustom_civicrm_pageRun( &$page ) {
 							  ".crm-activity-form-block-assignee_contact_id",
 							  ".crm-activity-form-block-activity_date_time",
 							  ".crm-activity-form-block-details",
+						  ];
+					  } else if (isActivityViewType61) {
+						  fieldsToHide = [
+							  ".crm-activity-form-block-target_contact_id",
+							  ".crm-activity-form-block-assignee_contact_id",
+							  ".crm-activity-form-block-engagement_level",
+							  ".crm-activity-form-block-duration",
+							  ".crm-activity-form-block-details",
+							  ".crm-activity-form-block-priority_id",
+							  ".crm-activity-form-block-subject",
+							  ".crm-activity-form-block-location",
 						  ];
 					  }
 
