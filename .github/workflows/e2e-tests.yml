@@ -37,8 +37,24 @@ jobs:
     - name: Post results.json to Discord
       if: always()
       run: |
-        # curl -F "file=@./playwright-report/results.json" -F "payload_json={\"content\":\"Test results uploaded\"}" "https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH"
-        curl -F "file=@./test-results/report.html" -F "payload_json={\"content\":\"Test results uploaded\"}" "https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH"
+        FAILED_COUNT=$(npx playwright show-report | grep -oP '(?<=failed=)\d+')
+        PASSED_COUNT=$(npx playwright show-report | grep -oP '(?<=passed=)\d+')
+        TOTAL_COUNT=$(($FAILED_COUNT + $PASSED_COUNT))
+        if [ $FAILED_COUNT -eq 0 ]; then
+          COLOR=3066993  # Green
+          STATUS="All tests passed"
+        else
+          COLOR=15158332  # Red
+          STATUS="$FAILED_COUNT tests failed"
+        fi
+        curl -H "Content-Type: application/json" \
+             -d "{\"username\": \"GitHub Actions\", \"embeds\": [{\"title\": \"Playwright Test Results\", \"description\": \"$STATUS\", \"color\": $COLOR, \"fields\": [{\"name\": \"Total\", \"value\": \"$TOTAL_COUNT\", \"inline\": true}, {\"name\": \"Passed\", \"value\": \"$PASSED_COUNT\", \"inline\": true}, {\"name\": \"Failed\", \"value\": \"$FAILED_COUNT\", \"inline\": true}]}]}" \
+             "https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH"
+    # - name: Post results.json to Discord
+    #   if: always()
+    #   run: |
+    #     # curl -F "file=@./playwright-report/results.json" -F "payload_json={\"content\":\"Test results uploaded\"}" "https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH"
+    #     curl -F "file=@./test-results/report.html" -F "payload_json={\"content\":\"Test results uploaded\"}" "https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH"
     - name: Install 7-Zip
       run: sudo apt-get install p7zip-full
     - name: Password protect playwright report
