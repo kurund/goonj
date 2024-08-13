@@ -41,23 +41,47 @@ jobs:
         script: |
           const fs = require('fs');
           const path = './playwright-report/results.json';
+      
           if (fs.existsSync(path)) {
-            const results = JSON.parse(fs.readFileSync(path, 'utf8'));
-            const total = results.suites.reduce((acc, suite) => acc + suite.tests.length, 0);
-            const passed = results.suites.reduce((acc, suite) => acc + suite.tests.filter(test => test.status === 'passed').length, 0);
-            const failed = results.suites.reduce((acc, suite) => acc + suite.tests.filter(test => test.status === 'failed').length, 0);
-            const skipped = results.suites.reduce((acc, suite) => acc + suite.tests.filter(test => test.status === 'skipped').length, 0);
-            const summary = `
-              ## Playwright Test Summary
-              - **Total Tests:** ${total}
-              - **Passed:** ${passed}
-              - **Failed:** ${failed}
-              - **Skipped:** ${skipped}
-            `;
-            core.summary.addRaw(summary).write();
-          } else {
-            core.setFailed('results.json file not found.');
-          }
+            try {
+              const results = JSON.parse(fs.readFileSync(path, 'utf8'));
+              let total = 0;
+              let passed = 0;
+              let failed = 0;
+              let skipped = 0;
+          
+              if (results.suites) {
+                results.suites.forEach(suite => {
+                  if (suite.specs) {
+                    suite.specs.forEach(spec => {
+                      if (spec.tests) {
+                        total += spec.tests.length;
+                        passed += spec.tests.filter(test => test.status === 'passed').length;
+                         failed += spec.tests.filter(test => test.status === 'failed').length;
+                        skipped += spec.tests.filter(test => test.status === 'skipped').length;
+                      }
+                    });
+                  }
+                });
+              }
+
+              const summary = `
+                ## Playwright Test Summary
+                - **Total Tests:** ${total}
+                - **Passed:** ${passed}
+                - **Failed:** ${failed}
+                - **Skipped:** ${skipped}
+              `;
+          
+          core.summary.addRaw(summary).write();
+
+        } catch (error) {
+          core.setFailed(`Error parsing results.json: ${error.message}`);
+        }
+      } else {
+        core.setFailed('results.json file not found.');
+      }
+
     #   if: always()
     #   run: |
     #     # curl -F "file=@./playwright-report/results.json" -F "payload_json={\"content\":\"Test results uploaded\"}" "https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH"
