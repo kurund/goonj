@@ -239,7 +239,7 @@ function goonj_handle_user_identification_form() {
 
 		// Recent camp data
 		$recentCamp = end($collectionCampResult['values']);
-		$display_name = urlencode($contact['display_name']);
+		$display_name = $contact['display_name'];
 
 		if (!empty($recentCamp)) {
 			// Save the recentCamp data to the session
