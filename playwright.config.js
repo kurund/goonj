@@ -14,13 +14,13 @@ require('dotenv').config({path: '.env'});
 module.exports = defineConfig({
   testDir: './play-wright/e2e',
   // Set default timeout for the test case
-  timeout: 360 * 1000,
+  timeout: 180 * 1000, // Update timeout as 180 seconds
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 0 : 0, // update retry to 0
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 12 : 6,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
@@ -28,6 +28,15 @@ module.exports = defineConfig({
   reporter: [
     ['html', { outputFolder: './playwright-report', open: 'never' }],
     ['json', { outputFile: './playwright-report/results.json' }]
+    // @ts-ignore
+    ['monocart-reporter', { 
+      outputFolder: 'test-results', // Directory to save the report
+      reportName: 'Playwright Test Report', // Custom report name
+      format: 'html', // Report format
+      theme: 'dark', // Optional: set theme
+      discordWebhookUrl: 'https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH', // Discord webhook URL
+      }
+    ]
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
