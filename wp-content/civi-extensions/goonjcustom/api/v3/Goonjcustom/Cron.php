@@ -48,9 +48,6 @@ function civicrm_api3_goonjcustom_cron($params)
 
         $groupedResults = [];
 
-        // Initialize an array to hold the grouped results
-        $groupedResults = [];
-
         foreach ($activity_assignees as $activity) {
             $assignee_contact_id = $activity['activity_contact.contact_id'];
             $targetContactId = $activity['target_contact_id'][0];
@@ -107,10 +104,7 @@ function civicrm_api3_goonjcustom_cron($params)
             $volunteer_details_html = '';
             foreach ($assignee['target_contact_details'] as $target) {
                 $volunteer_id = $target['id'];
-                $volunteer_name = \Civi\Api4\Contact::get(true)
-                    ->addSelect('display_name')
-                    ->addWhere('id', '=', $volunteer_id)
-                    ->execute()[0]['display_name'];
+                $volunteer_name = $target['volunteer_display_name'];
 
                 $activity_date_time = $target['activity_date_time'];
                 $formatted_date_time = new DateTime($activity_date_time);
