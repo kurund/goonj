@@ -1,5 +1,6 @@
 // @ts-check
 const { defineConfig, devices } = require('@playwright/test');
+import type { GitHubActionOptions } from '@estruyf/github-actions-reporter';
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
@@ -44,8 +45,10 @@ module.exports = defineConfig({
       title: 'Playwright test reports',
       useDetails: true,
       showError: true,
-      includeResults: ['pass', 'skipped', 'fail', 'flaky']
+      includeResults: ['pass', 'skipped', 'fail', 'flaky'],
+      outputFolder: './playwright-report'
     }]
+   
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
