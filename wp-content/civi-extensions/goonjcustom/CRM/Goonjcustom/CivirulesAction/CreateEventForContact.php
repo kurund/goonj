@@ -16,18 +16,18 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 		$contactId = $originalData['contact_id'] ?? null;
 		$activityId = $originalData['activity_id'] ?? null;
 		$location = $originalData['custom_69'] ?? null;
-		$district = $originalData['custom_72'] ?? null;
 		$state = $originalData['custom_71'] ?? null;
-		$country = $originalData['custom_70'] ?? null;
+		$postalCode = $originalData['custom_89'] ?? null;
+		$city = $originalData['custom_85'] ?? null;
 
 		// Save an address for the contact
 		try {
 			$addressResult = \Civi\Api4\Address::create(FALSE)
 				->addValue('contact_id', $contactId)
 				->addValue('street_address', $location)
-				->addValue('city', $district)
+				->addValue('city', $city)
 				->addValue('state_province_id', $state)
-				->addValue('country_id', $country)
+				->addValue('postal_code', $postalCode)
 				->setFixAddress(FALSE)
 				->execute();
 
