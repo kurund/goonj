@@ -2,6 +2,7 @@ name: e2e-tests
 on:
   pull_request:
     types: [ labeled ]
+  push:
     branches:
       - main
   schedule:
@@ -34,62 +35,64 @@ jobs:
       if: always()
       with:
         report-file: ./playwright-report/results.json
-    - name: Parse and Display JSON Summary
-      uses: actions/github-script@v6
-      if: always()
-      with:
-        script: |
-          const fs = require('fs');
-          const path = './playwright-report/results.json';
-      
-          if (fs.existsSync(path)) {
-            try {
-              const results = JSON.parse(fs.readFileSync(path, 'utf8'));
-              let total = 0;
-              let passed = 0;
-              let failed = 0;
-              let skipped = 0;
-              let flaky = 0;
-          
-              if (results.suites) {
-                results.suites.forEach(suite => {
-                  if (suite.specs) {
-                    suite.specs.forEach(spec => {
-                      if (spec.tests) {
-                        total += spec.tests.length;
-                        passed += spec.tests.filter(test => test.status === 'passed').length;
-                        failed += spec.tests.filter(test => test.status === 'failed').length;
-                        skipped += spec.tests.filter(test => test.status === 'skipped').length;
-                        flaky += spec.tests.filter(test => test.status === 'flaky').length;
-                      }
-                    });
-                  }
-                });
-              }
-
-              const summary = `
-                ## Playwright Test Summary
-                - **Total Tests:** ${total}
-                - **Passed:** ${passed}
-                - **Failed:** ${failed}
-                - **Skipped:** ${skipped}
-                - **Flaky:** ${flaky}
-              `;
-              console.log(summary); // For debugging
-              core.summary.addRaw(summary).write();
-
-            } catch (error) {
-              core.setFailed(`Error parsing results.json: ${error.message}`);
-            }
-          } else {
-            core.setFailed('results.json file not found.');
-          }
-
-
+    # - name: Parse and Display JSON Summary
+    #   uses: actions/github-script@v6
     #   if: always()
-    #   run: |
+    #   with:
+    #     script: |
+    #       const fs = require('fs');
+    #       const path = './playwright-report/results.json';
+      
+    #       if (fs.existsSync(path)) {
+    #         try {
+    #           const results = JSON.parse(fs.readFileSync(path, 'utf8'));
+    #           let total = 0;
+    #           let passed = 0;
+    #           let failed = 0;
+    #           let skipped = 0;
+    #           let flaky = 0;
+          
+    #           if (results.suites) {
+    #             results.suites.forEach(suite => {
+    #               if (suite.specs) {
+    #                 suite.specs.forEach(spec => {
+    #                   if (spec.tests) {
+    #                     total += spec.tests.length;
+    #                     passed += spec.tests.filter(test => test.status === 'passed').length;
+    #                     failed += spec.tests.filter(test => test.status === 'failed').length;
+    #                     skipped += spec.tests.filter(test => test.status === 'skipped').length;
+    #                     flaky += spec.tests.filter(test => test.status === 'flaky').length;
+    #                   }
+    #                 });
+    #               }
+    #             });
+    #           }
+
+    #           const summary = `
+    #             ## Playwright Test Summary
+    #             - **Total Tests:** ${total}
+    #             - **Passed:** ${passed}
+    #             - **Failed:** ${failed}
+    #             - **Skipped:** ${skipped}
+    #             - **Flaky:** ${flaky}
+    #           `;
+    #           console.log(summary); // For debugging
+    #           core.summary.addRaw(summary).write();
+
+    #         } catch (error) {
+    #           core.setFailed(`Error parsing results.json: ${error.message}`);
+    #         }
+    #       } else {
+    #         core.setFailed('results.json file not found.');
+    #       }
+
+
+      if: always()
+      run: |
     #     # curl -F "file=@./playwright-report/results.json" -F "payload_json={\"content\":\"Test results uploaded\"}" "https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH"
-    #     curl -F "file=@./test-results/report.html" -F "payload_json={\"content\":\"Test results uploaded\"}" "https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH"
+        # curl -F "file=@./test-results/report.html" -F "payload_json={\"content\":\"Test results uploaded\"}" "https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH"
+        curl -X POST -H "Content-Type: multipart/form-data" -F "file=@./playwright-report/index.html" "https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH"
+        -F "payload_json={\"content\":\"Playwright Test Report\"}" 
     - name: Install 7-Zip
       run: sudo apt-get install p7zip-full
     - name: Password protect playwright report
