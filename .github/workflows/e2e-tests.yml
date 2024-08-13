@@ -73,14 +73,14 @@ jobs:
                 - **Skipped:** ${skipped}
               `;
           
-          core.summary.addRaw(summary).write();
+              core.summary.addRaw(summary).write();
 
-        } catch (error) {
-          core.setFailed(`Error parsing results.json: ${error.message}`);
-        }
-      } else {
-        core.setFailed('results.json file not found.');
-      }
+            } catch (error) {
+              core.setFailed(`Error parsing results.json: ${error.message}`);
+            }
+          } else {
+            core.setFailed('results.json file not found.');
+          }
 
     #   if: always()
     #   run: |
