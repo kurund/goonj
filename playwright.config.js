@@ -29,14 +29,14 @@ module.exports = defineConfig({
     ['html', { outputFolder: './playwright-report', open: 'never' }],
     ['json', { outputFile: './playwright-report/results.json' }],
     // @ts-ignore
-    ['monocart-reporter', { 
-      outputFolder: 'test-results', // Directory to save the report
-      reportName: 'Playwright Test Report', // Custom report name
-      format: 'html', // Report format
-      theme: 'dark', // Optional: set theme
-      discordWebhookUrl: 'https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH' // Discord webhook URL
-      }
-    ]
+    // ['monocart-reporter', { 
+    //   outputFolder: 'test-results', // Directory to save the report
+    //   reportName: 'Playwright Test Report', // Custom report name
+    //   format: 'html', // Report format
+    //   theme: 'dark', // Optional: set theme
+    //   discordWebhookUrl: 'https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH' // Discord webhook URL
+    //   }
+    // ]
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
