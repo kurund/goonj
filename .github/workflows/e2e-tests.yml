@@ -41,8 +41,6 @@ jobs:
         script: |
             const fs = require('fs');
             const path = './playwright-report/results.json';
-
-            const discordWebhookUrl = "https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH";
             
             if (fs.existsSync(path)) {
               try {
@@ -80,19 +78,8 @@ jobs:
                   - **Skipped:** ${skipped}
                 `;
             
-                const discordMessage = {
-                  content: summary
-                };
-
-                // Use GitHub Actions' built-in `fetch` method
-                await github.rest.repos.createDispatchEvent({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  event_type: 'send_discord_message',
-                  client_payload: {
-                    message: summary
-                  }
-                });
+                console.log(summary); // For debugging
+                core.summary.addRaw(summary).write();
 
               } catch (error) {
                 core.setFailed(`Error parsing results.json: ${error.message}`);
