@@ -19,8 +19,6 @@ class CRM_Goonjcustom_Page_Manage_Event_Qr extends CRM_Core_Page {
 
 		$qrFilePath = $qrDir . "event_qr_$eventID.png";
 
-		error_log( $qrFilePath );
-
 		if ( ! file_exists( $qrFilePath ) ) {
 			$this->generateQrCode( $eventID, $qrFilePath );
 		}
@@ -32,6 +30,8 @@ class CRM_Goonjcustom_Page_Manage_Event_Qr extends CRM_Core_Page {
 		$qrImageUrl = content_url( "uploads/civicrm/goonjcustom/qrcodes/event_qr_$eventID.png" );
 
 		$this->assign( 'qrImageUrl', $qrImageUrl );
+
+		Civi::resources()->addStyleFile( 'goonjcustom', 'css/custom_styles.css' );
 
 		parent::run();
 	}
