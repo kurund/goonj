@@ -41,9 +41,10 @@ module.exports = defineConfig({
     //   outputFile: './test-results/report.html'
     // }]
     ['@estruyf/github-actions-reporter', {
-      title: 'My custom title',
+      title: 'Playwright test reports',
       useDetails: true,
-      showError: true
+      showError: true,
+      includeResults: ['pass', 'skipped', 'fail', 'flaky']
     }]
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
