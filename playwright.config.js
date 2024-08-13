@@ -1,6 +1,5 @@
 // @ts-check
 const { defineConfig, devices } = require('@playwright/test');
-import type { GitHubActionOptions } from '@estruyf/github-actions-reporter';
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
