@@ -245,7 +245,9 @@ function goonj_handle_user_identification_form() {
 			// Save the recentCamp data to the session
 			$_SESSION['recentCampData'] = $recentCamp;
 			$_SESSION['contactId'] = $contact['id'];
-			
+			$_SESSION['displayName'] = $display_name;
+			$_SESSION['contactNumber'] = $phone;
+
 			wp_redirect(get_home_url() . "/collection-camp-in-past/#?source_contact_id=" . $contact['id'] . '&message=past-collection-data' );
 			exit;
 		} else {
