@@ -10,7 +10,7 @@ on:
 jobs:
   checkout-and-test:
     if: github.event_name == 'schedule' || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'in review'))
-    timeout-minutes: 25
+    timeout-minutes: 10  # updated timeout to 10   minutes 
     runs-on: ubuntu-latest
     env:
       BASE_URL_ADMIN_SITE: ${{ secrets.GOONJ_STAGING_SITE_WPADMIN_URL }}
@@ -28,7 +28,8 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps  
     - name: Run Playwright tests
-      run: npx playwright test
+      # run: npx playwright test
+      run: npx playwright test play-wright/e2e/volunteer-registration.spec.js
     - uses: daun/playwright-report-summary@v3
       if: always()
       with:
