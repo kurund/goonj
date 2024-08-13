@@ -169,7 +169,7 @@ function goonj_handle_user_identification_form() {
 		// Find the contact ID based on email and phone number
 		$contactResult = civicrm_api3('Contact', 'get', [
 			'sequential' => 1,
-			'return' => ['id', 'contact_sub_type'],
+			'return' => ['id', 'contact_sub_type', "display_name"],
 			'email' => $email,
 			'phone' => $phone,
 			'is_deleted' => 0,
@@ -239,6 +239,7 @@ function goonj_handle_user_identification_form() {
 
 		// Recent camp data
 		$recentCamp = end($collectionCampResult['values']);
+		$display_name = urlencode($contact['display_name']);
 
 		if (!empty($recentCamp)) {
 			// Save the recentCamp data to the session
@@ -248,7 +249,7 @@ function goonj_handle_user_identification_form() {
 			wp_redirect(get_home_url() . "/collection-camp-in-past/#?source_contact_id=" . $contact['id'] . '&message=past-collection-data' );
 			exit;
 		} else {
-			$redirect_url = get_home_url() . "/collection-camp-form/#?source_contact_id=" . $contact['id'] . '&message=collection-camp-page' ;
+			$redirect_url = get_home_url() . "/collection-camp-form/#?source_contact_id=" . $contact['id'] . '&message=collection-camp-page&Collection_Camp_Intent.Name=' . $display_name . '&Collection_Camp_Intent.Contact_Number='. $phone;
 		}
 		wp_redirect($redirect_url);
 		exit;
