@@ -37,74 +37,69 @@ jobs:
     - name: Parse and Post JSON Summary to Discord
       uses: actions/github-script@v6
       if: always()
-      with:
-        script: |
-          const fs = require('fs');
-          const path = './playwright-report/results.json';
-          const fetch = require('node-fetch');
-          const discordWebhookUrl = "https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH";
-          
-          if (fs.existsSync(path)) {
-            try {
-              const results = JSON.parse(fs.readFileSync(path, 'utf8'));
-              let total = 0;
-              let passed = 0;
-              let failed = 0;
-              let skipped = 0;
-          
-              const calculateResults = (suites) => {
-                suites.forEach(suite => {
-                  if (suite.suites) {
-                    calculateResults(suite.suites);
-                  }
-                  if (suite.specs) {
-                    suite.specs.forEach(spec => {
-                      if (spec.tests) {
-                        total += spec.tests.length;
-                        passed += spec.tests.filter(test => test.status === 'passed').length;
-                        failed += spec.tests.filter(test => test.status === 'failed').length;
-                        skipped += spec.tests.filter(test => test.status === 'skipped').length;
-                      }
-                    });
+        with:
+          script: |
+            const fs = require('fs');
+            const path = './playwright-report/results.json';
+
+            const discordWebhookUrl = "https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH";
+            
+            if (fs.existsSync(path)) {
+              try {
+                const results = JSON.parse(fs.readFileSync(path, 'utf8'));
+                let total = 0;
+                let passed = 0;
+                let failed = 0;
+                let skipped = 0;
+
+                const calculateResults = (suites) => {
+                  suites.forEach(suite => {
+                    if (suite.suites) {
+                      calculateResults(suite.suites);
+                    }
+                    if (suite.specs) {
+                      suite.specs.forEach(spec => {
+                        if (spec.tests) {
+                          total += spec.tests.length;
+                          passed += spec.tests.filter(test => test.status === 'passed').length;
+                          failed += spec.tests.filter(test => test.status === 'failed').length;
+                          skipped += spec.tests.filter(test => test.status === 'skipped').length;
+                        }
+                      });
+                    }
+                  });
+                };
+
+                calculateResults(results.suites);
+
+                const summary = `
+                  ## Playwright Test Summary
+                  - **Total Tests:** ${total}
+                  - **Passed:** ${passed}
+                  - **Failed:** ${failed}
+                  - **Skipped:** ${skipped}
+                `;
+            
+                const discordMessage = {
+                  content: summary
+                };
+
+                // Use GitHub Actions' built-in `fetch` method
+                await github.rest.repos.createDispatchEvent({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  event_type: 'send_discord_message',
+                  client_payload: {
+                    message: summary
                   }
                 });
-              };
 
-              calculateResults(results.suites);
-
-              const summary = `
-                ## Playwright Test Summary
-                - **Total Tests:** ${total}
-                - **Passed:** ${passed}
-                - **Failed:** ${failed}
-                - **Skipped:** ${skipped}
-              `;
-          
-              const discordMessage = {
-                content: summary
-              };
-
-              fetch(discordWebhookUrl, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(discordMessage)
-              }).then(response => {
-                if (!response.ok) {
-                  throw new Error('Failed to send message to Discord');
-                }
-              }).catch(error => {
-                core.setFailed(`Error sending message to Discord: ${error.message}`);
-              });
-
-            } catch (error) {
-              core.setFailed(`Error parsing results.json: ${error.message}`);
+              } catch (error) {
+                core.setFailed(`Error parsing results.json: ${error.message}`);
+              }
+            } else {
+              core.setFailed('results.json file not found.');
             }
-          } else {
-            core.setFailed('results.json file not found.');
-          }
-
     #   if: always()
     #   run: |
     #     # curl -F "file=@./playwright-report/results.json" -F "payload_json={\"content\":\"Test results uploaded\"}" "https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH"
