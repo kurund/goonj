@@ -32,7 +32,7 @@ jobs:
       run: npx playwright test play-wright/e2e/volunteer-registration.spec.js
     - uses: daun/playwright-report-summary@v3
       if: always()
-        with:
+      with:
         report-file: ./playwright-report/results.json
     - name: Parse and Display JSON Summary
       uses: actions/github-script@v6
