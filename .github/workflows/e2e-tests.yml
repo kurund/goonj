@@ -37,8 +37,8 @@ jobs:
     - name: Parse and Post JSON Summary to Discord
       uses: actions/github-script@v6
       if: always()
-        with:
-          script: |
+      with:
+        script: |
             const fs = require('fs');
             const path = './playwright-report/results.json';
 
