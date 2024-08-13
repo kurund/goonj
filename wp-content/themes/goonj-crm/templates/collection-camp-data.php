@@ -2,6 +2,8 @@
 // Retrieve the recentCamp data from the session
 $recentCampData = $_SESSION['recentCampData'] ?? null;
 $contactId = $_SESSION['contactId'] ?? null;
+$displayName = $_SESSION['displayName'] ?? null;
+$contactNumber = $_SESSION['contactNumber'] ?? null;
 
 $redirectBaseUrl = get_home_url() . "/collection-camp-form/#?";
 
@@ -10,13 +12,19 @@ $queryParams = [
 	'Collection_Camp_Intent.District' => $recentCampData['custom_72'] ?? '',
 	'Collection_Camp_Intent.State' => $recentCampData['custom_71'] ?? '',
 	'Collection_Camp_Intent.Location_Area_of_camp' => $recentCampData['custom_69'] ?? '',
-	'message' => 'collection-camp-page'
+	'Collection_Camp_Intent.Name' => $displayName,
+	'Collection_Camp_Intent.Contact_Number' => $contactNumber,
+	'Collection_Camp_Intent.You_wish_to_register_as' => $recentCampData['custom_81'] ?? '',
+	'Collection_Camp_Intent.City' => $recentCampData['custom_85'] ?? '',
+	'Collection_Camp_Intent.Pin_Code' => $recentCampData['custom_89'] ?? '',
 ];
 
 $redirectUrl = $redirectBaseUrl . http_build_query($queryParams);
 $noDetailsRedirectUrl = get_home_url() . "/collection-camp-form/#?" . http_build_query([
 	'source_contact_id' => $contactId,
-	'message' => 'collection-camp-page'
+	'message' => 'collection-camp-page',
+	'Collection_Camp_Intent.Name' => $displayName,
+	'Collection_Camp_Intent.Contact_Number' => $contactNumber,
 ]);
 
 ?>
