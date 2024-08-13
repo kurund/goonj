@@ -41,44 +41,23 @@ jobs:
         script: |
           const fs = require('fs');
           const path = './playwright-report/results.json';
-          
           if (fs.existsSync(path)) {
-            try {
-              const results = JSON.parse(fs.readFileSync(path, 'utf8'));
-              
-              const stats = results.stats || {};
-              const suites = results.suites || [];
-              
-              const totalTests = suites.reduce((acc, suite) => acc + suite.specs.reduce((acc, spec) => acc + spec.tests.length, 0), 0);
-              const passedTests = suites.reduce((acc, suite) => acc + suite.specs.reduce((acc, spec) => acc + spec.tests.filter(test => test.results.every(result => result.status === 'passed')).length, 0), 0);
-              const failedTests = suites.reduce((acc, suite) => acc + suite.specs.reduce((acc, spec) => acc + spec.tests.filter(test => test.results.some(result => result.status === 'failed')).length, 0), 0);
-
-              const summary = `
-                ## Playwright Test Summary
-                - **Total Tests:** ${totalTests}
-                - **Passed:** ${passedTests}
-                - **Failed:** ${failedTests}
-                - **Duration:** ${(stats.duration / 1000).toFixed(2)} seconds
-                - **Start Time:** ${new Date(stats.startTime).toLocaleString()}
-              `;
-              
-              console.log(summary); // For debugging
-              core.summary.addRaw(summary).write();
-
-              // Send summary to Discord using curl
-              const webhookUrl = "https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH";
-              const command = `curl -H "Content-Type: application/json" -X POST -d "{\"content\":\"${summary}\"}" "${webhookUrl}"`;
-
-              const { execSync } = require('child_process');
-              execSync(command, { stdio: 'inherit' });
-
-            } catch (error) {
-              core.setFailed(`Error parsing results.json: ${error.message}`);
-            }
+            const results = JSON.parse(fs.readFileSync(path, 'utf8'));
+            const total = results.suites.reduce((acc, suite) => acc + suite.tests.length, 0);
+            const passed = results.suites.reduce((acc, suite) => acc + suite.tests.filter(test => test.status === 'passed').length, 0);
+            const failed = results.suites.reduce((acc, suite) => acc + suite.tests.filter(test => test.status === 'failed').length, 0);
+            const skipped = results.suites.reduce((acc, suite) => acc + suite.tests.filter(test => test.status === 'skipped').length, 0);
+            const summary = `
+              ## Playwright Test Summary
+              - **Total Tests:** ${total}
+              - **Passed:** ${passed}
+              - **Failed:** ${failed}
+              - **Skipped:** ${skipped}
+            `;
+            core.summary.addRaw(summary).write();
           } else {
             core.setFailed('results.json file not found.');
           }
-    # - name: Post results.json to Discord
     #   if: always()
     #   run: |
     #     # curl -F "file=@./playwright-report/results.json" -F "payload_json={\"content\":\"Test results uploaded\"}" "https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH"
