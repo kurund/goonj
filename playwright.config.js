@@ -37,10 +37,10 @@ module.exports = defineConfig({
     //   discordWebhookUrl: 'https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH' // Discord webhook URL
     //   }
     // ]
-    ['monocart-reporter', { 
-      name: "Playwright Test Report",
-      outputFile: './test-results/report.html'
-    }]
+    // ['monocart-reporter', { 
+    //   name: "Playwright Test Report",
+    //   outputFile: './test-results/report.html'
+    // }]
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
