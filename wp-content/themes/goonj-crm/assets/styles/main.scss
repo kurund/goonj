@@ -371,4 +371,12 @@ form input {
   border-color: #D64631 !important;
 }
 
-
+#bootstrap-theme input[type=radio], #bootstrap-theme input[type=checkbox] {
+  margin-top: 0 !important;
+}
+.crm-af-field.ng-scope .ng-binding.ng-scope {
+  margin-right: 30px !important;
+}
+.af-container .af-container .af-text {
+  margin-left: 10px !important;
+}
