@@ -247,6 +247,8 @@ function goonjcustom_civicrm_tabset($tabsetName, &$tabs, $context) {
 		return;
 	}
 
+	$eventID = $context['event_id'];
+
 	$url = CRM_Utils_System::url(
 		'civicrm/event/manage/qr',
 		"reset=1&snippet=5&force=1&id=$eventID&action=update&component=event"

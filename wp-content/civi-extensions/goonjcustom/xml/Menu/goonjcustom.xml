@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/event/manage/qr</path>
+    <page_callback>CRM_Goonjcustom_Page_Manage_Event_Qr</page_callback>
+    <title>Manage_Event_Qr</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>
