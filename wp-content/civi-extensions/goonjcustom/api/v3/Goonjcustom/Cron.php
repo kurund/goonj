@@ -116,7 +116,7 @@ function civicrm_api3_goonjcustom_cron($params)
                     <strong>Email:</strong> {$target['email']}<br>
                     <strong>Phone:</strong> {$target['phone']}<br>
                     <strong>Scheduled At:</strong> $induction_time
-                </li>";
+                </li><br>";
             }
 
             $html = "
