@@ -46,7 +46,6 @@ module.exports = defineConfig({
       useDetails: true,
       showError: true,
       includeResults: ['pass', 'skipped', 'fail', 'flaky'],
-      outputFolder: './playwright-report'
     }]
    
   ],

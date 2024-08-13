@@ -31,61 +31,26 @@ jobs:
     - name: Run Playwright tests
       # run: npx playwright test
       run: npx playwright test play-wright/e2e/volunteer-registration.spec.js play-wright/e2e/vistit-url.spec.js
-
     - uses: daun/playwright-report-summary@v3
       if: always()
       with:
         report-file: ./playwright-report/results.json
-    # - name: Parse and Display JSON Summary
-    #   uses: actions/github-script@v6
-    #   if: always()
-    #   with:
-    #     script: |
-    #       const fs = require('fs');
-    #       const path = './playwright-report/results.json';
-      
-    #       if (fs.existsSync(path)) {
-    #         try {
-    #           const results = JSON.parse(fs.readFileSync(path, 'utf8'));
-    #           let total = 0;
-    #           let passed = 0;
-    #           let failed = 0;
-    #           let skipped = 0;
-    #           let flaky = 0;
-          
-    #           if (results.suites) {
-    #             results.suites.forEach(suite => {
-    #               if (suite.specs) {
-    #                 suite.specs.forEach(spec => {
-    #                   if (spec.tests) {
-    #                     total += spec.tests.length;
-    #                     passed += spec.tests.filter(test => test.status === 'passed').length;
-    #                     failed += spec.tests.filter(test => test.status === 'failed').length;
-    #                     skipped += spec.tests.filter(test => test.status === 'skipped').length;
-    #                     flaky += spec.tests.filter(test => test.status === 'flaky').length;
-    #                   }
-    #                 });
-    #               }
-    #             });
-    #           }
-
-    #           const summary = `
-    #             ## Playwright Test Summary
-    #             - **Total Tests:** ${total}
-    #             - **Passed:** ${passed}
-    #             - **Failed:** ${failed}
-    #             - **Skipped:** ${skipped}
-    #             - **Flaky:** ${flaky}
-    #           `;
-    #           console.log(summary); // For debugging
-    #           core.summary.addRaw(summary).write();
-
-    #         } catch (error) {
-    #           core.setFailed(`Error parsing results.json: ${error.message}`);
-    #         }
-    #       } else {
-    #         core.setFailed('results.json file not found.');
-    #       }
+    - name: Take Screenshot of Report
+      if: always()
+      id: screenshot
+      run: |
+        npx playwright screenshot ./playwright-report/index.html ./playwright-report/report.png
+    
+    - name: Send Discord Notifications
+      if: always()
+      env:
+        DISCORD_WEBHOOK_URL: "https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH"
+      run: |
+        image_path="./playwright-report/report.png"
+        curl -X POST -H "Content-Type: multipart/form-data" \
+          -F "file=@$image_path" \
+          -F "payload_json={\"content\": \"E2E tests have completed. See the report image attached.\"}" \
+          $DISCORD_WEBHOOK_URL
     # - name: Parse and Display JSON Summary
     # if: always()
     # run: |
