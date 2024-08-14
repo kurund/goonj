@@ -18,12 +18,11 @@ $register_link = sprintf(
 	'/individual-registration-with-volunteer-option/#?Source_Tracking.Event=%s',
 	$action_target['id'],
 );
-error_log("Material Contribution Link: ");
+
 $material_contribution_link = sprintf(
 	'/collection-camp-contribution/#?Source_Tracking.Event=%s',
 	$action_target['id'],
 );
-error_log("Material Contribution Link: " . $material_contribution_link);
 
 $material_contribution_link = sprintf(
 	'/collection-camp-contribution/#?Source_Tracking.Event=%s',
