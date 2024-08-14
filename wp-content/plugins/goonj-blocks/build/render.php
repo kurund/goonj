@@ -14,6 +14,11 @@ $headings = array(
 
 $heading_text = $headings[ $target ];
 
+$register_link = sprintf(
+	'/individual-registration-with-volunteer-option/#?Source_Tracking.Event=%s',
+	$action_target['id'],
+);
+
 if ( in_array( $target, array( 'collection-camp', 'dropping-center' ) ) ) :
 	$start_date = new DateTime( $action_target['start_date'] );
 	$end_date   = new DateTime( $action_target['end_date'] );
@@ -34,11 +39,11 @@ if ( in_array( $target, array( 'collection-camp', 'dropping-center' ) ) ) :
 		</tbody>
 	</table>
 	<div <?php echo get_block_wrapper_attributes(); ?>>
-		<a href="" class="wp-block-gb-action-button">
+		<a href="<?php echo esc_url( $register_link ); ?>" class="wp-block-gb-action-button">
 			<?php esc_html_e( 'Register', 'goonj-blocks' ); ?>
 		</a>
 		<a href="" class="wp-block-gb-action-button">
-			<?php esc_html_e( 'Contribute', 'goonj-blocks' ); ?>
+			<?php esc_html_e( 'Material Contribution', 'goonj-blocks' ); ?>
 		</a>
 		<a href="" class="wp-block-gb-action-button">
 			<?php esc_html_e( 'Donate', 'goonj-blocks' ); ?>
