@@ -36,7 +36,7 @@ jobs:
         report-file: ./playwright-report/results.json
     - name: Take Screenshot of report and Send as Discord Notification
       # if: github.event_name == 'schedule'
-       env:
+      env:
         DISCORD_WEBHOOK_URL: "https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH"
       run: |
         # Take the screenshot of the report
