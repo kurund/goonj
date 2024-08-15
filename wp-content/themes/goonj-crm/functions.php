@@ -273,15 +273,15 @@ function goonj_handle_user_identification_form() {
 }
 
 function goonj_is_volunteer_inducted( $volunteer ) {
-	$activityResult = civicrm_api3('Activity', 'get', [
-		'sequential' => 1,
-		'return' => ['id'],
-		'contact_id' => $volunteer['id'],
-		'activity_type_id' => ['IN' => [57]], // hardcode ID of activity type "Induction"
-		'status_id' => ['IN' => [2]], // hardcode ID of activity status "Completed"
-	]);
+	$activityResult = \Civi\Api4\Activity::get(FALSE)
+	->addSelect('id')
+	->addWhere('target_contact_id', '=', $volunteer['id'])
+	->addWhere('activity_type_id', '=', 57) // hardcode ID of activity type "Induction"
+	->addWhere('status_id', '=', 2) // hardcode ID of activity status "Completed"
+	->setLimit(1)
+	->execute();
 
-	$foundCompletedInductionActivities = $activityResult['values'];
+	$foundCompletedInductionActivities= $activityResult->first() ?? null;
 
 	return ! empty( $foundCompletedInductionActivities );
 }
