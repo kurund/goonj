@@ -267,9 +267,9 @@ function goonj_handle_user_identification_form() {
 		}
 		wp_redirect($redirect_url);
 		exit;
-	} catch (CiviCRM_API3_Exception $e) {
-		$error = $e->getMessage();
-		echo "API error: $error";
+	} catch (Exception $e) {
+		error_log("Error: " . $e->getMessage());
+		echo "An error occurred. Please try again later.";
 	}
 }
 
