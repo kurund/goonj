@@ -3,7 +3,7 @@ on:
   pull_request:
     types: [ labeled ]
     branches:
-      - main
+      - test-notifcation # for testing, will change before merging
   schedule:
     - cron: '0 22 * * 1-6'  # Run at 22:00 from Monday to Saturday
 
@@ -19,26 +19,29 @@ jobs:
       PASSWORD: ${{ secrets.PLAYWRIGHT_TEST_ADMIN_PASSWORD }}
       ARTIFACT_PASSWORD: ${{ secrets.ARTIFACT_ZIP_PASSWORD }}
       # DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      DISCORD_WEBHOOK_URL: "https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH"
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
+
     - name: Install dependencies
       run: npm ci
+
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps  
+
     - name: Run Playwright tests
       # run: npx playwright test
       run: npx playwright test play-wright/e2e/volunteer-registration.spec.js
+    
     - uses: daun/playwright-report-summary@v3
       if: always()
       with:
         report-file: ./playwright-report/results.json
+
     - name: Take Screenshot of report and Send as Discord Notification
-      # if: (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'in review'))
-      env:
-        DISCORD_WEBHOOK: "https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH"
       run: |
         # Take the screenshot of the report
         npx playwright screenshot ./playwright-report/index.html ./playwright-report/report.png
@@ -49,8 +52,10 @@ jobs:
           -F "file=@$image_path" \
           -F "payload_json={\"content\": \"Test report for scheduled E2E tests.\"}" \
           $DISCORD_WEBHOOK
+
     - name: Install 7-Zip
       run: sudo apt-get install p7zip-full
+
     - name: Password protect playwright report
       if: always()
       run: |
