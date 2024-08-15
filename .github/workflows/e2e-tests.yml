@@ -3,7 +3,7 @@ on:
   pull_request:
     types: [ labeled ]
     branches:
-      - test-notifcation # for testing, will change before merging
+      - main
   schedule:
     - cron: '0 22 * * 1-6'  # Run at 22:00 from Monday to Saturday
 
