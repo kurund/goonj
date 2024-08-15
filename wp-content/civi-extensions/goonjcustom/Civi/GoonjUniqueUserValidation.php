@@ -3,7 +3,6 @@
 namespace Civi;
 
 use CRM_Goonjcustom_ExtensionUtil as E;
-// use Civi\Afform\AHQ;
 use Civi\Afform\Event\AfformValidateEvent;
 use Civi\Core\Service\AutoSubscriber;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -18,13 +17,19 @@ class GoonjUniqueUserValidation extends AutoSubscriber implements EventSubscribe
       'civi.afform.validate' => ['onAfformValidate'],
     ];
   }
+
   public static function onAfformValidate(AfformValidateEvent $event) {
+    $formTitle = $event->getAfform()['title'] ?? '';
+    error_log("Error formTitle: " . print_r($formTitle, true));
+
+    if ($formTitle !== 'Volunteer Registration') {
+      return;
+    }
 
     $entityValues = $event->getEntityValues();
 
     $phone = $entityValues['Individual1'][0]['joins']['Phone'][0]['phone'] ?? '';
     $email = $entityValues['Individual1'][0]['joins']['Email'][0]['email'] ?? '';
-
 
     $contactResult = civicrm_api3('Contact', 'get', [
         'sequential' => 1,
@@ -39,6 +44,8 @@ class GoonjUniqueUserValidation extends AutoSubscriber implements EventSubscribe
 
     if ($contactResult['count'] > 0) {
         foreach ($contactResult['values'] as $contact) {
+            error_log("Error Messages1: " . print_r($contact['email'], true));
+            error_log("Error Messages2: " . print_r($contact['phone'], true));
             if ($contact['email'] === $email && $contact['phone'] === $phone) {
                 $errorMessages[] = "Both the email address '$email' and the phone number '$phone' are already in use.";
                 break;
@@ -49,13 +56,9 @@ class GoonjUniqueUserValidation extends AutoSubscriber implements EventSubscribe
             }
         }
     }
- if (!empty($errorMessages)) {
-  error_log("Error Messages: " . print_r($errorMessages, true));
-  $event->setError(implode(' ', $errorMessages));
-  $event->setIsValid(false);
-} else {
-  $event->setIsValid(true);
-}
-}
 
+    if (!empty($errorMessages)) {
+        $event->setError(implode(' ', $errorMessages));
+    }
+  }
 }
