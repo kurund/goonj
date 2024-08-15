@@ -45,7 +45,9 @@ jobs:
       run: |
         # Take the screenshot of the report
         npx playwright screenshot ./playwright-report/index.html ./playwright-report/report.png
-        sleep(5)
+        
+        sleep 5
+
         # Send the screenshot to Discord
         image_path="./playwright-report/report.png"
         curl -X POST -H "Content-Type: multipart/form-data" \
