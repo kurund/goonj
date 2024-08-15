@@ -19,6 +19,9 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 		$state = $originalData['custom_71'] ?? null;
 		$postalCode = $originalData['custom_89'] ?? null;
 		$city = $originalData['custom_85'] ?? null;
+		$createdDate = $originalData['created_date'] ?? null;
+		$date = new DateTime($createdDate);
+		$createdYear = $date->format('Y');
 
 		// Save an address for the contact
 		try {
@@ -71,11 +74,7 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 		// Find the state code from the config
 		$stateCode = $goonjStateCode[$stateName] ?? null;
 
-		if ($stateCode) {
-			error_log("State code: " . $stateCode);
-		} else {
-			error_log("State code not found for state name: " . $stateName);
-		}
+		$title = $createdYear . '/' . ($stateCode ?? 'UNKNOWN') . '/CC';
 
 		// Create a location block with the address ID
 		try {
@@ -92,7 +91,7 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 		}
 
 		$eventParams = [
-			'title' => 'Collection Camp',
+			'title' => $title,
 			'event_type_id' => 7,
 			'start_date' => $startDate,
 			'end_date' => $endDate,
