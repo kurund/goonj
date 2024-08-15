@@ -1,5 +1,8 @@
 name: e2e-tests
 on:
+  push:
+    branches:
+      - test-notifcation
   pull_request:
     types: [ labeled ]
     branches:
