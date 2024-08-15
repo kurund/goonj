@@ -209,7 +209,7 @@ function goonj_handle_user_identification_form() {
 		$contactSubType = $foundContacts['contact_sub_type'] ?? []; 
 		// Check if the contact is a volunteer
 		if ( empty( $contactSubType ) || !in_array( 'Volunteer', $contactSubType ) ) {
-			wp_redirect('/volunteer-form/#?Individual1=' . urlencode($contactId) . '&message=individual-user');
+			wp_redirect('/volunteer-form/#?Individual1=' . $contactId . '&message=individual-user');
 			exit;
 		}
 
