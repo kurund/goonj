@@ -12,7 +12,7 @@ on:
 
 jobs:
   checkout-and-test:
-    if: github.event_name == 'schedule' || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'in review'))
+    # if: github.event_name == 'schedule' || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'in review'))
     timeout-minutes: 5
     runs-on: ubuntu-latest
     env:
