@@ -37,6 +37,7 @@ jobs:
       with:
         report-file: ./playwright-report/results.json
     - name: Take Screenshot of report and Send as Discord Notification
+      if: github.event_name == 'schedule' || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'in review'))
       run: |
         # Take the screenshot of the report
         npx playwright screenshot ./playwright-report/index.html ./playwright-report/report.png
