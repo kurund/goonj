@@ -176,7 +176,7 @@ function goonj_handle_user_identification_form() {
 	}
 
 	try {
-		// Find the foundContacts ID based on email and phone number
+		// Find the contact ID based on email and phone number
 		$contactResult = \Civi\Api4\Contact::get(TRUE)
 		->addSelect('id', 'contact_sub_type', 'display_name')
 		->addWhere('email_primary.email', '=', $email)
@@ -186,7 +186,7 @@ function goonj_handle_user_identification_form() {
 		->setLimit(1)
 		->execute();
 
-		$foundContacts= $contactResult->first() ?? null;
+		$foundContacts = $contactResult->first() ?? null;
 
 		// If the user does not exist in the Goonj database
 		// redirect to the volunteer registration form.
@@ -208,7 +208,7 @@ function goonj_handle_user_identification_form() {
 		$contactId = $foundContacts['id'];
 		$contactSubType = $foundContacts['contact_sub_type'] ?? []; 
 		// Check if the contact is a volunteer
-		if (empty($contactSubType) || !in_array('Volunteer', $contactSubType)) {
+		if ( empty( $contactSubType ) || !in_array( 'Volunteer', $contactSubType ) ) {
 			wp_redirect('/volunteer-form/#?Individual1=' . urlencode($contactId) . '&message=individual-user');
 			exit;
 		}
