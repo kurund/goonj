@@ -177,7 +177,7 @@ function goonj_handle_user_identification_form() {
 
 	try {
 		// Find the contact ID based on email and phone number
-		$contactResult = \Civi\Api4\Contact::get(TRUE)
+		$contactResult = \Civi\Api4\Contact::get(FALSE)
 		->addSelect('id', 'contact_sub_type', 'display_name')
 		->addWhere('email_primary.email', '=', $email)
 		->addWhere('phone_primary.phone', '=', $phone)
