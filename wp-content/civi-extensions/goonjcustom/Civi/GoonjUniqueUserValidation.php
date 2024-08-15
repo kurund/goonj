@@ -2,7 +2,6 @@
 
 namespace Civi;
 
-use CRM_Recaptcha_ExtensionUtil as E;
 // use Civi\Afform\AHQ;
 use Civi\Afform\Event\AfformValidateEvent;
 use Civi\Core\Service\AutoService;
