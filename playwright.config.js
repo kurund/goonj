@@ -14,13 +14,13 @@ require('dotenv').config({path: '.env'});
 module.exports = defineConfig({
   testDir: './play-wright/e2e',
   // Set default timeout for the test case
-  timeout: 360 * 1000,
+  timeout: 60 * 1000,
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 0 : 0,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 12 : 6,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
