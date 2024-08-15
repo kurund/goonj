@@ -31,10 +31,50 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 				->setFixAddress(FALSE)
 				->execute();
 
-			$addressData = $addressResult->first();
-			$addressId = $addressData['id'] ?? null;
+			$addressId = $addressResult->first()['id'] ?? null;
 		} catch (Exception $e) {
 			throw new Exception($e->getMessage());
+		}
+	
+		// Fetch the state_province_id from the address
+		try {
+			$addresses = \Civi\Api4\Address::get(FALSE)
+				->addSelect('state_province_id')
+				->addWhere('id', '=', $addressId)
+				->setLimit(1)
+				->execute();
+	
+			$addressData = $addresses->first();
+			$stateProvinceId = $addressData['state_province_id'] ?? null;	
+		} catch (Exception $e) {
+			throw new Exception($e->getMessage());
+		}
+	
+		// Fetch the state name
+		try {
+			$stateResult = \Civi\Api4\StateProvince::get(FALSE)
+				->addSelect('name')
+				->addWhere('id', '=', $stateProvinceId)
+				->setLimit(1)
+				->execute();
+	
+			$stateData = $stateResult->first();
+			$stateName = $stateData['name'] ?? null;	
+		} catch (Exception $e) {
+			throw new Exception($e->getMessage());
+		}
+
+		// Fetch the goonj specific code
+		$goonjStateCodePath = ABSPATH . 'wp-content/civi-extensions/goonjcustom/CRM/Goonjcustom/state_codes.php';
+		$goonjStateCode = include $goonjStateCodePath;
+
+		// Find the state code from the config
+		$stateCode = $goonjStateCode[$stateName] ?? null;
+
+		if ($stateCode) {
+			error_log("State code: " . $stateCode);
+		} else {
+			error_log("State code not found for state name: " . $stateName);
 		}
 
 		// Create a location block with the address ID
