@@ -37,7 +37,6 @@ class GoonjUniqueUserValidation extends AutoSubscriber implements EventSubscribe
 
     $errorMessages = [];
 
-    // Check if any contact exists with the same email or phone number
     if ($contactResult['count'] > 0) {
         foreach ($contactResult['values'] as $contact) {
             if ($contact['email'] === $email && $contact['phone'] === $phone) {
