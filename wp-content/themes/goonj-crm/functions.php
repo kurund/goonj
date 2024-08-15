@@ -239,17 +239,18 @@ function goonj_handle_user_identification_form() {
 
 		// If we are here, then it means the user exists as an inducted volunteer.
 		// Fetch the most recent collection camp activity based on the creation date
-		$collectionCampResult = civicrm_api3('Activity', 'get', [
-			'sequential' => 1,
-			'contact_id' => $foundContacts['id'],
-			'activity_type_id' => 61, // ID for "Collection Camp Intent"
-			'status_id' => 10, // Status ID for "Under Authorization"
-			'order_by' => 'created_date DESC',
-			'limit' => 1,
-		]);
+		$collectionCampResult = \Civi\Api4\Activity::get(FALSE)
+		->addSelect('custom.*', 'source_contact_id')
+		->addWhere('activity_type_id', '=', 61) // ID for "Collection Camp Intent"
+		->addWhere('status_id', '=', 10) // Status ID for "Under Authorization"
+		->addWhere('source_contact_id', '=', $foundContacts['id'])
+		->addOrderBy('created_date', 'DESC')
+		->setLimit(1)
+		->execute();
+
 
 		// Recent camp data
-		$recentCamp = end($collectionCampResult['values']);
+		$recentCamp = $collectionCampResult->first() ?? null;
 		$display_name = $foundContacts['display_name'];
 
 		if (!empty($recentCamp)) {
