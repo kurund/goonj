@@ -9,14 +9,14 @@ $redirectBaseUrl = get_home_url() . "/collection-camp-form/#?";
 
 $queryParams = [
 	'source_contact_id' => $recentCampData['source_contact_id'] ?? '',
-	'Collection_Camp_Intent.District' => $recentCampData['custom_72'] ?? '',
-	'Collection_Camp_Intent.State' => $recentCampData['custom_71'] ?? '',
-	'Collection_Camp_Intent.Location_Area_of_camp' => $recentCampData['custom_69'] ?? '',
+	'Collection_Camp_Intent.District' => $recentCampData['Collection_Camp_Intent.District'] ?? '',
+	'Collection_Camp_Intent.State' => $recentCampData['Collection_Camp_Intent.State'] ?? '',
+	'Collection_Camp_Intent.Location_Area_of_camp' => $recentCampData['Collection_Camp_Intent.Location_Area_of_camp'] ?? '',
 	'Collection_Camp_Intent.Name' => $displayName,
 	'Collection_Camp_Intent.Contact_Number' => $contactNumber,
-	'Collection_Camp_Intent.You_wish_to_register_as' => $recentCampData['custom_81'] ?? '',
-	'Collection_Camp_Intent.City' => $recentCampData['custom_85'] ?? '',
-	'Collection_Camp_Intent.Pin_Code' => $recentCampData['custom_89'] ?? '',
+	'Collection_Camp_Intent.You_wish_to_register_as' => $recentCampData['Collection_Camp_Intent.You_wish_to_register_as'] ?? '',
+	'Collection_Camp_Intent.City' => $recentCampData['Collection_Camp_Intent.City'] ?? '',
+	'Collection_Camp_Intent.Pin_Code' => $recentCampData['Collection_Camp_Intent.Pin_Code'] ?? '',
 ];
 
 $redirectUrl = $redirectBaseUrl . http_build_query($queryParams);

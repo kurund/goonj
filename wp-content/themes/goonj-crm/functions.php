@@ -177,16 +177,16 @@ function goonj_handle_user_identification_form() {
 
 	try {
 		// Find the contact ID based on email and phone number
-		$contactResult = civicrm_api3('Contact', 'get', [
-			'sequential' => 1,
-			'return' => ['id', 'contact_sub_type', "display_name"],
-			'email' => $email,
-			'phone' => $phone,
-			'is_deleted' => 0,
-			'contact_type' => 'Individual',
-		]);
+		$contactResult = \Civi\Api4\Contact::get(FALSE)
+		->addSelect('id', 'contact_sub_type', 'display_name')
+		->addWhere('email_primary.email', '=', $email)
+		->addWhere('phone_primary.phone', '=', $phone)
+		->addWhere('contact_type', '=', 'Individual')
+		->addWhere('is_deleted', '=', 0)
+		->setLimit(1)
+		->execute();
 
-		$foundContacts = $contactResult['values'];
+		$foundContacts = $contactResult->first() ?? null;
 
 		// If the user does not exist in the Goonj database
 		// redirect to the volunteer registration form.
@@ -205,10 +205,11 @@ function goonj_handle_user_identification_form() {
 			exit;
 		}
 
-		$contact = $foundContacts[0];
+		$contactId = $foundContacts['id'];
+		$contactSubType = $foundContacts['contact_sub_type'] ?? []; 
 		// Check if the contact is a volunteer
-		if ( empty( $contact['contact_sub_type'] ) || !in_array( 'Volunteer', $contact['contact_sub_type'] ) ) {
-			wp_redirect( '/volunteer-form/#?Individual1=' . $contact['id'] . '&message=individual-user' );
+		if ( empty( $contactSubType ) || !in_array( 'Volunteer', $contactSubType ) ) {
+			wp_redirect('/volunteer-form/#?Individual1=' . $contactId . '&message=individual-user');
 			exit;
 		}
 
@@ -217,7 +218,7 @@ function goonj_handle_user_identification_form() {
 		// If the volunteer is not inducted,
 		//   1. Trigger an email for Induction
 		//   2. Change volunteer status to "Waiting for Induction"
-		if ( ! goonj_is_volunteer_inducted( $contact ) ) {
+		if ( ! goonj_is_volunteer_inducted( $foundContacts ) ) {
 			$referer_url = wp_get_referer();
 			$parsed_url = parse_url($referer_url);
 			$query_params = [];
@@ -238,49 +239,50 @@ function goonj_handle_user_identification_form() {
 
 		// If we are here, then it means the user exists as an inducted volunteer.
 		// Fetch the most recent collection camp activity based on the creation date
-		$collectionCampResult = civicrm_api3('Activity', 'get', [
-			'sequential' => 1,
-			'contact_id' => $contact['id'],
-			'activity_type_id' => 61, // ID for "Collection Camp Intent"
-			'status_id' => 10, // Status ID for "Under Authorization"
-			'order_by' => 'created_date DESC',
-			'limit' => 1,
-		]);
+		$collectionCampResult = \Civi\Api4\Activity::get(FALSE)
+		->addSelect('custom.*', 'source_contact_id')
+		->addWhere('activity_type_id', '=', 61) // ID for "Collection Camp Intent"
+		->addWhere('status_id', '=', 10) // Status ID for "Under Authorization"
+		->addWhere('source_contact_id', '=', $foundContacts['id'])
+		->addOrderBy('created_date', 'DESC')
+		->setLimit(1)
+		->execute();
+
 
 		// Recent camp data
-		$recentCamp = end($collectionCampResult['values']);
-		$display_name = $contact['display_name'];
+		$recentCamp = $collectionCampResult->first() ?? null;
+		$display_name = $foundContacts['display_name'];
 
 		if (!empty($recentCamp)) {
 			// Save the recentCamp data to the session
 			$_SESSION['recentCampData'] = $recentCamp;
-			$_SESSION['contactId'] = $contact['id'];
+			$_SESSION['contactId'] = $foundContacts['id'];
 			$_SESSION['displayName'] = $display_name;
 			$_SESSION['contactNumber'] = $phone;
 
-			wp_redirect(get_home_url() . "/collection-camp-in-past/#?source_contact_id=" . $contact['id'] . '&message=past-collection-data' );
+			wp_redirect(get_home_url() . "/collection-camp-in-past/#?source_contact_id=" . $foundContacts['id'] . '&message=past-collection-data' );
 			exit;
 		} else {
-			$redirect_url = get_home_url() . "/collection-camp-form/#?source_contact_id=" . $contact['id'] . '&message=collection-camp-page&Collection_Camp_Intent.Name=' . $display_name . '&Collection_Camp_Intent.Contact_Number='. $phone;
+			$redirect_url = get_home_url() . "/collection-camp-form/#?source_contact_id=" . $foundContacts['id'] . '&message=collection-camp-page&Collection_Camp_Intent.Name=' . $display_name . '&Collection_Camp_Intent.Contact_Number='. $phone;
 		}
 		wp_redirect($redirect_url);
 		exit;
-	} catch (CiviCRM_API3_Exception $e) {
-		$error = $e->getMessage();
-		echo "API error: $error";
+	} catch (Exception $e) {
+		error_log("Error: " . $e->getMessage());
+		echo "An error occurred. Please try again later.";
 	}
 }
 
 function goonj_is_volunteer_inducted( $volunteer ) {
-	$activityResult = civicrm_api3('Activity', 'get', [
-		'sequential' => 1,
-		'return' => ['id'],
-		'contact_id' => $volunteer['id'],
-		'activity_type_id' => ['IN' => [57]], // hardcode ID of activity type "Induction"
-		'status_id' => ['IN' => [2]], // hardcode ID of activity status "Completed"
-	]);
+	$activityResult = \Civi\Api4\Activity::get(FALSE)
+	->addSelect('id')
+	->addWhere('target_contact_id', '=', $volunteer['id'])
+	->addWhere('activity_type_id', '=', 57) // hardcode ID of activity type "Induction"
+	->addWhere('status_id', '=', 2) // hardcode ID of activity status "Completed"
+	->setLimit(1)
+	->execute();
 
-	$foundCompletedInductionActivities = $activityResult['values'];
+	$foundCompletedInductionActivities= $activityResult->first() ?? null;
 
 	return ! empty( $foundCompletedInductionActivities );
 }
