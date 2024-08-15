@@ -2,17 +2,13 @@
 
 namespace Civi;
 
+use CRM_Goonjcustom_ExtensionUtil as E;
 // use Civi\Afform\AHQ;
 use Civi\Afform\Event\AfformValidateEvent;
-use Civi\Core\Service\AutoService;
+use Civi\Core\Service\AutoSubscriber;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Provides Unique user validation element to Afform
- * @internal
- * @service
- */
-class GoonjUniqueUserValidation extends AutoService implements EventSubscriberInterface {
+class GoonjUniqueUserValidation extends AutoSubscriber implements EventSubscriberInterface {
 
   /**
    * @return array
@@ -24,6 +20,7 @@ class GoonjUniqueUserValidation extends AutoService implements EventSubscriberIn
   }
 
   public static function onAfformValidate(AfformValidateEvent $event) {
+      error_log('Goonjcustom: onAfformValidate');
     // our logic goes here
   }
 
