@@ -19,6 +19,7 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 		$state = $originalData['custom_71'] ?? null;
 		$postalCode = $originalData['custom_89'] ?? null;
 		$city = $originalData['custom_85'] ?? null;
+		$createdDate = $originalData['created_date'] ?? null;
 
 		// Save an address for the contact
 		try {
@@ -31,8 +32,7 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 				->setFixAddress(FALSE)
 				->execute();
 
-			$addressData = $addressResult->first();
-			$addressId = $addressData['id'] ?? null;
+			$addressId = $addressResult->first()['id'] ?? null;
 		} catch (Exception $e) {
 			throw new Exception($e->getMessage());
 		}
@@ -52,7 +52,7 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 		}
 
 		$eventParams = [
-			'title' => 'Collection Camp',
+			'title' => $this->getEventCode($createdDate, $addressId),
 			'event_type_id' => 7,
 			'start_date' => $startDate,
 			'end_date' => $endDate,
@@ -79,6 +79,48 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 		} catch (CiviCRM_API3_Exception $e) {
 			throw new Exception($e->getMessage());
 		}
+	}
+
+	private function getEventCode($createdDate, $addressId) {
+		$date = new DateTime($createdDate);
+		$createdYear = $date->format('Y');
+
+		// Fetch the state_province_id from the address
+		try {
+			$addresses = \Civi\Api4\Address::get(FALSE)
+				->addSelect('state_province_id')
+				->addWhere('id', '=', $addressId)
+				->setLimit(1)
+				->execute();
+	
+			$addressData = $addresses->first();
+			$stateProvinceId = $addressData['state_province_id'] ?? null;    
+		} catch (Exception $e) {
+			throw new Exception($e->getMessage());
+		}
+
+		// Fetch the state abbreviation
+		try {
+			$stateResult = \Civi\Api4\StateProvince::get(FALSE)
+				->addSelect('abbreviation')
+				->addWhere('id', '=', $stateProvinceId)
+				->setLimit(1)
+				->execute();
+
+			$stateData = $stateResult->first();
+			$stateAbbreviation = $stateData['abbreviation'] ?? null;    
+		} catch (Exception $e) {
+			throw new Exception($e->getMessage());
+		}
+
+		// Fetch the goonj specific state code
+		$goonjStateCodePath = ABSPATH . 'wp-content/civi-extensions/goonjcustom/config/constants.php';
+		$goonjStateCode = include $goonjStateCodePath;
+
+		// Find the state code from the config
+		$stateCode = $goonjStateCode[$stateAbbreviation] ?? 'UNKNOWN';
+
+		return "$createdYear/$stateCode/CC";
 	}
 
 	/**
