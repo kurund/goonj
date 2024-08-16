@@ -254,6 +254,24 @@ function goonjcustom_civicrm_tabset($tabsetName, &$tabs, $context) {
 		"reset=1&snippet=5&force=1&id=$eventID&action=update&component=event"
 	);
 
+	$intentId = \Civi\Api4\Event::get(FALSE)
+	->addSelect('Event_Volunteers.Collection_Camp_Intent')
+	->addWhere('id', '=', $eventID)
+	->setLimit(1)
+	->execute();
+
+	error_log("NameventIDe_of_log: " . print_r($eventID, TRUE));
+
+	$collectionCampIntentId= $intentId->first()['Event_Volunteers.Collection_Camp_Intent'] ?? null;
+
+	error_log("collectionCampIntentId: " . print_r($collectionCampIntentId, TRUE));
+
+
+	// URL for the Intent tab
+	$intenturl = CRM_Utils_System::url(
+		"/wp-admin/admin.php?page=CiviCRM&q=civicrm%2Factivity%2Fadd&reset=1&action=view&id=$collectionCampIntentId"
+	);
+
 	$tabsToRemove = [
 		'event' => [
 			'manage' => [
@@ -268,6 +286,15 @@ function goonjcustom_civicrm_tabset($tabsetName, &$tabs, $context) {
 	foreach ($tabsToRemove['event']['manage'] as $toRemove) {
 		unset($tabs[$toRemove]);
 	}
+
+	// Add the Intent tab
+	$tabs['intent'] = [
+		'title' => ts('Intent'),
+		'link' => $intenturl,
+		'valid' => 1,
+		'active' => 1,
+		'current' => false,
+	];
 
 	// Add a new QR tab along with URL.
 	$tabs['qr'] = [
