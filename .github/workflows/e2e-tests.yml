@@ -6,7 +6,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: '20 8 * * 1-6'  # Run at 22:00 from Monday to Saturday
+    - cron: '30 10 * * 1-6'  # Run at 22:00 from Monday to Saturday
 
 jobs:
   # Job for pull request with label 'in review'
@@ -20,7 +20,6 @@ jobs:
       USERNAME: ${{ secrets.PLAYWRIGHT_TEST_ADMIN }}
       PASSWORD: ${{ secrets.PLAYWRIGHT_TEST_ADMIN_PASSWORD }}
       ARTIFACT_PASSWORD: ${{ secrets.ARTIFACT_ZIP_PASSWORD }}
-      # DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -62,8 +61,8 @@ jobs:
       USERNAME: ${{ secrets.PLAYWRIGHT_TEST_ADMIN }}
       PASSWORD: ${{ secrets.PLAYWRIGHT_TEST_ADMIN_PASSWORD }}
       ARTIFACT_PASSWORD: ${{ secrets.ARTIFACT_ZIP_PASSWORD }}
-      # DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-      DISCORD_WEBHOOK_URL: "https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH"
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      # DISCORD_WEBHOOK_URL: "https://discord.com/api/webhooks/1272525921995198534/Hh_3ccFsH5I8KGLNZiKUiJk12gLiLsyfks5qk0O0D6H9XKSSTM7vsGPDV6Rkx1paZEvH"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
