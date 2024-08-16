@@ -2,7 +2,7 @@ name: e2e-tests
 on:
   push:
     branches:
-      - test-notifcation
+      - main
   pull_request:
     types: [ labeled ]
     branches:
@@ -59,7 +59,7 @@ jobs:
     #       -F "payload_json={\"content\": \"Test report for scheduled E2E tests.\"}" \
     #       $DISCORD_WEBHOOK_URL
     - name: Take Screenshot of report and Send as Discord Notification
-      if: always()
+      if: github.event_name == 'pull_request'
       # if: github.event_name == 'schedule'
         # Take the screenshot of the report
         npx playwright screenshot ./playwright-report/index.html ./playwright-report/report.png
