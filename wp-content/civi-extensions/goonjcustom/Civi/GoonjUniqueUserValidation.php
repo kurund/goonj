@@ -43,8 +43,6 @@ class GoonjUniqueUserValidation extends AutoSubscriber implements EventSubscribe
         ->setLimit(1)
         ->execute();
     
-    error_log("contact: " . print_r($contacts, TRUE));
-    error_log("rowcount: " . print_r($contacts->rowCount, TRUE));
     
     $errorMessages = [];
     
