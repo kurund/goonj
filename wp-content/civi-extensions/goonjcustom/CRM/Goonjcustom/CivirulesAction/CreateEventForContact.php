@@ -37,7 +37,6 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 			throw new Exception($e->getMessage());
 		}
 
-
 		// Create a location block with the address ID
 		try {
 			$locBlockResult = \Civi\Api4\LocBlock::create(FALSE)
