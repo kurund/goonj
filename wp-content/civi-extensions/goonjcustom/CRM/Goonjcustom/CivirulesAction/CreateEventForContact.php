@@ -20,8 +20,6 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 		$postalCode = $originalData['custom_89'] ?? null;
 		$city = $originalData['custom_85'] ?? null;
 		$createdDate = $originalData['created_date'] ?? null;
-		$date = new DateTime($createdDate);
-		$createdYear = $date->format('Y');
 
 		// Save an address for the contact
 		try {
@@ -39,42 +37,8 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 			throw new Exception($e->getMessage());
 		}
 	
-		// Fetch the state_province_id from the address
-		try {
-			$addresses = \Civi\Api4\Address::get(FALSE)
-				->addSelect('state_province_id')
-				->addWhere('id', '=', $addressId)
-				->setLimit(1)
-				->execute();
-	
-			$addressData = $addresses->first();
-			$stateProvinceId = $addressData['state_province_id'] ?? null;	
-		} catch (Exception $e) {
-			throw new Exception($e->getMessage());
-		}
-	
-		// Fetch the state name
-		try {
-			$stateResult = \Civi\Api4\StateProvince::get(FALSE)
-				->addSelect('abbreviation')
-				->addWhere('id', '=', $stateProvinceId)
-				->setLimit(1)
-				->execute();
-	
-			$stateData = $stateResult->first();
-			$stateAbbreviation = $stateData['abbreviation'] ?? null;	
-		} catch (Exception $e) {
-			throw new Exception($e->getMessage());
-		}
-
-		// Fetch the goonj specific code
-		$goonjStateCodePath = ABSPATH . 'wp-content/civi-extensions/goonjcustom/config/constants.php';
-		$goonjStateCode = include $goonjStateCodePath;
-
-		// Find the state code from the config
-		$stateCode = $goonjStateCode[$stateAbbreviation] ?? null;
-
-		$title = $createdYear . '/' . ($stateCode ?? 'UNKNOWN') . '/CC';
+		// Generate event code
+		$title = $this->getEventCode($createdDate, $addressId);
 
 		// Create a location block with the address ID
 		try {
@@ -118,6 +82,48 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 		} catch (CiviCRM_API3_Exception $e) {
 			throw new Exception($e->getMessage());
 		}
+	}
+
+	private function getEventCode($createdDate, $addressId) {
+		$date = new DateTime($createdDate);
+		$createdYear = $date->format('Y');
+
+		// Fetch the state_province_id from the address
+		try {
+			$addresses = \Civi\Api4\Address::get(FALSE)
+				->addSelect('state_province_id')
+				->addWhere('id', '=', $addressId)
+				->setLimit(1)
+				->execute();
+	
+			$addressData = $addresses->first();
+			$stateProvinceId = $addressData['state_province_id'] ?? null;    
+		} catch (Exception $e) {
+			throw new Exception($e->getMessage());
+		}
+
+		// Fetch the state abbreviation
+		try {
+			$stateResult = \Civi\Api4\StateProvince::get(FALSE)
+				->addSelect('abbreviation')
+				->addWhere('id', '=', $stateProvinceId)
+				->setLimit(1)
+				->execute();
+
+			$stateData = $stateResult->first();
+			$stateAbbreviation = $stateData['abbreviation'] ?? null;    
+		} catch (Exception $e) {
+			throw new Exception($e->getMessage());
+		}
+
+		// Fetch the goonj specific state code
+		$goonjStateCodePath = ABSPATH . 'wp-content/civi-extensions/goonjcustom/config/constants.php';
+		$goonjStateCode = include $goonjStateCodePath;
+
+		// Find the state code from the config
+		$stateCode = $goonjStateCode[$stateAbbreviation] ?? 'UNKNOWN';
+
+		return "$createdYear/$stateCode/CC";
 	}
 
 	/**
