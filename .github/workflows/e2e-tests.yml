@@ -59,9 +59,8 @@ jobs:
     #       -F "payload_json={\"content\": \"Test report for scheduled E2E tests.\"}" \
     #       $DISCORD_WEBHOOK_URL
     - name: Take Screenshot of report and Send as Discord Notification
+      if: always()
       # if: github.event_name == 'schedule'
-      if: (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'in review'))
-      run: |
         # Take the screenshot of the report
         npx playwright screenshot ./playwright-report/index.html ./playwright-report/report.png
         sleep 5
