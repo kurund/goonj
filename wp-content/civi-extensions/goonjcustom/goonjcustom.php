@@ -260,10 +260,7 @@ function goonjcustom_civicrm_tabset($tabsetName, &$tabs, $context) {
 	->setLimit(1)
 	->execute();
 
-
 	$collectionCampIntentId= $intentId->first()['Event_Volunteers.Collection_Camp_Intent'] ?? null;
-
-
 
 	// URL for the Intent tab
 	$intenturl = CRM_Utils_System::url(
