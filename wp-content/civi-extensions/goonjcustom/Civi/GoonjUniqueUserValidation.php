@@ -33,38 +33,40 @@ class GoonjUniqueUserValidation extends AutoSubscriber implements EventSubscribe
         $phone = $entityValues['Individual1'][0]['joins']['Phone'][0]['phone'] ?? '';
         $email = $entityValues['Individual1'][0]['joins']['Email'][0]['email'] ?? '';
 
-        $contactResult = civicrm_api3(
-            'Contact', 'get', [
-            'sequential' => 1,
-            'return' => ['id', 'email', 'phone'],
-            'email' => $email,
-            'phone' => $phone,
-            'is_deleted' => 0,
-            'contact_type' => 'Individual',
-            ]
-        );
 
-        $errorMessages = [];
-
-        if ($contactResult['count'] > 0) {
-            foreach ($contactResult['values'] as $contact) {
-                if ($contact['email'] === $email && $contact['phone'] === $phone) {
-                    $errorMessages[] = "Both the email address '$email' and the phone number '$phone' are already in use.";
-                    break;
-                } elseif ($contact['email'] === $email) {
-                    $errorMessages[] = "The email address '$email' is already in use.";
-                } elseif ($contact['phone'] === $phone) {
-                    $errorMessages[] = "The phone number '$phone' is already in use.";
-                }
+        $contacts = \Civi\Api4\Contact::get()
+        ->addSelect('id', 'email_primary.email', 'phone_primary.phone')
+        ->addWhere('email_primary.email', '=', $email)
+        ->addWhere('phone_primary.phone', '=', $phone)
+        ->addWhere('contact_type', '=', 'Individual')
+        ->addWhere('is_deleted', '=', 0)
+        ->setLimit(1)
+        ->execute();
+    
+    error_log("contact: " . print_r($contacts, TRUE));
+    error_log("rowcount: " . print_r($contacts->rowCount, TRUE));
+    
+    $errorMessages = [];
+    
+    if (!empty($contacts)) {
+        foreach ($contacts as $contact) {
+            if ($contact['email_primary.email'] === $email && $contact['phone_primary.phone'] === $phone) {
+                $errorMessages[] = "Both the email address '$email' and the phone number '$phone' are already in use.";
+                break;
+            } elseif ($contact['email_primary.email'] === $email) {
+                $errorMessages[] = "The email address '$email' is already in use.";
+            } elseif ($contact['phone_primary.phone'] === $phone) {
+                $errorMessages[] = "The phone number '$phone' is already in use.";
             }
         }
-
-        if (!empty($errorMessages)) {
-          
-            $errorMessagesString = implode("\n", $errorMessages);
-            echo '<script type="text/javascript">
-          alert(' . json_encode($errorMessagesString) . ');
-          </script>';
-        }
+    }
+    
+    if (!empty($errorMessages)) {
+        $errorMessagesString = implode("\n", $errorMessages);
+        echo '<script type="text/javascript">
+            alert(' . json_encode($errorMessagesString) . ');
+        </script>';
+    }
+    
     }
 }
