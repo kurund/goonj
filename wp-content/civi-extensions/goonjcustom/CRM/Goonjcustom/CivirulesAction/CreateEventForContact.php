@@ -56,13 +56,13 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 		// Fetch the state name
 		try {
 			$stateResult = \Civi\Api4\StateProvince::get(FALSE)
-				->addSelect('name')
+				->addSelect('abbreviation')
 				->addWhere('id', '=', $stateProvinceId)
 				->setLimit(1)
 				->execute();
 	
 			$stateData = $stateResult->first();
-			$stateName = $stateData['name'] ?? null;	
+			$stateAbbreviation = $stateData['abbreviation'] ?? null;	
 		} catch (Exception $e) {
 			throw new Exception($e->getMessage());
 		}
@@ -72,7 +72,7 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 		$goonjStateCode = include $goonjStateCodePath;
 
 		// Find the state code from the config
-		$stateCode = $goonjStateCode[$stateName] ?? null;
+		$stateCode = $goonjStateCode[$stateAbbreviation] ?? null;
 
 		$title = $createdYear . '/' . ($stateCode ?? 'UNKNOWN') . '/CC';
 
