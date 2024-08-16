@@ -120,7 +120,19 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 		// Find the state code from the config
 		$stateCode = $goonjStateCode[$stateAbbreviation] ?? 'UNKNOWN';
 
-		return "$createdYear/$stateCode/CC";
+		// Fetch existing collection camps for the state
+		try {
+			$existingCamps = \Civi\Api4\Event::get(FALSE)
+				->addSelect('title')
+				->addWhere('title', 'LIKE', "$createdYear/$stateCode/CC/%")
+				->execute();
+	
+			$serialNumber = $existingCamps->count() + 1;
+		} catch (Exception $e) {
+			throw new Exception($e->getMessage());
+		}
+
+		return "$createdYear/$stateCode/CC/$serialNumber";
 	}
 
 	/**
