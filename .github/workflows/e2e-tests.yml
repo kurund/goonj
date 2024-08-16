@@ -6,7 +6,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: '35 7 * * 1-6'  # Run at 22:00 from Monday to Saturday
+    - cron: '16 8 * * 1-6'  # Run at 22:00 from Monday to Saturday
 
 jobs:
   # Job for pull request with label 'in review'
@@ -80,6 +80,7 @@ jobs:
         with:
           report-file: ./playwright-report/results.json
       - name: Take Screenshot of report and Send as Discord Notification
+        if: always()
         run: |
           # Take the screenshot of the report
           npx playwright screenshot ./playwright-report/index.html ./playwright-report/report.png
