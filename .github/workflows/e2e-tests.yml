@@ -61,6 +61,7 @@ jobs:
     - name: Take Screenshot of report and Send as Discord Notification
       # if: github.event_name == 'pull_request'
       # if: github.event_name == 'schedule'
+      if: always
       run: |
         # Take the screenshot of the report
         npx playwright screenshot ./playwright-report/index.html ./playwright-report/report.png
