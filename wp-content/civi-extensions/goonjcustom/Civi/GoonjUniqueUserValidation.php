@@ -22,12 +22,11 @@ class GoonjUniqueUserValidation extends AutoSubscriber implements EventSubscribe
 
     public static function onAfformValidate(AfformValidateEvent $event)
     {
-        $formTitle = $event->getAfform()['title'] ?? '';
+        $formName = $event->getAfform()['name'] ?? '';
 
-        if ($formTitle !== 'Volunteer Registration') {
+        if ($formName !== 'afformIndividualRegistration1') {
             return;
         }
-
         $entityValues = $event->getEntityValues();
 
         $phone = $entityValues['Individual1'][0]['joins']['Phone'][0]['phone'] ?? '';
@@ -47,19 +46,21 @@ class GoonjUniqueUserValidation extends AutoSubscriber implements EventSubscribe
         $errorMessages = [];
     
         if (!empty($contacts)) {
-          foreach ($contacts as $contact) {
-              if ($contact['email_primary.email'] === $email && $contact['phone_primary.phone'] === $phone) {
-                  $errorMessages[] = "Both the email address '$email' and the phone number '$phone' are already in use.";
-              }
-          }
-      }
+            foreach ($contacts as $contact) {
+                if ($contact['email_primary.email'] === $email && $contact['phone_primary.phone'] === $phone) {
+                    $errorMessages[] = "Both the email address '$email' and the phone number '$phone' are already in use.";
+                }
+            }
+        }
     
+       
         if (!empty($errorMessages)) {
             $errorMessagesString = implode("\n", $errorMessages);
             error_log("Validation Errors: " . $errorMessagesString);
-            $event->setError($errorMessagesString);
+            // TODO: will update this  section later to handle validation errors properly
+            $event->setFormData(['errors' => $errorMessages]);
+
         }
-   
     }
 
 }
