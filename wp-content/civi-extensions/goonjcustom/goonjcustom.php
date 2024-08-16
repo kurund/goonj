@@ -260,11 +260,9 @@ function goonjcustom_civicrm_tabset($tabsetName, &$tabs, $context) {
 	->setLimit(1)
 	->execute();
 
-	error_log("NameventIDe_of_log: " . print_r($eventID, TRUE));
 
 	$collectionCampIntentId= $intentId->first()['Event_Volunteers.Collection_Camp_Intent'] ?? null;
 
-	error_log("collectionCampIntentId: " . print_r($collectionCampIntentId, TRUE));
 
 
 	// URL for the Intent tab
