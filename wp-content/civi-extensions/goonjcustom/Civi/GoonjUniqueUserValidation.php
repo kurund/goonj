@@ -47,17 +47,12 @@ class GoonjUniqueUserValidation extends AutoSubscriber implements EventSubscribe
         $errorMessages = [];
     
         if (!empty($contacts)) {
-            foreach ($contacts as $contact) {
-                if ($contact['email_primary.email'] === $email && $contact['phone_primary.phone'] === $phone) {
-                    $errorMessages[] = "Both the email address '$email' and the phone number '$phone' are already in use.";
-                    break;
-                } elseif ($contact['email_primary.email'] === $email) {
-                    $errorMessages[] = "The email address '$email' is already in use.";
-                } elseif ($contact['phone_primary.phone'] === $phone) {
-                    $errorMessages[] = "The phone number '$phone' is already in use.";
-                }
-            }
-        }
+          foreach ($contacts as $contact) {
+              if ($contact['email_primary.email'] === $email && $contact['phone_primary.phone'] === $phone) {
+                  $errorMessages[] = "Both the email address '$email' and the phone number '$phone' are already in use.";
+              }
+          }
+      }
     
         if (!empty($errorMessages)) {
             $errorMessagesString = implode("\n", $errorMessages);
