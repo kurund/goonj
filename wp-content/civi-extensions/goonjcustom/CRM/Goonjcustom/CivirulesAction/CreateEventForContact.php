@@ -68,7 +68,7 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 		}
 
 		// Fetch the goonj specific code
-		$goonjStateCodePath = ABSPATH . 'wp-content/civi-extensions/goonjcustom/CRM/Goonjcustom/state_codes.php';
+		$goonjStateCodePath = ABSPATH . 'wp-content/civi-extensions/goonjcustom/config/constants.php';
 		$goonjStateCode = include $goonjStateCodePath;
 
 		// Find the state code from the config
