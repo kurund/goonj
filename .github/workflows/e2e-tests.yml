@@ -3,10 +3,10 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    types: [ labeled ]
-    branches:
-      - main
+  # pull_request:
+  #   types: [ labeled ]
+  #   branches:
+  #     - main
   schedule:
     - cron: '0 22 * * 1-6'  # Run at 22:00 from Monday to Saturday
 
