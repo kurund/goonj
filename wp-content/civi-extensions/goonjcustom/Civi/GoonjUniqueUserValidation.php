@@ -60,13 +60,11 @@ class GoonjUniqueUserValidation extends AutoSubscriber implements EventSubscribe
         }
 
         if (!empty($errorMessages)) {
-
+          
             $errorMessagesString = implode("\n", $errorMessages);
-
             echo '<script type="text/javascript">
           alert(' . json_encode($errorMessagesString) . ');
-      </script>';
-
+          </script>';
         }
     }
 }
