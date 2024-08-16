@@ -61,7 +61,7 @@ class GoonjUniqueUserValidation extends AutoSubscriber implements EventSubscribe
 
         if (!empty($errorMessages)) {
 
-            echo '<script>alert("Welcome to Geeks for Geeks")</script>'; 
+            echo '<script>alert("duplicate entries")</script>'; 
 
         }
     }
