@@ -36,9 +36,7 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 		} catch (Exception $e) {
 			throw new Exception($e->getMessage());
 		}
-	
-		// Generate event code
-		$title = $this->getEventCode($createdDate, $addressId);
+
 
 		// Create a location block with the address ID
 		try {
@@ -55,7 +53,7 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 		}
 
 		$eventParams = [
-			'title' => $title,
+			'title' => $this->getEventCode($createdDate, $addressId),
 			'event_type_id' => 7,
 			'start_date' => $startDate,
 			'end_date' => $endDate,
