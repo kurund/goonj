@@ -256,16 +256,17 @@ function goonjcustom_civicrm_tabset($tabsetName, &$tabs, $context) {
 	);
 
 	$intentId = \Civi\Api4\Event::get(FALSE)
-		->addSelect('Event_Volunteers.Collection_Camp_Intent')
+		->addSelect('*', 'Event_Volunteers.Collection_Camp_Intent')
 		->addWhere('id', '=', $eventID)
 		->setLimit(1)
 		->execute();
 
-	$collectionCampIntentId= $intentId->first()['Event_Volunteers.Collection_Camp_Intent'] ?? null;
+	$collectionCampIntentId = $intentId->first()['Event_Volunteers.Collection_Camp_Intent'] ?? null;
+	$collectionCampEventTypeId = $intentId->first()['event_type_id'] ?? null;
 
 	// URL for the Intent tab
 	$intentUrl = CRM_Utils_System::url(
-		"/wp-admin/admin.php?page=CiviCRM&q=civicrm%2Factivity%2Fadd&reset=1&type=Activity&subType=61&action=view&id=$collectionCampIntentId"
+		"/wp-admin/admin.php?page=CiviCRM&q=civicrm%2Factivity%2Fadd&reset=1&type=Event&subType=$collectionCampEventTypeId&action=view&id=$collectionCampIntentId"
 	);
 
 	$tabsToRemove = [
@@ -309,9 +310,9 @@ function goonjcustom_civicrm_tabset($tabsetName, &$tabs, $context) {
 					$(document).ajaxComplete(function(event, xhr, settings) {
 						var urlParams = new URLSearchParams(settings.url);
 						var currentUrl = window.location.href;
-						var isActivityViewType61 = urlParams.get("subType") === "61";
+						var isEventSubType = urlParams.get("subType") === "7";
 
-						if (isActivityViewType61) {
+						if (isEventSubType) {
 							var fieldsToHide = [
 								".crm-activity-form-block-target_contact_id",
 								".crm-activity-form-block-assignee_contact_id",
