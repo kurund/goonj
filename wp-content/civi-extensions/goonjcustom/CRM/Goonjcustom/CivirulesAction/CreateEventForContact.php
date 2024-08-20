@@ -124,10 +124,10 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 		try {
 			$existingCamps = \Civi\Api4\Event::get(FALSE)
 				->addSelect('title')
-				->addWhere('title', 'LIKE', "$createdYear/$stateCode/CC/%")
+				->addWhere('title', 'LIKE', "$createdYear/$stateCode/Coll/%")
 				->execute();
-	
-			$serialNumber = $existingCamps->count() + 1;
+
+				$serialNumber = sprintf('%03d', $existingCamps->count() + 1);
 		} catch (Exception $e) {
 			throw new Exception($e->getMessage());
 		}
