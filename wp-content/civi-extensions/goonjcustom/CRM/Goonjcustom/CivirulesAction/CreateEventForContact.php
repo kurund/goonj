@@ -9,17 +9,26 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 	public function processAction(CRM_Civirules_TriggerData_TriggerData $triggerData) {
 		$contactId = $triggerData->getContactId();
 		$originalData = $triggerData->getOriginalData();
+		$activityId = $originalData['activity_id'] ?? null;
+
+		// Fetch the updated data
+		$updatedActivityApi = \Civi\Api4\Activity::get(TRUE)
+		->addSelect('*', 'custom.*')
+		->addWhere('id', '=', $activityId)
+		->setLimit(1)
+		->execute();
+
+		$updatedActivity = $updatedActivityApi->first();
 
 		// Extract fields
-		$startDate = $originalData['custom_73'] ?? null;
-		$endDate = $originalData['custom_74'] ?? null;
+		$startDate = $updatedActivity['Collection_Camp_Intent.Start_Date'] ?? null;
+		$endDate = $updatedActivity['Collection_Camp_Intent.End_Date'] ?? null;
 		$contactId = $originalData['contact_id'] ?? null;
-		$activityId = $originalData['activity_id'] ?? null;
-		$location = $originalData['custom_69'] ?? null;
-		$state = $originalData['custom_71'] ?? null;
-		$postalCode = $originalData['custom_89'] ?? null;
-		$city = $originalData['custom_85'] ?? null;
-		$createdDate = $originalData['created_date'] ?? null;
+		$location = $updatedActivity['Collection_Camp_Intent.Location_Area_of_camp'] ?? null;
+		$state = $updatedActivity['Collection_Camp_Intent.State'] ?? null;
+		$postalCode = $updatedActivity['Collection_Camp_Intent.Pin_Code'] ?? null;
+		$city = $updatedActivity['Collection_Camp_Intent.City'] ?? null;
+		$createdDate = $updatedActivity['created_date'] ?? null;
 
 		// Save an address for the contact
 		try {
