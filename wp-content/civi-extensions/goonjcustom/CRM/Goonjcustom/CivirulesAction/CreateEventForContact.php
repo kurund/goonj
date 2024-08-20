@@ -132,7 +132,7 @@ class CRM_Goonjcustom_CivirulesAction_CreateEventForContact extends CRM_Civirule
 			throw new Exception($e->getMessage());
 		}
 
-		return "$createdYear/$stateCode/CC/$serialNumber";
+		return "$createdYear/$stateCode/Coll/$serialNumber";
 	}
 
 	/**
