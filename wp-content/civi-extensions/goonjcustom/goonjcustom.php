@@ -264,7 +264,7 @@ function goonjcustom_civicrm_tabset($tabsetName, &$tabs, $context) {
 	$collectionCampIntentId= $intentId->first()['Event_Volunteers.Collection_Camp_Intent'] ?? null;
 
 	// URL for the Intent tab
-	$intenturl = CRM_Utils_System::url(
+	$intentUrl = CRM_Utils_System::url(
 		"/wp-admin/admin.php?page=CiviCRM&q=civicrm%2Factivity%2Fadd&reset=1&type=Activity&subType=61&action=view&id=$collectionCampIntentId"
 	);
 
@@ -286,7 +286,7 @@ function goonjcustom_civicrm_tabset($tabsetName, &$tabs, $context) {
 	// Add the Intent tab
 	$tabs['intent'] = [
 		'title' => ts('Intent'),
-		'link' => $intenturl,
+		'link' => $intentUrl,
 		'valid' => 1,
 		'active' => 1,
 		'current' => false,
@@ -310,6 +310,7 @@ function goonjcustom_civicrm_tabset($tabsetName, &$tabs, $context) {
 					var urlParams = new URLSearchParams(settings.url);
 					var currentUrl = window.location.href;
 					var isActivityViewType61 = urlParams.get("subType") === "61";
+					console.log(isActivityViewType61);
 
 					if (isActivityViewType61) {
 						var fieldsToHide = [
