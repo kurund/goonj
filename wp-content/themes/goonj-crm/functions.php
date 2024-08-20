@@ -163,9 +163,12 @@ function goonj_check_user_action() {
 
 add_action('wp', 'goonj_handle_user_identification_form');
 function goonj_handle_user_identification_form() {
-	if ( ! isset( $_POST['action'] ) || ( $_POST['action'] !== 'goonj-check-user' && $_POST['action'] !== 'goonj-camp-contribution' ) ) {
+	if ( ! isset( $_POST['action'] ) || ( $_POST['action'] !== 'goonj-check-user' ) ) {
 		return;
 	}
+
+	$purpose = $_POST['purpose'] ?? 'collection-camp-intent';
+	
 
 	// Retrieve the email and phone number from the POST data
 	$email = $_POST['email'] ?? '';
@@ -199,18 +202,16 @@ function goonj_handle_user_identification_form() {
 		);
 
 		$individual_volunteer_registration_form_path = sprintf(
-			'/individual-registration-with-volunteer-option/#?email=%s&phone=%s&message=%s&Volunteer_fields.Which_activities_are_you_interested_in_=%s',
+			'/individual-registration-with-volunteer-option/#?email=%s&phone=%s',
 			$email,
 			$phone,
-			'not-inducted-volunteer',
-			'9'
 		);
-		if($_POST['action'] === 'goonj-camp-contribution' && empty( $foundContacts ) ){
-			wp_redirect( $individual_volunteer_registration_form_path );
-			exit;
-		}
 
 		if ( empty( $foundContacts ) ) {
+			if ( $purpose == 'material-contribution' ) {
+				wp_redirect( $individual_volunteer_registration_form_path );
+				exit;
+			}
 			// We are currently hardcoding the path of the volunteer registration page.
 			// If this path changes, then this code needs to be updated.
 			wp_redirect( $volunteer_registration_form_path );
