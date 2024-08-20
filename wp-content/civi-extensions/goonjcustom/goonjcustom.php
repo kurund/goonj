@@ -183,62 +183,62 @@ function goonjcustom_civicrm_pageRun( &$page ) {
 					}
 
 					if (isInductionActivity || isCollectionCampActivity || isActivityViewType61) {
-					  var fieldsToHide = [];
+						var fieldsToHide = [];
 
-					  if (isInductionActivity) {
-						  fieldsToHide = [
-							  ".crm-activity-form-block-subject",
-							  ".crm-activity-form-block-campaign_id",
-							  ".crm-activity-form-block-engagement_level",
-							  ".crm-activity-form-block-duration",
-							  ".crm-activity-form-block-priority_id",
-							  ".crm-activity-form-block-location",
-							  ".crm-activity-form-block-attachment",
-							  ".crm-activity-form-block-recurring_activity",
-							  ".crm-activity-form-block-schedule_followup",
-						  ];
-					  } else if (isCollectionCampActivity) {
-						  fieldsToHide = [
-							  ".crm-activity-form-block-subject",
-							  ".crm-activity-form-block-engagement_level",
-							  ".crm-activity-form-block-duration",
-							  ".crm-activity-form-block-priority_id",
-							  ".crm-activity-form-block-location",
-							  ".crm-activity-form-block-attachment",
-							  ".crm-activity-form-block-recurring_activity",
-							  ".crm-activity-form-block-schedule_followup",
-							  ".crm-activity-form-block-target_contact_id",
-							  ".crm-activity-form-block-assignee_contact_id",
-							  ".crm-activity-form-block-activity_date_time",
-							  ".crm-activity-form-block-details",
-						  ];
-					  } else if (isActivityViewType61) {
-						  fieldsToHide = [
-							  ".crm-activity-form-block-target_contact_id",
-							  ".crm-activity-form-block-assignee_contact_id",
-							  ".crm-activity-form-block-engagement_level",
-							  ".crm-activity-form-block-duration",
-							  ".crm-activity-form-block-details",
-							  ".crm-activity-form-block-priority_id",
-							  ".crm-activity-form-block-subject",
-							  ".crm-activity-form-block-location",
-							  ".crm-activity-form-block-campaign_id",
-						  ];
-					  }
+						if (isInductionActivity) {
+							fieldsToHide = [
+								".crm-activity-form-block-subject",
+								".crm-activity-form-block-campaign_id",
+								".crm-activity-form-block-engagement_level",
+								".crm-activity-form-block-duration",
+								".crm-activity-form-block-priority_id",
+								".crm-activity-form-block-location",
+								".crm-activity-form-block-attachment",
+								".crm-activity-form-block-recurring_activity",
+								".crm-activity-form-block-schedule_followup",
+							];
+						} else if (isCollectionCampActivity) {
+							fieldsToHide = [
+								".crm-activity-form-block-subject",
+								".crm-activity-form-block-engagement_level",
+								".crm-activity-form-block-duration",
+								".crm-activity-form-block-priority_id",
+								".crm-activity-form-block-location",
+								".crm-activity-form-block-attachment",
+								".crm-activity-form-block-recurring_activity",
+								".crm-activity-form-block-schedule_followup",
+								".crm-activity-form-block-target_contact_id",
+								".crm-activity-form-block-assignee_contact_id",
+								".crm-activity-form-block-activity_date_time",
+								".crm-activity-form-block-details",
+							];
+						} else if (isActivityViewType61) {
+							fieldsToHide = [
+								".crm-activity-form-block-target_contact_id",
+								".crm-activity-form-block-assignee_contact_id",
+								".crm-activity-form-block-engagement_level",
+								".crm-activity-form-block-duration",
+								".crm-activity-form-block-details",
+								".crm-activity-form-block-priority_id",
+								".crm-activity-form-block-subject",
+								".crm-activity-form-block-location",
+								".crm-activity-form-block-campaign_id",
+							];
+						}
 
 						fieldsToHide.forEach(function(field) {
 							$(field).css("display", "none");
 						});
 
-					  if (isInductionActivity) {
-						  var inductionFields = $(".custom-group-Induction_Fields tr");
-						  $(".crm-activity-form-block-activity_date_time").after(inductionFields);
-						  $(".custom-group-Induction_Fields").remove();
-					  }
+						if (isInductionActivity) {
+							var inductionFields = $(".custom-group-Induction_Fields tr");
+							$(".crm-activity-form-block-activity_date_time").after(inductionFields);
+							$(".custom-group-Induction_Fields").remove();
+						}
 					}
-				  });
-			  })(CRM.$);
-		  ',
+					});
+				})(CRM.$);
+			',
 		)
 	);
 }
@@ -256,10 +256,10 @@ function goonjcustom_civicrm_tabset($tabsetName, &$tabs, $context) {
 	);
 
 	$intentId = \Civi\Api4\Event::get(FALSE)
-	->addSelect('Event_Volunteers.Collection_Camp_Intent')
-	->addWhere('id', '=', $eventID)
-	->setLimit(1)
-	->execute();
+		->addSelect('Event_Volunteers.Collection_Camp_Intent')
+		->addWhere('id', '=', $eventID)
+		->setLimit(1)
+		->execute();
 
 	$collectionCampIntentId= $intentId->first()['Event_Volunteers.Collection_Camp_Intent'] ?? null;
 
@@ -300,44 +300,43 @@ function goonjcustom_civicrm_tabset($tabsetName, &$tabs, $context) {
 		'active' => 1,
 		'current' => false,
 	];
+	// Hide the Intent fields by adding JavaScript specifically to the Intent page
+	if (isset($_GET['selectedChild']) && $_GET['selectedChild'] === 'intent') {
+		CRM_Core_Region::instance('page-footer')->add(
+			array(
+				'script' => '
+				(function($) {
+					$(document).ajaxComplete(function(event, xhr, settings) {
+						var urlParams = new URLSearchParams(settings.url);
+						var currentUrl = window.location.href;
+						var isActivityViewType61 = urlParams.get("subType") === "61";
 
-	// Add JavaScript to dynamically hide fields
-	CRM_Core_Region::instance('page-footer')->add(
-		array(
-			'script' => '
-			(function($) {
-				$(document).ajaxComplete(function(event, xhr, settings) {
-					var urlParams = new URLSearchParams(settings.url);
-					var currentUrl = window.location.href;
-					var isActivityViewType61 = urlParams.get("subType") === "61";
-					console.log(isActivityViewType61);
+						if (isActivityViewType61) {
+							var fieldsToHide = [
+								".crm-activity-form-block-target_contact_id",
+								".crm-activity-form-block-assignee_contact_id",
+								".crm-activity-form-block-engagement_level",
+								".crm-activity-form-block-duration",
+								".crm-activity-form-block-details",
+								".crm-activity-form-block-priority_id",
+								".crm-activity-form-block-subject",
+								".crm-activity-form-block-location",
+								".crm-activity-form-block-status_id",
+								".crm-activity-form-block-activity_date_time",
+								".crm-activity-form-block-activity_date_time",
+								".crm-accordion-bold summary",
+								".crm-activity-form-block-source_contact_id",
+								".crm-activity-form-block-campaign_id"
+							];
 
-					if (isActivityViewType61) {
-						var fieldsToHide = [
-							".crm-activity-form-block-target_contact_id",
-							".crm-activity-form-block-assignee_contact_id",
-							".crm-activity-form-block-engagement_level",
-							".crm-activity-form-block-duration",
-							".crm-activity-form-block-details",
-							".crm-activity-form-block-priority_id",
-							".crm-activity-form-block-subject",
-							".crm-activity-form-block-location",
-							".crm-activity-form-block-status_id",
-							".crm-activity-form-block-activity_date_time",
-							".crm-activity-form-block-activity_date_time",
-							".crm-accordion-bold summary",
-							".crm-activity-form-block-source_contact_id",
-							".crm-activity-form-block-campaign_id"
-						];
-
-						fieldsToHide.forEach(function(field) {
-							$(field).css("display", "none");
-						});
-					}
-				});
-			})(CRM.$);
-			',
-		)
-	);
-
+							fieldsToHide.forEach(function(field) {
+								$(field).css("display", "none");
+							});
+						}
+					});
+				})(CRM.$);
+				',
+			)
+		);
+	}
 }
