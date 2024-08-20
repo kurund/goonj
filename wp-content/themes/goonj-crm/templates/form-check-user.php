@@ -5,9 +5,8 @@
 
 // Retrieve the message from the global variable
 $message = get_query_var('goonj_pending_induction_message', '');
-$current_url = $_SERVER['REQUEST_URI'];
-
-$action_value = ($current_url === '/collection-camp-contribution/') ? 'goonj-camp-contribution' : 'goonj-check-user';
+$purpose = $args['purpose'];
+$target_id = get_query_var('target_id', '');
 ?>
 
 <div class="text-center w-xl-520 m-auto">
@@ -18,7 +17,9 @@ $action_value = ($current_url === '/collection-camp-contribution/') ? 'goonj-cam
             </div>
         <?php endif; ?>
         <!-- Hidden input field with conditional action value -->
-        <input type="hidden" name="action" value="<?php echo esc_attr($action_value); ?>" />
+        <input type="hidden" name="action" value="goonj-check-user" />
+        <input type="hidden" name="purpose" value="<?php echo esc_attr($purpose); ?>" />
+        <input type="hidden" name="target_id" value="<?php echo esc_attr($target_id); ?>" />
         <?php if (!$message) : ?>
             <h2 class="mt-0 mb-6 font-sans fz-20 fw-600">Goonj Collection Camp</h2>
             <p class="mb-24 mt-0 fz-16 font-sans">Please fill the following fields to continue</p>

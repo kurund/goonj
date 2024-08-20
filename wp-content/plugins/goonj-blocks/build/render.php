@@ -20,9 +20,10 @@ $register_link = sprintf(
 );
 
 $material_contribution_link = sprintf(
-	'/collection-camp-contribution/#?Source_Tracking.Event=%s',
+	'/collection-camp-contribution?target_id=%s',
 	$action_target['id'],
 );
+
 
 if ( in_array( $target, array( 'collection-camp', 'dropping-center' ) ) ) :
 	$start_date = new DateTime( $action_target['start_date'] );
