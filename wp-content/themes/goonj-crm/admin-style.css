@@ -7,3 +7,6 @@
 .af-container .af-container .af-text {
 	margin-left: 10px !important;
 }
+#wpbody .wpbody-content #crm-container .crm-accordion-header:not(.crm-master-accordion-header)+.crm-accordion-body, .crm-container .crm-accordion-bold>.crm-accordion-body {
+    box-shadow: none !important;
+}
