@@ -222,6 +222,7 @@ function goonjcustom_civicrm_pageRun( &$page ) {
 							  ".crm-activity-form-block-priority_id",
 							  ".crm-activity-form-block-subject",
 							  ".crm-activity-form-block-location",
+							  ".crm-activity-form-block-campaign_id",
 						  ];
 					  }
 
@@ -264,7 +265,7 @@ function goonjcustom_civicrm_tabset($tabsetName, &$tabs, $context) {
 
 	// URL for the Intent tab
 	$intenturl = CRM_Utils_System::url(
-		"/wp-admin/admin.php?page=CiviCRM&q=civicrm%2Factivity%2Fadd&reset=1&action=view&id=$collectionCampIntentId"
+		"/wp-admin/admin.php?page=CiviCRM&q=civicrm%2Factivity%2Fadd&reset=1&type=Activity&subType=61&action=view&id=$collectionCampIntentId"
 	);
 
 	$tabsToRemove = [
@@ -299,4 +300,43 @@ function goonjcustom_civicrm_tabset($tabsetName, &$tabs, $context) {
 		'active' => 1,
 		'current' => false,
 	];
+
+	// Add JavaScript to dynamically hide fields
+	CRM_Core_Region::instance('page-footer')->add(
+		array(
+			'script' => '
+			(function($) {
+				$(document).ajaxComplete(function(event, xhr, settings) {
+					var urlParams = new URLSearchParams(settings.url);
+					var currentUrl = window.location.href;
+					var isActivityViewType61 = urlParams.get("subType") === "61";
+
+					if (isActivityViewType61) {
+						var fieldsToHide = [
+							".crm-activity-form-block-target_contact_id",
+							".crm-activity-form-block-assignee_contact_id",
+							".crm-activity-form-block-engagement_level",
+							".crm-activity-form-block-duration",
+							".crm-activity-form-block-details",
+							".crm-activity-form-block-priority_id",
+							".crm-activity-form-block-subject",
+							".crm-activity-form-block-location",
+							".crm-activity-form-block-status_id",
+							".crm-activity-form-block-activity_date_time",
+							".crm-activity-form-block-activity_date_time",
+							".crm-accordion-bold summary",
+							".crm-activity-form-block-source_contact_id",
+							".crm-activity-form-block-campaign_id"
+						];
+
+						fieldsToHide.forEach(function(field) {
+							$(field).css("display", "none");
+						});
+					}
+				});
+			})(CRM.$);
+			',
+		)
+	);
+
 }
