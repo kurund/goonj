@@ -39,7 +39,6 @@ function civicrm_api3_goonjcustom_cron($params)
       ->addWhere('status_id:name', '=', 'Scheduled')
       ->addWhere('activity_date_time', '>=', $startOfDay->format('Y-m-d H:i:s'))
       ->addWhere('activity_date_time', '<=', $endOfDay->format('Y-m-d H:i:s'))
-      ->setLimit(25)
       ->execute();
 
     $groupedResults = [];
@@ -63,7 +62,6 @@ function civicrm_api3_goonjcustom_cron($params)
         ->addJoin('Email AS email', 'LEFT')
         ->addJoin('Phone AS phone', 'LEFT')
         ->addWhere('id', '=', $targetContactId)
-        ->setLimit(25)
         ->execute();
 
       // If the contact_id is not in the grouped results, initialize it
