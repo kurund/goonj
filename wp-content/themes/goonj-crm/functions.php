@@ -297,6 +297,16 @@ function goonj_handle_user_identification_form() {
 		->execute();
 
 
+        if ($purpose == 'material-contribution') {
+            wp_redirect($material_contribution_form_path);
+            exit;
+        }
+
+		if ($purpose == 'dropping-center') {
+			wp_redirect(get_home_url() . "/dropping-center/#?source_contact_id=" . $foundContacts['id']);
+			exit;
+		}
+
 		// Recent camp data
 		$recentCamp = $collectionCampResult->first() ?? null;
 		$display_name = $foundContacts['display_name'];
