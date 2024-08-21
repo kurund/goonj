@@ -89,7 +89,7 @@ function civicrm_api3_goonjcustom_cron($params)
     list($defaultFromName, $defaultFromEmail) = CRM_Core_BAO_Domain::getNameAndEmail();
     $from = "\"$defaultFromName\" <$defaultFromEmail>";
 
-    foreach ($inductionAssignees as $assignee) {
+    foreach ($inductionConductors as $assignee) {
 
       $mailParams = [
         'groupName' => 'Mailing Event',
