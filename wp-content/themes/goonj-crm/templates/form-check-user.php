@@ -22,8 +22,8 @@ $target_id = get_query_var('target_id', '');
         <input type="hidden" name="target_id" value="<?php echo esc_attr($target_id); ?>" />
         <?php if (!$message) : ?>
             <div class="d-grid">
-                <label class="font-sans" for="email">Email <span class="required-indicator">*</span></label>
-                <input type="email" id="email" name="email" required value="<?php echo isset($_POST['email']) ? esc_attr(sanitize_email($_POST['email'])) : ''; ?>">
+                <label class="font-sans" for="email">Email <?php if ($purpose != 'material-contribution') : ?><span class="required-indicator">*</span><?php endif; ?></label>
+                <input type="email" id="email" name="email" <?php echo ($purpose != 'material-contribution') ? 'required' : ''; ?> value="<?php echo isset($_POST['email']) ? esc_attr(sanitize_email($_POST['email'])) : ''; ?>">
             </div>
             <br>
             <div class="d-grid">
