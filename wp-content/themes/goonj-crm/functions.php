@@ -119,7 +119,12 @@ function goonj_check_user_action($atts)
     ob_start();
     $message = '';
     if (isset($_GET['message'])) {
-        if ($_GET['message'] === 'waiting-induction') {
+		if ($_GET['message'] === 'waiting-induction') {
+			echo '<style>
+					.user-identification-heading {
+						display: none;
+					}
+				</style>';
             $message = '
 				<p class="fw-600 fz-20 mb-6">Your induction is pending</p>
 				<p class="fw-400 fz-16 mt-0 mb-24">
