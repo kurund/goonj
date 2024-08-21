@@ -29,18 +29,18 @@ function civicrm_api3_goonjcustom_cron($params)
 
     try {
 
-        $induction_activity_type_id = 57;
-        $assignee_record_type_id = 1 ;
-        $induction_status_id = 1 ;
+        $inductionActivityTypeId = 57;
+        $assigneeRecordTypeId = 1 ;
+        $inductionStatusId = 1 ;
         $startOfDay = new DateTime('today midnight');
 
         $endOfDay = new DateTime('tomorrow midnight -1 second');
 
-        $activity_assignees = \Civi\Api4\Activity::get(true)
+        $activityAssignees = \Civi\Api4\Activity::get(TRUE)
             ->addSelect('target_contact_id', 'activity_contact.contact_id', 'activity_date_time')
-            ->addJoin('ActivityContact AS activity_contact', 'LEFT', ['activity_contact.record_type_id', '=', $assignee_record_type_id])
-            ->addWhere('activity_type_id', '=', $induction_activity_type_id)
-            ->addWhere('status_id', '=', $induction_status_id)
+            ->addJoin('ActivityContact AS activity_contact', 'LEFT', ['activity_contact.record_type_id', '=', $assigneeRecordTypeId])
+            ->addWhere('activity_type_id', '=', $inductionActivityTypeId)
+            ->addWhere('status_id', '=', $inductionStatusId)
             ->addWhere('activity_date_time', '>=', $startOfDay->format('Y-m-d H:i:s'))
             ->addWhere('activity_date_time', '<=', $endOfDay->format('Y-m-d H:i:s'))
             ->setLimit(25)
@@ -48,21 +48,21 @@ function civicrm_api3_goonjcustom_cron($params)
 
         $groupedResults = [];
 
-        foreach ($activity_assignees as $activity) {
-            $assignee_contact_id = $activity['activity_contact.contact_id'];
+        foreach ($activityAssignees as $activity) {
+            $assigneeContactId = $activity['activity_contact.contact_id'];
             $targetContactId = $activity['target_contact_id'][0];
             $activityDateTime = $activity['activity_date_time'];
 
 
             // Get details for the assignee contact
-            $assignee_details = \Civi\Api4\Contact::get(true)
+            $assigneeDetails = \Civi\Api4\Contact::get(true)
                 ->addSelect('email.email', 'display_name')
                 ->addJoin('Email AS email', 'LEFT')
-                ->addWhere('id', '=', $assignee_contact_id)
+                ->addWhere('id', '=', $assigneeContactId)
                 ->execute();
 
             // Get details for the target contact
-            $volunteer_details = \Civi\Api4\Contact::get(true)
+            $volunteerDetails = \Civi\Api4\Contact::get(true)
                 ->addSelect('email.email', 'phone.phone', 'display_name')
                 ->addJoin('Email AS email', 'LEFT')
                 ->addJoin('Phone AS phone', 'LEFT')
@@ -71,60 +71,57 @@ function civicrm_api3_goonjcustom_cron($params)
                 ->execute();
 
             // If the contact_id is not in the grouped results, initialize it
-            if (!isset($groupedResults[$assignee_contact_id])) {
-                $groupedResults[$assignee_contact_id] = [
-                    'activity_contact.contact_id' => $assignee_contact_id,
-                    'assignee_display_name' => $assignee_details[0]['display_name'],
-                    'assignee_email' => $assignee_details[0]['email.email'],
+            if (!isset($groupedResults[$assigneeContactId])) {
+                $groupedResults[$assigneeContactId] = [
+                    'activity_contact.contact_id' => $assigneeContactId,
+                    'assignee_display_name' => $assigneeDetails[0]['display_name'],
+                    'assignee_email' => $assigneeDetails[0]['email.email'],
                     'target_contact_details' => [],
                 ];
             }
 
-            $groupedResults[$assignee_contact_id]['target_contact_details'][] = [
+            $groupedResults[$assigneeContactId]['target_contact_details'][] = [
                 'id' => $targetContactId,
                 'activity_date_time' => $activityDateTime,
-                "volunteer_display_name" => $volunteer_details[0]['display_name'],
-                'email' => $volunteer_details[0]['email.email'] ?? '',
-                'phone' => $volunteer_details[0]['phone.phone'] ?? '',
+                "volunteer_display_name" => $volunteerDetails[0]['display_name'],
+                'email' => $volunteerDetails[0]['email.email'] ?? '',
+                'phone' => $volunteerDetails[0]['phone.phone'] ?? '',
             ];
         }
 
         // Convert the grouped results to a list of arrays
         $finalResults = array_values($groupedResults);
 
-
-
         foreach ($finalResults as $assignee) {
-            $assignee_contact_id = $assignee['activity_contact.contact_id'];
-            $assignee_name = $assignee['assignee_display_name'];
+            $assigneeContactId = $assignee['activity_contact.contact_id'];
+            $assigneeName = $assignee['assignee_display_name'];
 
-            $assignee_email = $assignee['assignee_email'];
+            $assigneeEmail = $assignee['assignee_email'];
 
             // Prepare the email body content
-            $volunteer_details_html = '';
+            $volunteerDetailsHtml = '';
             foreach ($assignee['target_contact_details'] as $target) {
-                $volunteer_id = $target['id'];
-                $volunteer_name = $target['volunteer_display_name'];
+                $volunteerName = $target['volunteer_display_name'];
 
-                $activity_date_time = $target['activity_date_time'];
-                $formatted_date_time = new DateTime($activity_date_time);
-                $induction_time = $formatted_date_time->format('F jS, Y g:i A');
+                $activityDateTime = $target['activity_date_time'];
+                $formattedDateTime = new DateTime($activityDateTime);
+                $inductionTime = $formattedDateTime->format('F jS, Y g:i A');
 
                 // Append each volunteer's details to the email body
-                $volunteer_details_html .= "
-                <li><strong>Name:</strong> $volunteer_name<br>
+                $volunteerDetailsHtml .= "
+                <li><strong>Name:</strong> $volunteerName<br>
                     <strong>Email:</strong> {$target['email']}<br>
                     <strong>Phone:</strong> {$target['phone']}<br>
-                    <strong>Scheduled At:</strong> $induction_time
+                    <strong>Scheduled At:</strong> $inductionTime
                 </li><br>";
             }
 
             $html = "
-            <p>Dear $assignee_name,</p>
+            <p>Dear $assigneeName,</p>
             <p>This is a friendly reminder that you have volunteer inductions scheduled for today.</p>
             <p>Here are the details for the volunteers being inducted:</p>
             <ul>
-                $volunteer_details_html
+                $volunteerDetailsHtml
             </ul>
             <p>Best regards,<br>Goonj</p>";
 
@@ -135,8 +132,8 @@ function civicrm_api3_goonjcustom_cron($params)
                 'groupName' => 'Mailing Event',
                 'subject' => 'Reminder: Volunteer Inductions Scheduled for Today',
                 'from' => $from,
-                'toEmail' => $assignee_email,
-                'toName' => $assignee_name,
+                'toEmail' => $assigneeEmail,
+                'toName' => $assigneeName,
                 'replyTo' => $from,
                 'html' => $html,
                 // 'messageTemplateID' => 76, // Uncomment if using a message template
