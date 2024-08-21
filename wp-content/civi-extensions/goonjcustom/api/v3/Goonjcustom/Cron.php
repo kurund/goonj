@@ -50,14 +50,14 @@ function civicrm_api3_goonjcustom_cron($params)
 
 
       // Get details for the assignee contact
-      $assigneeDetails = \Civi\Api4\Contact::get(true)
+      $assigneeDetails = \Civi\Api4\Contact::get(TRUE)
         ->addSelect('email.email', 'display_name')
         ->addJoin('Email AS email', 'LEFT')
         ->addWhere('id', '=', $assigneeContactId)
         ->execute();
 
       // Get details for the target contact
-      $volunteerDetails = \Civi\Api4\Contact::get(true)
+      $volunteerDetails = \Civi\Api4\Contact::get(TRUE)
         ->addSelect('email.email', 'phone.phone', 'display_name')
         ->addJoin('Email AS email', 'LEFT')
         ->addJoin('Phone AS phone', 'LEFT')
