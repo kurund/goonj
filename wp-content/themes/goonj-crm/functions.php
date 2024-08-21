@@ -231,7 +231,7 @@ function goonj_handle_user_identification_form() {
 			'/volunteer-registration/#?email=%s&phone=%s&message=%s',
 			$email,
 			$phone,
-			'not-inducted-volunteer'
+			'not-inducted-for-dropping-center'
 		);
 
         if (empty($foundContacts)) {
