@@ -4,23 +4,15 @@ exports.VolunteerRegistrationPage =  class VolunteerRegistrationPage {
   constructor(page) {
     this.page = page;
     this.url = process.env.BASE_URL_USER_SITE;
-    // this.firstNameField = page.locator('first-name-1')
     this.firstNameField = page.locator('input[id^="first-name-"]');
     this.lastNameField = page.locator('input[id^="last-name-"]');
-    // this.lastNameField = page.locator('input#last-name-2');
-    // this.emailField = page.locator('input#email-3');
     this.emailField = page.locator('input[id^="email-"]');
     this.mobileNumberField = page.locator('input#phone-5');
-    // this.streetAddress = page.locator('input#street-address-10');
     this.streetAddress = page.locator('input[id^="street-address-"]');
-    // this.cityName = page.locator('input#city-14');
     this.cityName = page.locator('input[id^="city-"]')
-    // this.postalCode = page.locator('input#postal-code-15');
     this.postalCode = page.locator('input[id^="postal-code-"]')
     this.profession = page.locator('input[id^="volunteer-fields-profession-"]')
-    // this.profession = page.locator('input#volunteer-fields-profession-21')
     this.otherSkills = page.locator('input[id^="volunteer-fields-others-skills-"]')
-    // this.otherSkills = page.locator('input#volunteer-fields-others-skills-19')
   }
   
   async enterFirstName(firstName) {
@@ -120,11 +112,11 @@ exports.VolunteerRegistrationPage =  class VolunteerRegistrationPage {
   }
 
   async selectCountryAndClear(country) {
-    await this.selectAndClearDropdownOption('#select2-chosen-4', '#s2id_autogen4_search', country);
+    await this.selectAndClearDropdownOption('#select2-chosen-3', '#s2id_autogen3_search', country);
   }
 
   async selectGenderAndClear(gender) {
-    await this.selectAndClearDropdownOption('#select2-chosen-3', '#s2id_autogen3_search', gender);
+    await this.selectAndClearDropdownOption('#select2-chosen-2', '#s2id_autogen2_search', gender);
   }
 
   async selectStateAndClear(state) {
@@ -132,19 +124,19 @@ exports.VolunteerRegistrationPage =  class VolunteerRegistrationPage {
   }
 
   async selectActivityInterestedAndClear(activity) {
-    await this.selectAndClearMultipleDropdownOption('#s2id_autogen5', '#s2id_autogen5', activity);
+    await this.selectAndClearMultipleDropdownOption('#s2id_autogen4', '#s2id_autogen4', activity);
   }
 
   async selectVoluntarySkillsAndClear(skill) {
-    await this.selectAndClearMultipleDropdownOption('#s2id_autogen7', '#s2id_autogen7', skill);
+    await this.selectAndClearMultipleDropdownOption('#s2id_autogen6', '#s2id_autogen6', skill);
   }
 
   async selectVolunteerMotivationAndClear(motivation) {
-    await this.selectAndClearMultipleDropdownOption('#s2id_autogen6', '#s2id_autogen6', motivation);
+    await this.selectAndClearMultipleDropdownOption('#s2id_autogen5', '#s2id_autogen5', motivation);
   }
 
   async selectVolunteerHoursAndClear(hours) {
-    await this.selectAndClearDropdownOption('#select2-chosen-8', '#s2id_autogen8_search', hours);
+    await this.selectAndClearDropdownOption('#select2-chosen-7', '#s2id_autogen7_search', hours);
   }
 
   async selectRadioButton(buttonOption) {
