@@ -222,9 +222,20 @@ function goonj_handle_user_identification_form() {
             $target_id,
         );
 
+		$dropping_center_volunteer_registration_form_path = sprintf(
+            '/volunteer-registration/#?email=%s&phone=%s&message=%s',
+            $email,
+            $phone,
+            'not-inducted-volunteer'
+        );
+
         if (empty($foundContacts)) {
             if ($purpose == 'material-contribution') {
                 wp_redirect($individual_volunteer_registration_form_path);
+                exit;
+            }
+			if ($purpose == 'dropping-center') {
+                wp_redirect($dropping_center_volunteer_registration_form_path);
                 exit;
             }
             // We are currently hardcoding the path of the volunteer registration page.
