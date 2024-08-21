@@ -302,7 +302,7 @@ function goonjcustom_civicrm_tabset($tabsetName, &$tabs, $context) {
 		'current' => false,
 	];
 	// Hide the Intent fields by adding JavaScript specifically to the Intent page
-	if (isset($_GET['selectedChild']) && $_GET['selectedChild'] === 'intent') {
+	if ((isset($_GET['selectedChild']) && $_GET['selectedChild'] === 'intent') || (isset($_GET['action']) && $_GET['action'] === 'update' && isset($_GET['component']) && $_GET['component'] === 'event')) {
 		CRM_Core_Region::instance('page-footer')->add(
 			array(
 				'script' => '
