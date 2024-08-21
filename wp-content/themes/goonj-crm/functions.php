@@ -209,6 +209,13 @@ function goonj_handle_user_identification_form() {
             $target_id,
         );
 
+        $material_contribution_form_path = sprintf(
+            '/material-contribution/#?email=%s&phone=%s&Source_Tracking.Event=%s',
+            $email,
+            $phone,
+            $target_id,
+        );
+
         if (empty($foundContacts)) {
             if ($purpose == 'material-contribution') {
                 wp_redirect($individual_volunteer_registration_form_path);
@@ -264,6 +271,10 @@ function goonj_handle_user_identification_form() {
 		->execute();
 
 
+        if ($purpose == 'material-contribution') {
+            wp_redirect($material_contribution_form_path);
+            exit;
+        }
 		// Recent camp data
 		$recentCamp = $collectionCampResult->first() ?? null;
 		$display_name = $foundContacts['display_name'];
