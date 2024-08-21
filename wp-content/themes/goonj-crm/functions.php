@@ -116,11 +116,11 @@ add_shortcode( 'goonj_check_user_form', 'goonj_check_user_action' );
 
 function goonj_check_user_action($atts)
 {
-    ob_start();
-    $message = '';
-    if (isset($_GET['message'])) {
-        if ($_GET['message'] === 'waiting-induction') {
-            $message = '
+	ob_start();
+	$message = '';
+	if (isset($_GET['message'])) {
+		if ($_GET['message'] === 'waiting-induction') {
+			$message = '
 				<p class="fw-600 fz-20 mb-6">Your induction is pending</p>
 				<p class="fw-400 fz-16 mt-0 mb-24">
 					We noticed that you\'ve already submitted your volunteer registration form. Just one more step to go before you can start your collection camp. Please finish your induction to move forward.
@@ -135,52 +135,52 @@ function goonj_check_user_action($atts)
 					<a href="tel:01141401216" class="contact-link">011-41401216</a>
 				</div>
 			</div>';
-        }
-    }
+		}
+	}
 
-    // Pass the message to the template
-    set_query_var('goonj_pending_induction_message', $message);
-    get_template_part('templates/form', 'check-user', [ 'purpose' => $atts['purpose'] ]);
-    return ob_get_clean();
+	// Pass the message to the template
+	set_query_var('goonj_pending_induction_message', $message);
+	get_template_part('templates/form', 'check-user', [ 'purpose' => $atts['purpose'] ]);
+	return ob_get_clean();
 
-    ob_start();
-    $message = '';
-    if (isset($_GET['message'])) {
-        if ($_GET['message'] === 'waiting-induction') {
-            $message = '<p class="fw-600 fz-16 mb-6">Your induction is pending</p>
+	ob_start();
+	$message = '';
+	if (isset($_GET['message'])) {
+		if ($_GET['message'] === 'waiting-induction') {
+			$message = '<p class="fw-600 fz-16 mb-6">Your induction is pending</p>
 						<p class="fw-400 fz-16 mt-0 mb-24">Just one more step to go before you can start your collection camp. Please finish your induction to move forward.</p>
 						<p class="fw-400 fz-16 mt-0 mb-24">
 							Please reach out to <a href="mailto:mail@goonj.org">mail@goonj.org</a> in case there are any queries.
 						</p>';
-        }
-    }
+		}
+	}
 
-    // Pass the message to the template
-    set_query_var('goonj_pending_induction_message', $message);
+	// Pass the message to the template
+	set_query_var('goonj_pending_induction_message', $message);
 	get_template_part( 'templates/form', 'check-user' );
-    return ob_get_clean();
+	return ob_get_clean();
 }
 
 
 add_action('wp', 'goonj_handle_user_identification_form');
 function goonj_handle_user_identification_form() {
 	if ( ! isset( $_POST['action'] ) || ( $_POST['action'] !== 'goonj-check-user' ) ) {
-        return;
-    }
+		return;
+	}
 
-    $purpose = $_POST['purpose'] ?? 'collection-camp-intent';
-    $target_id = $_POST['target_id'] ?? '';
+	$purpose = $_POST['purpose'] ?? 'collection-camp-intent';
+	$target_id = $_POST['target_id'] ?? '';
 
-    // Retrieve the email and phone number from the POST data
-    $email = $_POST['email'] ?? '';
-    $phone = $_POST['phone'] ?? '';
+	// Retrieve the email and phone number from the POST data
+	$email = $_POST['email'] ?? '';
+	$phone = $_POST['phone'] ?? '';
 
 	if ( empty( $phone ) || empty( $email ) ) {
-        return;
-    }
+		return;
+	}
 
-    try {
-        // Find the contact ID based on email and phone number
+	try {
+		// Find the contact ID based on email and phone number
 		$contactResult = \Civi\Api4\Contact::get(FALSE)
 		->addSelect('id', 'contact_sub_type', 'display_name')
 		->addWhere('email_primary.email', '=', $email)
@@ -190,42 +190,53 @@ function goonj_handle_user_identification_form() {
 		->setLimit(1)
 		->execute();
 
-        $foundContacts = $contactResult->first() ?? null;
+		$foundContacts = $contactResult->first() ?? null;
 
-        // If the user does not exist in the Goonj database
-        // redirect to the volunteer registration form.
-        $volunteer_registration_form_path = sprintf(
-            '/volunteer-registration/#?email=%s&phone=%s&message=%s&Volunteer_fields.Which_activities_are_you_interested_in_=%s',
-            $email,
-            $phone,
-            'not-inducted-volunteer',
-            '9'
-        );
+		// If the user does not exist in the Goonj database
+		// redirect to the volunteer registration form.
+		$volunteer_registration_form_path = sprintf(
+			'/volunteer-registration/#?email=%s&phone=%s&message=%s&Volunteer_fields.Which_activities_are_you_interested_in_=%s',
+			$email,
+			$phone,
+			'not-inducted-volunteer',
+			'9'
+		);
 
-        $individual_volunteer_registration_form_path = sprintf(
-            '/individual-registration-with-volunteer-option/#?email=%s&phone=%s&Source_Tracking.Event=%s',
-            $email,
-            $phone,
-            $target_id,
-        );
+		$individual_volunteer_registration_form_path = sprintf(
+			'/individual-registration-with-volunteer-option/#?email=%s&phone=%s&Source_Tracking.Event=%s',
+			$email,
+			$phone,
+			$target_id,
+		);
 
-        $material_contribution_form_path = sprintf(
-            '/material-contribution/#?email=%s&phone=%s&Source_Tracking.Event=%s',
-            $email,
-            $phone,
-            $target_id,
-        );
+		$material_contribution_form_path = sprintf(
+			'/material-contribution/#?email=%s&phone=%s&Source_Tracking.Event=%s',
+			$email,
+			$phone,
+			$target_id,
+		);
 
-        if (empty($foundContacts)) {
-            if ($purpose == 'material-contribution') {
-                wp_redirect($individual_volunteer_registration_form_path);
-                exit;
-            }
-            // We are currently hardcoding the path of the volunteer registration page.
-            // If this path changes, then this code needs to be updated.
-            wp_redirect($volunteer_registration_form_path);
-            exit;
-        }
+		$dropping_center_volunteer_registration_form_path = sprintf(
+			'/volunteer-registration/#?email=%s&phone=%s&message=%s',
+			$email,
+			$phone,
+			'not-inducted-volunteer'
+		);
+
+		if (empty($foundContacts)) {
+			if ($purpose == 'material-contribution') {
+				wp_redirect($individual_volunteer_registration_form_path);
+				exit;
+			}
+			if ($purpose == 'dropping-center') {
+				wp_redirect($dropping_center_volunteer_registration_form_path);
+				exit;
+			}
+			// We are currently hardcoding the path of the volunteer registration page.
+			// If this path changes, then this code needs to be updated.
+			wp_redirect($volunteer_registration_form_path);
+			exit;
+		}
 
 		$contactId = $foundContacts['id'];
 		$contactSubType = $foundContacts['contact_sub_type'] ?? []; 
@@ -271,10 +282,10 @@ function goonj_handle_user_identification_form() {
 		->execute();
 
 
-        if ($purpose == 'material-contribution') {
-            wp_redirect($material_contribution_form_path);
-            exit;
-        }
+		if ($purpose == 'material-contribution') {
+			wp_redirect($material_contribution_form_path);
+			exit;
+		}
 		// Recent camp data
 		$recentCamp = $collectionCampResult->first() ?? null;
 		$display_name = $foundContacts['display_name'];
@@ -348,10 +359,10 @@ function goonj_custom_rewrite_rules() {
 
 add_filter( 'query_vars', 'goonj_query_vars' );
 function goonj_query_vars( $vars ) {
-    $vars[] = 'target';
-    $vars[] = 'id';
-    $vars[] = 'target_id';
-    return $vars;
+	$vars[] = 'target';
+	$vars[] = 'id';
+	$vars[] = 'target_id';
+	return $vars;
 }
 
 add_action( 'template_redirect', 'goonj_check_action_target_exists' );
