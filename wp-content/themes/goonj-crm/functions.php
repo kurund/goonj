@@ -296,12 +296,6 @@ function goonj_handle_user_identification_form() {
 		->setLimit(1)
 		->execute();
 
-
-        if ($purpose == 'material-contribution') {
-            wp_redirect($material_contribution_form_path);
-            exit;
-        }
-
 		if ($purpose == 'dropping-center') {
 			wp_redirect(get_home_url() . "/dropping-center/#?source_contact_id=" . $foundContacts['id']);
 			exit;
