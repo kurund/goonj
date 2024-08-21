@@ -223,11 +223,11 @@ function goonj_handle_user_identification_form() {
         );
 
 		$dropping_center_volunteer_registration_form_path = sprintf(
-            '/volunteer-registration/#?email=%s&phone=%s&message=%s',
-            $email,
-            $phone,
-            'not-inducted-volunteer'
-        );
+			'/volunteer-registration/#?email=%s&phone=%s&message=%s',
+			$email,
+			$phone,
+			'not-inducted-volunteer'
+		);
 
         if (empty($foundContacts)) {
             if ($purpose == 'material-contribution') {
@@ -235,9 +235,9 @@ function goonj_handle_user_identification_form() {
                 exit;
             }
 			if ($purpose == 'dropping-center') {
-                wp_redirect($dropping_center_volunteer_registration_form_path);
-                exit;
-            }
+				wp_redirect($dropping_center_volunteer_registration_form_path);
+				exit;
+			}
             // We are currently hardcoding the path of the volunteer registration page.
             // If this path changes, then this code needs to be updated.
             wp_redirect($volunteer_registration_form_path);
