@@ -227,9 +227,9 @@ function goonj_handle_user_identification_form() {
             exit;
         }
 
-		if ( $foundContacts && $purpose == 'material-contribution' ){
-            wp_redirect($material_contribution_form_path);
-            exit;
+		if ( $foundContacts && $purpose == 'material-contribution' ) {
+			wp_redirect($material_contribution_form_path);
+			exit;
 		}
 
 		$contactId = $foundContacts['id'];
@@ -276,10 +276,6 @@ function goonj_handle_user_identification_form() {
 		->execute();
 
 
-        // if ($purpose == 'material-contribution') {
-        //     wp_redirect($material_contribution_form_path);
-        //     exit;
-        // }
 		// Recent camp data
 		$recentCamp = $collectionCampResult->first() ?? null;
 		$display_name = $foundContacts['display_name'];
