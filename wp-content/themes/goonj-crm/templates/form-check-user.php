@@ -7,6 +7,7 @@
 $message = get_query_var('goonj_pending_induction_message', '');
 $purpose = $args['purpose'];
 $target_id = get_query_var('target_id', '');
+$is_material_contribution = $purpose !== 'material-contribution';
 ?>
 
 <div class="text-center w-xl-520 m-auto">
@@ -22,8 +23,8 @@ $target_id = get_query_var('target_id', '');
         <input type="hidden" name="target_id" value="<?php echo esc_attr($target_id); ?>" />
         <?php if (!$message) : ?>
             <div class="d-grid">
-                <label class="font-sans" for="email">Email <span class="required-indicator">*</span></label>
-                <input type="email" id="email" name="email" required value="<?php echo isset($_POST['email']) ? esc_attr(sanitize_email($_POST['email'])) : ''; ?>">
+                <label class="font-sans" for="email">Email <?php if ($is_material_contribution) : ?><span class="required-indicator">*</span><?php endif; ?></label>
+                <input type="email" id="email" name="email" <?php echo $is_material_contribution ? 'required' : ''; ?> value="<?php echo isset($_POST['email']) ? esc_attr(sanitize_email($_POST['email'])) : ''; ?>">
             </div>
             <br>
             <div class="d-grid">

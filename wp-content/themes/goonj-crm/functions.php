@@ -175,20 +175,26 @@ function goonj_handle_user_identification_form() {
     $email = $_POST['email'] ?? '';
     $phone = $_POST['phone'] ?? '';
 
-	if ( empty( $phone ) || empty( $email ) ) {
-        return;
-    }
+	$is_material_contribution = $purpose !== 'material-contribution';
+
+	if ( empty( $phone ) || ( $is_material_contribution && empty( $email ) ) ) {
+		return;
+	}
 
     try {
         // Find the contact ID based on email and phone number
-		$contactResult = \Civi\Api4\Contact::get(FALSE)
-		->addSelect('id', 'contact_sub_type', 'display_name')
-		->addWhere('email_primary.email', '=', $email)
-		->addWhere('phone_primary.phone', '=', $phone)
-		->addWhere('contact_type', '=', 'Individual')
-		->addWhere('is_deleted', '=', 0)
-		->setLimit(1)
-		->execute();
+		$query = \Civi\Api4\Contact::get(FALSE)
+			->addSelect('id', 'contact_sub_type', 'display_name')
+			->addWhere('phone_primary.phone', '=', $phone)
+			->addWhere('contact_type', '=', 'Individual')
+			->addWhere('is_deleted', '=', 0);
+
+		if ( !empty( $email ) ) {
+			$query->addWhere('email_primary.email', '=', $email);
+		}
+
+		// Execute the query with a limit of 1
+		$contactResult = $query->setLimit(1)->execute();
 
         $foundContacts = $contactResult->first() ?? null;
 
