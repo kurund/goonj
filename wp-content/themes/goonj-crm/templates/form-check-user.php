@@ -21,8 +21,6 @@ $target_id = get_query_var('target_id', '');
         <input type="hidden" name="purpose" value="<?php echo esc_attr($purpose); ?>" />
         <input type="hidden" name="target_id" value="<?php echo esc_attr($target_id); ?>" />
         <?php if (!$message) : ?>
-            <h2 class="mt-0 mb-6 font-sans fz-20 fw-600">Goonj Collection Camp</h2>
-            <p class="mb-24 mt-0 fz-16 font-sans">Please fill the following fields to continue</p>
             <div class="d-grid">
                 <label class="font-sans" for="email">Email <span class="required-indicator">*</span></label>
                 <input type="email" id="email" name="email" required value="<?php echo isset($_POST['email']) ? esc_attr(sanitize_email($_POST['email'])) : ''; ?>">
