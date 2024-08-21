@@ -175,9 +175,11 @@ function goonj_handle_user_identification_form() {
     $email = $_POST['email'] ?? '';
     $phone = $_POST['phone'] ?? '';
 
-	if ( empty( $phone ) || ( $purpose != 'material-contribution' && empty( $email ) ) ) {
+	$is_material_contribution = $purpose !== 'material-contribution';
+
+	if ( empty( $phone ) || ( $is_material_contribution && empty( $email ) ) ) {
 		return;
-	}	
+	}
 
     try {
         // Find the contact ID based on email and phone number
