@@ -34,14 +34,6 @@ function goonj_enqueue_admin_scripts() {
 }
 
 
-wp_enqueue_script(
-	'dynamic-field-visibility',
-	get_template_directory_uri() . '/dynamic-field-visibility.js',
-		array(),
-		null,
-		true
-	);
-
 add_action('after_setup_theme', 'goonj_theme_setup');
 function goonj_theme_setup() {
 	add_editor_style('style.css');
