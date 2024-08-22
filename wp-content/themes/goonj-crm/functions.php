@@ -21,6 +21,13 @@ function goonj_enqueue_scripts() {
 		wp_get_theme()->get('Version'),
 		true
 	);
+	wp_enqueue_script(
+        'dynamic-field-visibility',
+        get_template_directory_uri() . '/dynamic-field-visibility.js',
+        array(),
+        null,
+        true
+    );
 }
 
 add_action('admin_enqueue_scripts', 'goonj_enqueue_admin_scripts');
@@ -34,13 +41,7 @@ function goonj_enqueue_admin_scripts() {
 }
 
 
-wp_enqueue_script(
-	'dynamic-field-visibility',
-	get_template_directory_uri() . '/dynamic-field-visibility.js',
-		array(),
-		null,
-		true
-	);
+
 
 add_action('after_setup_theme', 'goonj_theme_setup');
 function goonj_theme_setup() {
