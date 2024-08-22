@@ -296,7 +296,7 @@ function goonj_handle_user_identification_form() {
 			wp_redirect(get_home_url() . "/collection-camp-in-past/#?source_contact_id=" . $foundContacts['id'] . '&message=past-collection-data' );
 			exit;
 		} else {
-			$redirect_url = get_home_url() . "/collection-camp-form/#?source_contact_id=" . $foundContacts['id'] . '&message=collection-camp-page&Collection_Camp_Intent.Name=' . $display_name . '&Collection_Camp_Intent.Contact_Number='. $phone;
+			$redirect_url = get_home_url() . "/collection-camp-intent/#?Collection_Camp_Intent_Details.Created_By=" . $foundContacts['id'] . '&message=collection-camp-page&Collection_Camp_Intent_Details.Name=' . $display_name . '&Collection_Camp_Intent_Details.Contact_Number='. $phone;
 		}
 		wp_redirect($redirect_url);
 		exit;
