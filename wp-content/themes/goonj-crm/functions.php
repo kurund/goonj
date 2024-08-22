@@ -118,8 +118,7 @@ function goonj_check_user_action($atts)
 {
     ob_start();
     $message = '';
-    if (isset($_GET['message'])) {
-		if ($_GET['message'] === 'waiting-induction') {
+	if ( isset( $_GET['message'] ) && $_GET['message'] === 'waiting-induction' ) {
 			echo '<style>
 					.user-identification-heading {
 						display: none;
@@ -140,8 +139,7 @@ function goonj_check_user_action($atts)
 					<a href="tel:01141401216" class="contact-link">011-41401216</a>
 				</div>
 			</div>';
-        }
-    }
+	}
 
     // Pass the message to the template
     set_query_var('goonj_pending_induction_message', $message);
