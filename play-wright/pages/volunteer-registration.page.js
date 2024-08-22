@@ -69,6 +69,10 @@ exports.VolunteerRegistrationPage =  class VolunteerRegistrationPage {
     await this.selectDropdownOption('#select2-chosen-3', '#s2id_autogen3_search', country);
   }
 
+  // async selectCountry(nationality) {
+  //   await this.selectDropdownOption('#select2-chosen-4', '#s2id_autogen4_search', nationality);
+  // }
+
   async selectGender(gender) {
     await this.selectDropdownOption('#select2-chosen-2', '#s2id_autogen2_search', gender);
   }
@@ -78,19 +82,19 @@ exports.VolunteerRegistrationPage =  class VolunteerRegistrationPage {
   }
 
   async selectActivityInterested(activity) {
-    await this.selectDropdownOption('#s2id_autogen4', '#s2id_autogen4', activity);
+    await this.selectDropdownOption('#s2id_autogen5', '#s2id_autogen5', activity);
   }
 
   async selectVoluntarySkills(skill) {
-    await this.selectDropdownOption('#s2id_autogen6', '#s2id_autogen6', skill);
+    await this.selectDropdownOption('#s2id_autogen7', '#s2id_autogen7', skill);
   }
 
   async selectVolunteerMotivation(motivation) {
-    await this.selectDropdownOption('#s2id_autogen5', '#s2id_autogen5', motivation);
+    await this.selectDropdownOption('#s2id_autogen6', '#s2id_autogen6', motivation);
   }
 
   async selectVolunteerHours(hours) {
-    await this.selectDropdownOption('#select2-chosen-7', '#s2id_autogen7_search', hours);
+    await this.selectDropdownOption('#select2-chosen-8', '#s2id_autogen8_search', hours);
   }
   
   async selectAndClearDropdownOption(dropdownSelector, inputField, option) {

@@ -68,7 +68,7 @@ export async function submitVolunteerRegistrationForm(page, userDetails) {
   await volunteerRegistrationPage.selectActivityInterested(userDetails.activityInterested);
   await volunteerRegistrationPage.selectVolunteerMotivation(userDetails.volunteerMotivation);
   await volunteerRegistrationPage.selectVoluntarySkills(userDetails.voluntarySkills);
-  await volunteerRegistrationPage.enterOtherSkills(userDetails.otherSkills);
+  // await volunteerRegistrationPage.enterOtherSkills(userDetails.otherSkills);
   await volunteerRegistrationPage.selectVolunteerHours(userDetails.volunteerHours);
   await volunteerRegistrationPage.enterProfession(userDetails.profession);
   await page.waitForTimeout(400);
