@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const select2Container = document.querySelector(".select2-container");
 
     if (!select2Container) {
-      console.error("Select2 container not found.");
       return;
     }
 
