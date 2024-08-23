@@ -282,11 +282,10 @@ function goonj_handle_user_identification_form() {
 
 		// If we are here, then it means the user exists as an inducted volunteer.
 		// Fetch the most recent collection camp activity based on the creation date
-		$collectionCampResult = \Civi\Api4\Activity::get(FALSE)
-		->addSelect('custom.*', 'source_contact_id')
-		->addWhere('activity_type_id', '=', 61) // ID for "Collection Camp Intent"
-		->addWhere('status_id', '=', 10) // Status ID for "Under Authorization"
-		->addWhere('source_contact_id', '=', $foundContacts['id'])
+		$collectionCampResult = \Civi\Api4\EckEntity::get('Collection_Camp', FALSE)
+		->addSelect('*', 'custom.*')
+		->addWhere('Status.Contact_Id', '=', $foundContacts['id'])
+		->addWhere('subtype', '=', 4) // Collection Camp subtype
 		->addOrderBy('created_date', 'DESC')
 		->setLimit(1)
 		->execute();
@@ -303,7 +302,7 @@ function goonj_handle_user_identification_form() {
 			$_SESSION['displayName'] = $display_name;
 			$_SESSION['contactNumber'] = $phone;
 
-			wp_redirect(get_home_url() . "/collection-camp-in-past/#?source_contact_id=" . $foundContacts['id'] . '&message=past-collection-data' );
+			wp_redirect(get_home_url() . "/collection-camp-in-past/#?Status.Contact_Id=" . $foundContacts['id'] . '&message=past-collection-data' );
 			exit;
 		} else {
 			$redirect_url = get_home_url() . "/collection-camp-intent/#?Status.Contact_Id=" . $foundContacts['id'] . '&message=collection-camp-page&Collection_Camp_Intent_Details.Name=' . $display_name . '&Collection_Camp_Intent_Details.Contact_Number='. $phone;
