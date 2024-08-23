@@ -197,8 +197,6 @@ function goonj_handle_user_identification_form() {
 		$contactResult = $query->setLimit(1)->execute();
 
         $foundContacts = $contactResult->first() ?? null;
-		// var_dump($foundContacts['id']);
-		// die;
 
         // If the user does not exist in the Goonj database
         // redirect to the volunteer registration form.
