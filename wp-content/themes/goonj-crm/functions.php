@@ -39,6 +39,19 @@ function goonj_theme_setup() {
 	add_editor_style('style.css');
 }
 
+function enqueue_custom_reset_script() {
+    wp_enqueue_script(
+        'reset-button-handler-script',
+        get_stylesheet_directory_uri() . '/reset-button-handler.js',
+        array(),
+        null,
+        true
+    );
+}
+add_action('wp_enqueue_scripts', 'enqueue_custom_reset_script');
+
+
+
 
 
 add_action('template_redirect', 'goonj_redirect_logged_in_user_to_civi_dashboard');
