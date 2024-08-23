@@ -274,7 +274,6 @@ function goonj_handle_user_identification_form() {
 		// Fetch the most recent collection camp activity based on the creation date
 		$collectionCampResult = \Civi\Api4\EckEntity::get('Collection_Camp', FALSE)
 		->addSelect('*', 'custom.*')
-		->addWhere('Status.Status', '=', 1) // Status ID for "Under Authorization"
 		->addWhere('Status.Contact_Id', '=', $foundContacts['id'])
 		->addWhere('subtype', '=', 4) // Collection Camp subtype
 		->addOrderBy('created_date', 'DESC')
