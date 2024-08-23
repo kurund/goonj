@@ -220,7 +220,7 @@ function goonj_handle_user_identification_form() {
             $email,
             $phone,
             $target_id,
-			$foundContacts['id'],
+	    $foundContacts['id'],
         );
 
         if (empty($foundContacts)) {
