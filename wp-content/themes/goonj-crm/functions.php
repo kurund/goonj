@@ -118,18 +118,21 @@ function goonj_check_user_action($atts)
 {
     ob_start();
     $message = '';
-	if ( isset( $_GET['message'] ) && $_GET['message'] === 'waiting-induction' ) {
-			echo '<style>
-					.user-identification-heading {
-						display: none;
-					}
-				</style>';
-            $message = '
-				<p class="fw-600 fz-20 mb-6">Your induction is pending</p>
-				<p class="fw-400 fz-16 mt-0 mb-24">
-					We noticed that you\'ve already submitted your volunteer registration form. Just one more step to go before you can start your collection camp. Please finish your induction to move forward.
-				</p>
-				<div class="contact-info">
+	if ( isset( $_GET['message'] ) && ($_GET['message'] === 'waiting-induction' || $_GET['message'] === 'dropping-center-waiting-induction') ) {
+		echo '<style>
+				.user-identification-heading {
+					display: none;
+				}
+			</style>';
+	
+		$additional_message = ($_GET['message'] === 'dropping-center-waiting-induction') ? 'dropping center' : 'collection camp';
+
+		$message = '
+			<p class="fw-600 fz-20 mb-6">Your induction is pending</p>
+			<p class="fw-400 fz-16 mt-0 mb-24">
+				We noticed that you\'ve already submitted your volunteer registration form. Just one more step to go before you can start your ' . $additional_message . '. Please finish your induction to move forward.
+			</p>
+			<div class="contact-info">
 				<div class="contact-item">
 					<img src="' . get_template_directory_uri() . '/images/email-icon.png" alt="Email Icon" class="icon">
 					<a href="mailto:mail@goonj.org" class="contact-link">mail@goonj.org</a>
@@ -276,7 +279,7 @@ function goonj_handle_user_identification_form() {
 			}
 
 			// Set the message parameter
-			$query_params['message'] = 'waiting-induction';
+			$query_params['message'] = ($purpose == 'dropping-center') ? 'dropping-center-waiting-induction' : 'waiting-induction';
 
 			// Build and redirect to the new URL
 			$redirect_url = $parsed_url['path'] . '?' . http_build_query($query_params);
