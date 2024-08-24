@@ -440,11 +440,7 @@ function goonjcustom_civicrm_post(string $op, string $objectName, int $objectId,
 						->addValue('title', $newTitle)
 						->execute();
 
-				} else {
-					error_log("No camp found with ID: " . $campId);
 				}
-			} else {
-				error_log("ID not found in data.");
 			}
 		}
 	}
