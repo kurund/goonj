@@ -26,6 +26,14 @@ document.addEventListener('DOMContentLoaded', function () {
 					</div>
 				`;
 			}
+			else if (message === 'not-inducted-for-dropping-center') {
+				messageDiv.innerHTML = `
+					<div class="w-520 mt-30">
+						<p class="fw-400 fz-20 mb-11">You are not registered as a volunteer with us.</p>
+						<p class="fw-400 fz-16 mt-0 mb-24">To set up a dropping centre, please take a moment to fill out the volunteer registration form below. We can't wait to have you on board!</p>
+					</div>
+				`;
+			}
 		}
 	}
 });
