@@ -361,8 +361,11 @@ function goonjcustom_civicrm_post(string $op, string $objectName, int $objectId,
 		$data = $objectRef->data;
 
 		$decodedData = json_decode($data, true);
-		// error_log("decodedData: " . print_r($decodedData, TRUE));
-		if ($decodedData['Eck_Collection_Camp1'][0]['fields']['subtype'] = 4){
+
+		// Access the subtype
+		$subtype = $decodedData['Eck_Collection_Camp1'][0]['fields']['subtype'] ?? null;
+
+		if ($subtype == 4 || $subtype == 5) {
 			// Access the id within the decoded data
 			if (isset($decodedData['Eck_Collection_Camp1'][0]['fields']['id'])) {
 				$campId = $decodedData['Eck_Collection_Camp1'][0]['fields']['id'];
@@ -381,7 +384,9 @@ function goonjcustom_civicrm_post(string $op, string $objectName, int $objectId,
 
 					// Fetch the state ID from the collection camp intent details
 					$stateId = $decodedData['Eck_Collection_Camp1'][0]['fields']['Collection_Camp_Intent_Details.State'] ?? null;
-
+					if ($subtype == 5) {
+						$stateId = $decodedData['Eck_Collection_Camp1'][0]['fields']['Dropping_Centre.State'] ?? null;
+					}
 
 					if ($stateId) {
 						// Fetch the state abbreviation using the API
@@ -416,7 +421,7 @@ function goonjcustom_civicrm_post(string $op, string $objectName, int $objectId,
 					// Count existing camps for the state and year with the same event code
 					$existingCamps = \Civi\Api4\EckEntity::get('Collection_Camp', FALSE)
 						->addSelect('title')
-						->addWhere('title', 'LIKE', "$year/$stateCode/CC/%")
+						->addWhere('title', 'LIKE', "$year/$stateCode/$eventCode/%")
 						->execute();
 
 					$serialNumber = sprintf('%03d', $existingCamps->count() + 1);
@@ -444,4 +449,3 @@ function goonjcustom_civicrm_post(string $op, string $objectName, int $objectId,
 		}
 	}
 }
-
