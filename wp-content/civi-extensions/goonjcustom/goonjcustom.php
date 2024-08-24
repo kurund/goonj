@@ -366,7 +366,7 @@ function goonjcustom_civicrm_post(string $op, string $objectName, int $objectId,
 		// Access the id within the decoded data
 		if (isset($decodedData['Eck_Collection_Camp1'][0]['fields']['id'])) {
 			$campId = $decodedData['Eck_Collection_Camp1'][0]['fields']['id'];
-			
+
 			// Fetch the collection camp details using the API
 			$collectionCamps = \Civi\Api4\EckEntity::get('Collection_Camp', FALSE)
 				->addWhere('id', '=', $campId)
@@ -406,8 +406,19 @@ function goonjcustom_civicrm_post(string $op, string $objectName, int $objectId,
 					}
 				}
 
-				// Modify the title to include the year and state code
-				$newTitle = $year . '/' . $stateCode;
+				// Get the current event title
+				$currentTitle = $decodedData['Eck_Collection_Camp1'][0]['fields']['title'] ?? 'Collection Camp';
+
+				// Fetch the event code from the eventCode.php configuration
+				$eventCodePath = ABSPATH . 'wp-content/civi-extensions/goonjcustom/config/eventCode.php';
+				$eventCodeConfig = include $eventCodePath;
+
+				// Determine the event code based on the current title
+				$eventCode = $eventCodeConfig[$currentTitle] ?? 'UNKNOWN';
+
+				// Modify the title to include the year, state code, and event code
+				$newTitle = $year . '/' . $stateCode . '/' . $eventCode;
+
 				$decodedData['Eck_Collection_Camp1'][0]['fields']['title'] = $newTitle;
 
 				// Update the objectRef's data to reflect the new title
@@ -429,3 +440,4 @@ function goonjcustom_civicrm_post(string $op, string $objectName, int $objectId,
 		}
 	}
 }
+
