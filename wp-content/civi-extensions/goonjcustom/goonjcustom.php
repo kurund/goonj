@@ -416,8 +416,17 @@ function goonjcustom_civicrm_post(string $op, string $objectName, int $objectId,
 				// Determine the event code based on the current title
 				$eventCode = $eventCodeConfig[$currentTitle] ?? 'UNKNOWN';
 
-				// Modify the title to include the year, state code, and event code
-				$newTitle = $year . '/' . $stateCode . '/' . $eventCode;
+				// Count existing camps for the state and year with the same event code
+				$existingCamps = \Civi\Api4\EckEntity::get('Collection_Camp', FALSE)
+					->addSelect('title')
+					->addWhere('title', 'LIKE', "$year/$stateCode/CC/%")
+					->execute();
+
+				// Calculate the next serial number
+				$serialNumber = sprintf('%03d', $existingCamps->count() + 1);
+
+				// Modify the title to include the year, state code, event code, and serial number
+				$newTitle = $year . '/' . $stateCode . '/' . $eventCode . '/' . $serialNumber;
 
 				$decodedData['Eck_Collection_Camp1'][0]['fields']['title'] = $newTitle;
 
