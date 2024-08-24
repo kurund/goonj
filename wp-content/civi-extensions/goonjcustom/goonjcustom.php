@@ -341,3 +341,91 @@ function goonjcustom_civicrm_tabset($tabsetName, &$tabs, $context) {
 		);
 	}
 }
+
+/**
+ * This hook is called after a db write on entities.
+ *
+ * @param string $op
+ *   The type of operation being performed.
+ * @param string $objectName
+ *   The name of the object.
+ * @param int $objectId
+ *   The unique identifier for the object.
+ * @param object $objectRef
+ *   The reference to the object.
+ */
+function goonjcustom_civicrm_post(string $op, string $objectName, int $objectId, &$objectRef) {
+	// Check if the object name is 'AfformSubmission'
+	if ($objectName === 'AfformSubmission') {
+		// Extract the 'data' field
+		$data = $objectRef->data;
+
+		// Decode the JSON data
+		$decodedData = json_decode($data, true);
+
+		// Access the id within the decoded data
+		if (isset($decodedData['Eck_Collection_Camp1'][0]['fields']['id'])) {
+			$campId = $decodedData['Eck_Collection_Camp1'][0]['fields']['id'];
+			
+			// Fetch the collection camp details using the API
+			$collectionCamps = \Civi\Api4\EckEntity::get('Collection_Camp', FALSE)
+				->addWhere('id', '=', $campId)
+				->setLimit(1)
+				->execute();
+
+			// Check if the API returned a result
+			if (!empty($collectionCamps)) {
+				$collectionCampsCreatedDate = $collectionCamps->first()['created_date'] ?? null;
+
+				// Get the year from the created_date
+				$year = date('Y', strtotime($collectionCampsCreatedDate));
+
+				// Fetch the state ID from the collection camp intent details
+				$stateId = $decodedData['Eck_Collection_Camp1'][0]['fields']['Collection_Camp_Intent_Details.State'] ?? null;
+
+				$stateCode = 'UNKNOWN'; // Default value in case state code is not found
+
+				if ($stateId) {
+					// Fetch the state abbreviation using the API
+					$stateProvinces = \Civi\Api4\StateProvince::get(TRUE)
+						->addWhere('id', '=', $stateId)
+						->setLimit(1)
+						->execute();
+
+					// Check if the API returned a result
+					if (!empty($stateProvinces)) {
+						$stateAbbreviation = $stateProvinces->first()['abbreviation'] ?? null;
+
+						if ($stateAbbreviation) {
+							// Fetch the Goonj-specific state code from the config
+							$goonjStateCodePath = ABSPATH . 'wp-content/civi-extensions/goonjcustom/config/constants.php';
+							$goonjStateCode = include $goonjStateCodePath;
+							// Find the state code from the config
+							$stateCode = $goonjStateCode[$stateAbbreviation] ?? 'UNKNOWN';
+						}
+					}
+				}
+
+				// Modify the title to include the year and state code
+				$newTitle = $year . '/' . $stateCode;
+				$decodedData['Eck_Collection_Camp1'][0]['fields']['title'] = $newTitle;
+
+				// Update the objectRef's data to reflect the new title
+				$objectRef->data = json_encode($decodedData);
+
+				// Save the updated title back to the Collection Camp entity
+				\Civi\Api4\EckEntity::update('Collection_Camp')
+					->addWhere('id', '=', $campId)
+					->addValue('title', $newTitle)
+					->execute();
+
+				// Log the updated title for debugging
+				error_log("Updated Title: " . $newTitle);
+			} else {
+				error_log("No camp found with ID: " . $campId);
+			}
+		} else {
+			error_log("ID not found in data.");
+		}
+	}
+}
