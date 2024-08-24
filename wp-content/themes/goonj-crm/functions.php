@@ -241,7 +241,7 @@ function goonj_handle_user_identification_form() {
 		->setLimit(1)
 		->execute();
 
-		if ($purpose == 'dropping-center') {
+		if ($purpose === 'dropping-center') {
 			wp_redirect(get_home_url() . "/dropping-center/#?Collection_Camp_Core_Details.Contact_Id=" . $foundContacts['id']);
 			exit;
 		}
