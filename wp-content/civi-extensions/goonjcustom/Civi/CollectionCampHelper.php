@@ -3,7 +3,6 @@
 namespace Civi;
 
 use Civi\Core\Service\AutoSubscriber;
-use CRM_Pets_ExtensionUtil as E;
 
 class CollectionCampHelper extends AutoSubscriber {
 
