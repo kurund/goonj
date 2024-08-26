@@ -42,9 +42,6 @@ class CollectionCampHelper extends AutoSubscriber {
 	
 		foreach ($collectionCampEntries as $entry) {
 			$collectionCampData = $entry['fields'] ?? null;
-			if (!array_key_exists('Eck_Collection_Camp1', $decodedData)) {
-				continue;
-			}
 	
 			// Access the subtype
 			$subtypeId = $collectionCampData['subtype'] ?? null;
