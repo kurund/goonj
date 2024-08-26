@@ -39,6 +39,8 @@ function goonj_theme_setup() {
 	add_editor_style('style.css');
 }
 
+
+
 add_action('template_redirect', 'goonj_redirect_logged_in_user_to_civi_dashboard');
 function goonj_redirect_logged_in_user_to_civi_dashboard() {
 	if (is_user_logged_in() && is_front_page()) {
