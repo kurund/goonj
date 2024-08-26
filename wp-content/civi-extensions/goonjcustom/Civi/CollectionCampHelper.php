@@ -70,11 +70,8 @@ class CollectionCampHelper extends AutoSubscriber {
 			// Get the year
 			$year = date('Y', strtotime($collectionCampsCreatedDate));
 	
-			// Fetch the state ID from the collection camp intent details
-			$stateId = $collectionCampData['Collection_Camp_Intent_Details.State'] ?? null;
-			if ($subtypeId == 5) {
-				$stateId = $collectionCampData['Dropping_Centre.State'] ?? null;
-			}
+			// Fetch the state ID
+			$stateId = self::getStateIdForSubtype($collectionCampData, $subtypeId);
 	
 			if (!$stateId) {
 				continue;
@@ -126,7 +123,6 @@ class CollectionCampHelper extends AutoSubscriber {
 		}
 	}
 	
-	
 	private static function getConfig() {
 		// Get the path to the CiviCRM extensions directory
 		$extensionsDir = \CRM_Core_Config::singleton()->extensionsDir;
@@ -139,6 +135,13 @@ class CollectionCampHelper extends AutoSubscriber {
 			'state_codes' => include $extensionPath . 'constants.php',
 			'event_codes' => include $extensionPath . 'eventCode.php'
 		];
+	}
+
+	public static function getStateIdForSubtype(array $collectionCampData, int $subtypeId): ?int {
+		if ($subtypeId === 5) { // Subtype for 'Dropping Centre'
+			return $collectionCampData['Dropping_Centre.State'] ?? null;
+		}
+		return $collectionCampData['Collection_Camp_Intent_Details.State'] ?? null;
 	}
 
 }
