@@ -34,14 +34,11 @@ class CollectionCampHelper extends AutoSubscriber {
 		$data = $objectRef->data;
 		$decodedData = json_decode($data, true);
 	
-		// Check if the 'Eck_Collection_Camp1' exists
+		// Check if 'Eck_Collection_Camp1' exists
 		$collectionCampEntries = $decodedData['Eck_Collection_Camp1'] ?? [];
 		if (empty($collectionCampEntries)) {
 			return;
 		}
-	
-		// Get subtype information
-		$subtypeMap = self::getSubtypeMap();
 	
 		foreach ($collectionCampEntries as $entry) {
 			$collectionCampData = $entry['fields'] ?? null;
@@ -51,10 +48,7 @@ class CollectionCampHelper extends AutoSubscriber {
 	
 			// Access the subtype
 			$subtypeId = $collectionCampData['subtype'] ?? null;
-			$subtypeLabel = $subtypeMap[$subtypeId] ?? null;
-	
-			// Check if the subtype is valid (Collection Camp or Dropping Center)
-			if (!in_array($subtypeLabel, ['Collection Camp', 'Dropping Center'])) {
+			if ($subtypeId === null) {
 				continue;
 			}
 	
@@ -81,7 +75,7 @@ class CollectionCampHelper extends AutoSubscriber {
 	
 			// Fetch the state ID from the collection camp intent details
 			$stateId = $collectionCampData['Collection_Camp_Intent_Details.State'] ?? null;
-			if ($subtypeLabel === 'Dropping Center') {
+			if ($subtypeId == 5) {
 				$stateId = $collectionCampData['Dropping_Centre.State'] ?? null;
 			}
 	
@@ -150,25 +144,5 @@ class CollectionCampHelper extends AutoSubscriber {
 		];
 	}
 
-	private static function getSubtypeMap() {
-		// Fetch subtype information from CiviCRM
-		$eckEntityTypes = \Civi\Api4\EckEntityType::get(TRUE)
-			->addSelect('sub_types:label', 'sub_types')
-			->addWhere('label', '=', 'Collection Camp')
-			->setLimit(1)
-			->execute();
-	
-		$subtypeMap = [];
-		if (!empty($eckEntityTypes)) {
-			$subtypeInfo = $eckEntityTypes->first();
-			$subtypeIds = $subtypeInfo['sub_types'] ?? [];
-			$subtypeLabels = $subtypeInfo['sub_types:label'] ?? [];
-			
-			// Create a map of subtype IDs to labels
-			$subtypeMap = array_combine($subtypeIds, $subtypeLabels);
-		}
-	
-		return $subtypeMap;
-	}
 	
 }
