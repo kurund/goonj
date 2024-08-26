@@ -198,6 +198,16 @@ function goonj_handle_user_identification_form() {
 				wp_redirect($dropping_center_volunteer_registration_form_path);
 				exit;
 			}
+
+			if ($purpose == 'institute-registration') {
+				$individual_registration_form_path = sprintf(
+					'/individual-institute-registration/#?email=%s&phone=%s',
+					$email,
+					$phone,
+				);
+                wp_redirect($individual_registration_form_path);
+                exit;
+            }
             // We are currently hardcoding the path of the volunteer registration page.
             // If this path changes, then this code needs to be updated.
             wp_redirect($volunteer_registration_form_path);
