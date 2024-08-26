@@ -44,7 +44,7 @@ class CollectionCampHelper extends AutoSubscriber {
 		// Access the subtype
 		$subtype = $collectionCampData['subtype'] ?? null;
 	
-		// Check if the subtype is 4 or 5
+		// Check if the subtype is 4 or 5 (collection camp and dropping center)
 		if ($subtype != 4 && $subtype != 5) {
 			return;
 		}
