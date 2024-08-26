@@ -40,12 +40,16 @@ class CollectionCampHelper extends AutoSubscriber {
 		if ($collectionCampData === null) {
 			return;
 		}
+
+		// Get subtype information
+		$subtypeMap = self::getSubtypeMap();
 	
 		// Access the subtype
-		$subtype = $collectionCampData['subtype'] ?? null;
+		$subtypeId = $collectionCampData['subtype'] ?? null;
+		$subtypeLabel = $subtypeMap[$subtypeId] ?? null;		
 	
 		// Check if the subtype is 4 or 5 (collection camp and dropping center)
-		if ($subtype != 4 && $subtype != 5) {
+		if (!in_array($subtypeLabel, ['Collection Camp', 'Dropping Center'])) {
 			return;
 		}
 	
@@ -72,7 +76,7 @@ class CollectionCampHelper extends AutoSubscriber {
 	
 		// Fetch the state ID from the collection camp intent details
 		$stateId = $collectionCampData['Collection_Camp_Intent_Details.State'] ?? null;
-		if ($subtype == 5) {
+		if ($subtypeLabel === 'Dropping Center') {
 			$stateId = $collectionCampData['Dropping_Centre.State'] ?? null;
 		}
 	
@@ -140,5 +144,27 @@ class CollectionCampHelper extends AutoSubscriber {
 			'event_codes' => include $extensionPath . 'eventCode.php'
 		];
 	}
+
+	private static function getSubtypeMap() {
+		// Fetch subtype information from CiviCRM
+		$eckEntityTypes = \Civi\Api4\EckEntityType::get(TRUE)
+			->addSelect('sub_types:label', 'sub_types')
+			->addWhere('label', '=', 'Collection Camp')
+			->setLimit(1)
+			->execute();
+	
+		$subtypeMap = [];
+		if (!empty($eckEntityTypes)) {
+			$subtypeInfo = $eckEntityTypes->first();
+			$subtypeIds = $subtypeInfo['sub_types'] ?? [];
+			$subtypeLabels = $subtypeInfo['sub_types:label'] ?? [];
+			
+			// Create a map of subtype IDs to labels
+			$subtypeMap = array_combine($subtypeIds, $subtypeLabels);
+		}
+	
+		return $subtypeMap;
+	}
+	
 	
 }
