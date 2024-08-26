@@ -144,5 +144,4 @@ class CollectionCampHelper extends AutoSubscriber {
 		];
 	}
 
-	
 }
