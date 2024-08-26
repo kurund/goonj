@@ -189,6 +189,12 @@ function goonj_handle_user_identification_form() {
 			'not-inducted-for-dropping-center'
 		);
 
+		$institute_registration_form_path = sprintf(
+            '/institute-registration/#?email=%s&phone=%s',
+            $email,
+            $phone,
+            $target_id,
+        );
         if (empty($foundContacts)) {
             if ($purpose == 'material-contribution') {
                 wp_redirect($individual_volunteer_registration_form_path);
@@ -216,6 +222,11 @@ function goonj_handle_user_identification_form() {
 
 		if ( $foundContacts && $purpose == 'material-contribution' ) {
 			wp_redirect($material_contribution_form_path);
+			exit;
+		}
+
+		if ( $foundContacts && $purpose == 'institute-registration' ) {
+			wp_redirect($institute_registration_form_path);
 			exit;
 		}
 
