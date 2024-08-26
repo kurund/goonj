@@ -36,100 +36,106 @@ class CollectionCampHelper extends AutoSubscriber {
 		$decodedData = json_decode($data, true);
 	
 		// Check if the 'Eck_Collection_Camp1' exists
-		$collectionCampData = $decodedData['Eck_Collection_Camp1'][0]['fields'] ?? null;
-		if ($collectionCampData === null) {
+		$collectionCampEntries = $decodedData['Eck_Collection_Camp1'] ?? [];
+		if (empty($collectionCampEntries)) {
 			return;
 		}
-
+	
 		// Get subtype information
 		$subtypeMap = self::getSubtypeMap();
 	
-		// Access the subtype
-		$subtypeId = $collectionCampData['subtype'] ?? null;
-		$subtypeLabel = $subtypeMap[$subtypeId] ?? null;		
+		foreach ($collectionCampEntries as $entry) {
+			$collectionCampData = $entry['fields'] ?? null;
+			if (!array_key_exists('Eck_Collection_Camp1', $decodedData)) {
+				continue;
+			}
 	
-		// Check if the subtype is 4 or 5 (collection camp and dropping center)
-		if (!in_array($subtypeLabel, ['Collection Camp', 'Dropping Center'])) {
-			return;
+			// Access the subtype
+			$subtypeId = $collectionCampData['subtype'] ?? null;
+			$subtypeLabel = $subtypeMap[$subtypeId] ?? null;
+	
+			// Check if the subtype is valid (Collection Camp or Dropping Center)
+			if (!in_array($subtypeLabel, ['Collection Camp', 'Dropping Center'])) {
+				continue;
+			}
+	
+			// Access the id within the decoded data
+			$campId = $collectionCampData['id'] ?? null;
+			if ($campId === null) {
+				continue;
+			}
+	
+			// Fetch the collection camp details
+			$collectionCamps = \Civi\Api4\EckEntity::get('Collection_Camp', FALSE)
+				->addWhere('id', '=', $campId)
+				->setLimit(1)
+				->execute();
+	
+			if (empty($collectionCamps)) {
+				continue;
+			}
+	
+			$collectionCampsCreatedDate = $collectionCamps->first()['created_date'] ?? null;
+	
+			// Get the year
+			$year = date('Y', strtotime($collectionCampsCreatedDate));
+	
+			// Fetch the state ID from the collection camp intent details
+			$stateId = $collectionCampData['Collection_Camp_Intent_Details.State'] ?? null;
+			if ($subtypeLabel === 'Dropping Center') {
+				$stateId = $collectionCampData['Dropping_Centre.State'] ?? null;
+			}
+	
+			if (!$stateId) {
+				continue;
+			}
+	
+			// Fetch the state abbreviation
+			$stateProvinces = \Civi\Api4\StateProvince::get(TRUE)
+				->addWhere('id', '=', $stateId)
+				->setLimit(1)
+				->execute();
+	
+			if (empty($stateProvinces)) {
+				continue;
+			}
+	
+			$stateAbbreviation = $stateProvinces->first()['abbreviation'] ?? null;
+	
+			if (!$stateAbbreviation) {
+				continue;
+			}
+	
+			// Fetch the Goonj-specific state code
+			$config = self::getConfig();
+			$stateCode = $config['state_codes'][$stateAbbreviation] ?? 'UNKNOWN';
+	
+			// Get the current event title
+			$currentTitle = $collectionCampData['title'] ?? 'Collection Camp';
+	
+			// Fetch the event code
+			$eventCode = $config['event_codes'][$currentTitle] ?? 'UNKNOWN';
+	
+			// Count existing camps for the state and year with the same event code
+			$existingCamps = \Civi\Api4\EckEntity::get('Collection_Camp', FALSE)
+				->addSelect('title')
+				->addWhere('title', 'LIKE', "$year/$stateCode/$eventCode/%")
+				->execute();
+	
+			$serialNumber = sprintf('%03d', $existingCamps->count() + 1);
+	
+			// Modify the title to include the year, state code, event code, and serial number
+			$newTitle = $year . '/' . $stateCode . '/' . $eventCode . '/' . $serialNumber;
+			$collectionCampData['title'] = $newTitle;
+	
+			// Save the updated title back to the Collection Camp entity
+			\Civi\Api4\EckEntity::update('Collection_Camp')
+				->addWhere('id', '=', $campId)
+				->addValue('title', $newTitle)
+				->execute();
 		}
-	
-		// Access the id within the decoded data
-		$campId = $collectionCampData['id'] ?? null;
-		if ($campId === null) {
-			return;
-		}
-	
-		// Fetch the collection camp details
-		$collectionCamps = \Civi\Api4\EckEntity::get('Collection_Camp', FALSE)
-			->addWhere('id', '=', $campId)
-			->setLimit(1)
-			->execute();
-	
-		if (empty($collectionCamps)) {
-			return;
-		}
-	
-		$collectionCampsCreatedDate = $collectionCamps->first()['created_date'] ?? null;
-	
-		// Get the year
-		$year = date('Y', strtotime($collectionCampsCreatedDate));
-	
-		// Fetch the state ID from the collection camp intent details
-		$stateId = $collectionCampData['Collection_Camp_Intent_Details.State'] ?? null;
-		if ($subtypeLabel === 'Dropping Center') {
-			$stateId = $collectionCampData['Dropping_Centre.State'] ?? null;
-		}
-	
-		if (!$stateId) {
-			return;
-		}
-	
-		// Fetch the state abbreviation
-		$stateProvinces = \Civi\Api4\StateProvince::get(TRUE)
-			->addWhere('id', '=', $stateId)
-			->setLimit(1)
-			->execute();
-	
-		if (empty($stateProvinces)) {
-			return;
-		}
-	
-		$stateAbbreviation = $stateProvinces->first()['abbreviation'] ?? null;
-	
-		if (!$stateAbbreviation) {
-			return;
-		}
-	
-		// Fetch the Goonj-specific state code
-		$config = self::getConfig();
-
-		$stateCode = $config['state_codes'][$stateAbbreviation] ?? 'UNKNOWN';
-
-		// Get the current event title
-		$currentTitle = $collectionCampData['title'] ?? 'Collection Camp';
-		
-	
-		// Fetch the event code
-		$eventCode = $config['event_codes'][$currentTitle] ?? 'UNKNOWN';
-	
-		// Count existing camps for the state and year with the same event code
-		$existingCamps = \Civi\Api4\EckEntity::get('Collection_Camp', FALSE)
-			->addSelect('title')
-			->addWhere('title', 'LIKE', "$year/$stateCode/$eventCode/%")
-			->execute();
-	
-		$serialNumber = sprintf('%03d', $existingCamps->count() + 1);
-	
-		// Modify the title to include the year, state code, event code, and serial number
-		$newTitle = $year . '/' . $stateCode . '/' . $eventCode . '/' . $serialNumber;
-		$collectionCampData['title'] = $newTitle;
-	
-		// Save the updated title back to the Collection Camp entity
-		\Civi\Api4\EckEntity::update('Collection_Camp')
-			->addWhere('id', '=', $campId)
-			->addValue('title', $newTitle)
-			->execute();
 	}
+	
 	
 	private static function getConfig() {
 		// Get the path to the CiviCRM extensions directory
