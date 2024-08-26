@@ -60,13 +60,13 @@ class CollectionCampHelper extends AutoSubscriber {
 			->addWhere('id', '=', $campId)
 			->setLimit(1)
 			->execute();
-
+	
 		if (empty($collectionCamps)) {
 			return;
 		}
 	
 		$collectionCampsCreatedDate = $collectionCamps->first()['created_date'] ?? null;
-
+	
 		// Get the year
 		$year = date('Y', strtotime($collectionCampsCreatedDate));
 	
@@ -97,19 +97,16 @@ class CollectionCampHelper extends AutoSubscriber {
 		}
 	
 		// Fetch the Goonj-specific state code
-		$goonjStateCodePath = ABSPATH . 'wp-content/civi-extensions/goonjcustom/config/constants.php';
-		$goonjStateCode = include $goonjStateCodePath;
-		$stateCode = $goonjStateCode[$stateAbbreviation] ?? 'UNKNOWN';
-	
+		$config = self::getConfig();
+
+		$stateCode = $config['state_codes'][$stateAbbreviation] ?? 'UNKNOWN';
+
 		// Get the current event title
 		$currentTitle = $collectionCampData['title'] ?? 'Collection Camp';
+		
 	
 		// Fetch the event code
-		$eventCodePath = ABSPATH . 'wp-content/civi-extensions/goonjcustom/config/eventCode.php';
-		$eventCodeConfig = include $eventCodePath;
-	
-		// Determine the event code based on the current title
-		$eventCode = $eventCodeConfig[$currentTitle] ?? 'UNKNOWN';
+		$eventCode = $config['event_codes'][$currentTitle] ?? 'UNKNOWN';
 	
 		// Count existing camps for the state and year with the same event code
 		$existingCamps = \Civi\Api4\EckEntity::get('Collection_Camp', FALSE)
@@ -123,7 +120,6 @@ class CollectionCampHelper extends AutoSubscriber {
 		$newTitle = $year . '/' . $stateCode . '/' . $eventCode . '/' . $serialNumber;
 		$collectionCampData['title'] = $newTitle;
 	
-	
 		// Save the updated title back to the Collection Camp entity
 		\Civi\Api4\EckEntity::update('Collection_Camp')
 			->addWhere('id', '=', $campId)
@@ -131,5 +127,18 @@ class CollectionCampHelper extends AutoSubscriber {
 			->execute();
 	}
 	
-
+	private static function getConfig() {
+		// Get the path to the CiviCRM extensions directory
+		$extensionsDir = \CRM_Core_Config::singleton()->extensionsDir;
+		
+		// Relative path to the extension's config directory
+		$extensionPath = $extensionsDir . 'goonjcustom/config/';
+	
+		// Include and return the configuration files
+		return [
+			'state_codes' => include $extensionPath . 'constants.php',
+			'event_codes' => include $extensionPath . 'eventCode.php'
+		];
+	}
+	
 }
