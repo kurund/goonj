@@ -116,8 +116,8 @@ add_shortcode( 'goonj_check_user_form', 'goonj_check_user_action' );
 
 function goonj_check_user_action($atts)
 {
-    get_template_part('templates/form', 'check-user', [ 'purpose' => $atts['purpose'] ]);
-    return ob_get_clean();
+	get_template_part('templates/form', 'check-user', [ 'purpose' => $atts['purpose'] ]);
+	return ob_get_clean();
 
 }
 
@@ -125,15 +125,15 @@ function goonj_check_user_action($atts)
 add_action('wp', 'goonj_handle_user_identification_form');
 function goonj_handle_user_identification_form() {
 	if ( ! isset( $_POST['action'] ) || ( $_POST['action'] !== 'goonj-check-user' ) ) {
-        return;
-    }
+		return;
+	}
 
-    $purpose = $_POST['purpose'] ?? 'collection-camp-intent';
-    $target_id = $_POST['target_id'] ?? '';
+	$purpose = $_POST['purpose'] ?? 'collection-camp-intent';
+	$target_id = $_POST['target_id'] ?? '';
 
-    // Retrieve the email and phone number from the POST data
-    $email = $_POST['email'] ?? '';
-    $phone = $_POST['phone'] ?? '';
+	// Retrieve the email and phone number from the POST data
+	$email = $_POST['email'] ?? '';
+	$phone = $_POST['phone'] ?? '';
 
 	$is_material_contribution = $purpose !== 'material-contribution';
 
@@ -141,8 +141,8 @@ function goonj_handle_user_identification_form() {
 		return;
 	}
 
-    try {
-        // Find the contact ID based on email and phone number
+	try {
+		// Find the contact ID based on email and phone number
 		$query = \Civi\Api4\Contact::get(FALSE)
 			->addSelect('id', 'contact_sub_type', 'display_name')
 			->addWhere('phone_primary.phone', '=', $phone)
@@ -156,31 +156,31 @@ function goonj_handle_user_identification_form() {
 		// Execute the query with a limit of 1
 		$contactResult = $query->setLimit(1)->execute();
 
-        $foundContacts = $contactResult->first() ?? null;
+		$foundContacts = $contactResult->first() ?? null;
 
-        // If the user does not exist in the Goonj database
-        // redirect to the volunteer registration form.
-        $volunteer_registration_form_path = sprintf(
-            '/volunteer-registration/#?email=%s&phone=%s&message=%s&Volunteer_fields.Which_activities_are_you_interested_in_=%s',
-            $email,
-            $phone,
-            'not-inducted-volunteer',
-            '9'
-        );
+		// If the user does not exist in the Goonj database
+		// redirect to the volunteer registration form.
+		$volunteer_registration_form_path = sprintf(
+			'/volunteer-registration/#?email=%s&phone=%s&message=%s&Volunteer_fields.Which_activities_are_you_interested_in_=%s',
+			$email,
+			$phone,
+			'not-inducted-volunteer',
+			'9'
+		);
 
-        $individual_volunteer_registration_form_path = sprintf(
-            '/individual-registration-with-volunteer-option/#?email=%s&phone=%s&Source_Tracking.Event=%s',
-            $email,
-            $phone,
-            $target_id,
-        );
+		$individual_volunteer_registration_form_path = sprintf(
+			'/individual-registration-with-volunteer-option/#?email=%s&phone=%s&Source_Tracking.Event=%s',
+			$email,
+			$phone,
+			$target_id,
+		);
 
-        $material_contribution_form_path = sprintf(
-            '/material-contribution/#?email=%s&phone=%s&Source_Tracking.Event=%s',
-            $email,
-            $phone,
-            $target_id,
-        );
+		$material_contribution_form_path = sprintf(
+			'/material-contribution/#?email=%s&phone=%s&Source_Tracking.Event=%s',
+			$email,
+			$phone,
+			$target_id,
+		);
 
 		$dropping_center_volunteer_registration_form_path = sprintf(
 			'/volunteer-registration/#?email=%s&phone=%s&message=%s',
@@ -190,15 +190,15 @@ function goonj_handle_user_identification_form() {
 		);
 
 		$institute_registration_form_path = sprintf(
-            '/institute-registration/#?email=%s&phone=%s',
-            $email,
-            $phone,
-        );
-        if (empty($foundContacts)) {
-            if ($purpose === 'material-contribution') {
-                wp_redirect($individual_volunteer_registration_form_path);
-                exit;
-            }
+			'/institute-registration/#?email=%s&phone=%s',
+			$email,
+			$phone,
+		);
+		if (empty($foundContacts)) {
+			if ($purpose === 'material-contribution') {
+				wp_redirect($individual_volunteer_registration_form_path);
+				exit;
+			}
 			if ($purpose === 'dropping-center') {
 				wp_redirect($dropping_center_volunteer_registration_form_path);
 				exit;
@@ -210,14 +210,14 @@ function goonj_handle_user_identification_form() {
 					$email,
 					$phone,
 				);
-                wp_redirect($individual_registration_form_path);
-                exit;
-            }
-            // We are currently hardcoding the path of the volunteer registration page.
-            // If this path changes, then this code needs to be updated.
-            wp_redirect($volunteer_registration_form_path);
-            exit;
-        }
+				wp_redirect($individual_registration_form_path);
+				exit;
+			}
+			// We are currently hardcoding the path of the volunteer registration page.
+			// If this path changes, then this code needs to be updated.
+			wp_redirect($volunteer_registration_form_path);
+			exit;
+		}
 
 		if ( $foundContacts && $purpose === 'material-contribution' ) {
 			wp_redirect($material_contribution_form_path);
@@ -244,8 +244,8 @@ function goonj_handle_user_identification_form() {
 		//   2. Change volunteer status to "Waiting for Induction"
 		if ( ! goonj_is_volunteer_inducted( $foundContacts ) ) {
 			$redirect_url = ($purpose === 'dropping-center')
-            ? home_url('/dropping-centre-waiting-induction/')
-            : home_url('/collection-camp-waiting-induction/');
+			? home_url('/dropping-centre-waiting-induction/')
+			: home_url('/collection-camp-waiting-induction/');
 	
 			wp_redirect($redirect_url);
 			exit;
@@ -339,10 +339,10 @@ function goonj_custom_rewrite_rules() {
 
 add_filter( 'query_vars', 'goonj_query_vars' );
 function goonj_query_vars( $vars ) {
-    $vars[] = 'target';
-    $vars[] = 'id';
-    $vars[] = 'target_id';
-    return $vars;
+	$vars[] = 'target';
+	$vars[] = 'id';
+	$vars[] = 'target_id';
+	return $vars;
 }
 
 add_action( 'template_redirect', 'goonj_check_action_target_exists' );
