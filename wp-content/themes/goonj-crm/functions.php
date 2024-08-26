@@ -219,7 +219,7 @@ function goonj_handle_user_identification_form() {
             exit;
         }
 
-		if ( $foundContacts && $purpose == 'material-contribution' ) {
+		if ( $foundContacts && $purpose === 'material-contribution' ) {
 			wp_redirect($material_contribution_form_path);
 			exit;
 		}
