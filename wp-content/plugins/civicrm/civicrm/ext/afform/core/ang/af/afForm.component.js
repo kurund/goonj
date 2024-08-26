@@ -283,7 +283,7 @@
           var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
           if (!emailPattern.test(emailValue)) {
             errorMessage +=
-              "Invalid email address. Please enter a valid email.\n";
+              "Please enter a valid email.\n";
             isValid = false;
           }
         }
