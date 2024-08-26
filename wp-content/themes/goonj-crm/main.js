@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
-// This script resets form fields, when the reset button is clicked.
+// This script resets form fields when the reset button is clicked.
 document.addEventListener("DOMContentLoaded", function () {
   setTimeout(function () {
     var container = document.querySelector("#bootstrap-theme > crm-angular-js");
