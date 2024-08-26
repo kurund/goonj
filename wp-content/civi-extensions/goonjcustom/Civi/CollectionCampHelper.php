@@ -66,7 +66,7 @@ class CollectionCampHelper extends AutoSubscriber {
 		}
 	
 		$collectionCampsCreatedDate = $collectionCamps->first()['created_date'] ?? null;
-		
+
 		// Get the year
 		$year = date('Y', strtotime($collectionCampsCreatedDate));
 	
@@ -123,9 +123,6 @@ class CollectionCampHelper extends AutoSubscriber {
 		$newTitle = $year . '/' . $stateCode . '/' . $eventCode . '/' . $serialNumber;
 		$collectionCampData['title'] = $newTitle;
 	
-		// Update the objectRef's data to reflect the new title
-		$decodedData['Eck_Collection_Camp1'][0]['fields'] = $collectionCampData;
-		$objectRef->data = json_encode($decodedData);
 	
 		// Save the updated title back to the Collection Camp entity
 		\Civi\Api4\EckEntity::update('Collection_Camp')
