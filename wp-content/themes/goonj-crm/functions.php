@@ -193,19 +193,18 @@ function goonj_handle_user_identification_form() {
             '/institute-registration/#?email=%s&phone=%s',
             $email,
             $phone,
-            $target_id,
         );
         if (empty($foundContacts)) {
-            if ($purpose == 'material-contribution') {
+            if ($purpose === 'material-contribution') {
                 wp_redirect($individual_volunteer_registration_form_path);
                 exit;
             }
-			if ($purpose == 'dropping-center') {
+			if ($purpose === 'dropping-center') {
 				wp_redirect($dropping_center_volunteer_registration_form_path);
 				exit;
 			}
 
-			if ($purpose == 'institute-registration') {
+			if ($purpose === 'institute-registration') {
 				$individual_registration_form_path = sprintf(
 					'/individual-institute-registration/#?email=%s&phone=%s',
 					$email,
