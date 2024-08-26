@@ -25,9 +25,17 @@ document.addEventListener('DOMContentLoaded', function () {
 						<p class="fw-400 fz-16 mt-0 mb-24">Please provide the details related to the collection camp you want to organize. These details will be sent to Goonj for authorization.</p>
 					</div>
 				`;
-      }
-    }
-  }
+			}
+			else if (message === 'not-inducted-for-dropping-center') {
+				messageDiv.innerHTML = `
+					<div class="w-520 mt-30">
+						<p class="fw-400 fz-20 mb-11">You are not registered as a volunteer with us.</p>
+						<p class="fw-400 fz-16 mt-0 mb-24">To set up a dropping centre, please take a moment to fill out the volunteer registration form below. We can't wait to have you on board!</p>
+					</div>
+				`;
+			}
+		}
+	}
 });
 
 // This script resets form fields when the reset button is clicked.
