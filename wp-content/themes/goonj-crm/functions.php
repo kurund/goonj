@@ -252,7 +252,7 @@ function goonj_handle_user_identification_form() {
 		if ( ! goonj_is_volunteer_inducted( $found_contacts ) ) {
 			$redirect_url = ($purpose === 'dropping-center')
 			? home_url('/dropping-centre-waiting-induction/')
-			: home_url('/collection-camp-waiting-induction/');
+			: home_url('/collection-camp/waiting-induction/');
 	
 			wp_redirect($redirect_url);
 			exit;
