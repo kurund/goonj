@@ -128,7 +128,7 @@ function goonj_handle_user_identification_form() {
 		return;
 	}
 
-	$purpose = $_POST['purpose'] ?? 'collection-camp/intent';
+	$purpose = $_POST['purpose'] ?? 'collection-camp-intent';
 	$target_id = $_POST['target_id'] ?? '';
 
 	// Retrieve the email and phone number from the POST data
