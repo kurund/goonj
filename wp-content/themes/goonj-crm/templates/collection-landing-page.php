@@ -19,6 +19,6 @@ Template Name: Collection Landing Page
 		</li>
 	</ol>
 	<div class="login-submit w-100p mt-36">
-		<a class="button button-primary" href="<?php echo esc_url( get_page_by_path( 'collection-camp/check-user' ) ); ?>">Continue</a>
+		<a class="button button-primary" href="<?php echo esc_url( get_permalink( get_page_by_path( 'collection-camp/check-user' ) ) ); ?>">Continue</a>
 	</div>
 </div>
