@@ -128,7 +128,7 @@ function goonj_handle_user_identification_form() {
 		return;
 	}
 
-	$purpose = $_POST['purpose'] ?? 'collection-camp-intent';
+	$purpose = $_POST['purpose'] ?? 'collection-camp/intent';
 	$target_id = $_POST['target_id'] ?? '';
 
 	// Retrieve the email and phone number from the POST data
@@ -287,7 +287,7 @@ function goonj_handle_user_identification_form() {
 			wp_redirect(get_home_url() . "/collection-camp/choose-from-past/#?Collection_Camp_Core_Details.Contact_Id=" . $found_contacts['id'] . '&message=past-collection-data' );
 			exit;
 		} else {
-			$redirect_url = get_home_url() . "/collection-camp-intent/#?Collection_Camp_Core_Details.Contact_Id=" . $found_contacts['id'] . '&message=collection-camp-page&Collection_Camp_Intent_Details.Name=' . $display_name . '&Collection_Camp_Intent_Details.Contact_Number='. $phone;
+			$redirect_url = get_home_url() . "/collection-camp/intent/#?Collection_Camp_Core_Details.Contact_Id=" . $found_contacts['id'] . '&message=collection-camp-page&Collection_Camp_Intent_Details.Name=' . $display_name . '&Collection_Camp_Intent_Details.Contact_Number='. $phone;
 		}
 		wp_redirect($redirect_url);
 		exit;
