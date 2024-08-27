@@ -30,16 +30,16 @@ $noDetailsRedirectUrl = get_home_url() . "/collection-camp-intent/#?" . http_bui
 ?>
 
 <div class="m-auto w-520 pl-27">
-	<button class="button button-primary w-520 mb-12 border-none font-sans fz-16 br-4 fw-600">
-		<a href="<?php echo esc_url($redirectUrl); ?>" class="text-white text-decoration-none">
+	<a href="<?php echo esc_url($redirectUrl); ?>">
+		<button	button class="button button-primary w-520 mb-12 border-none font-sans fz-16 br-4 fw-600">
 			Yes, use details from last camp
-		</a>
-	</button>
-	<button class="button button-primary w-520 border-none font-sans fz-16 bg-white br-4 red-border fw-600">
-		<a href="<?php echo esc_url($noDetailsRedirectUrl); ?>" class="text-light-red text-decoration-none">
+		</button>
+	</a>
+	<a href="<?php echo esc_url($noDetailsRedirectUrl); ?>">
+		<button class="button button-primary w-520 border-none font-sans fz-16 bg-white br-4 red-border fw-600 text-light-red">
 			No, the details are different
-		</a>
-	</button>
+		</button>
+	</a>
 </div>
 
 <?php
