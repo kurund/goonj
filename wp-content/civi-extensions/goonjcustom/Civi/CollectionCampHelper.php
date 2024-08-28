@@ -231,7 +231,7 @@ class CollectionCampHelper extends AutoSubscriber {
       try {
           $emailParams = [
               'contact_id' => $contactId, // For testing: Use your own contact ID with the associated email address. For example, contact ID 8355 is assigned to tarun.joshi@coloredcow.com. This will send a test email to that address.
-              'template_id' => 77, // Template ID for the authorization email
+              'template_id' => 77, // Template ID for the unauthorization email
               'subject' => "UnAuthorization Notification",
           ];
 
