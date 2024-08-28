@@ -218,7 +218,7 @@ class CollectionCampHelper extends AutoSubscriber {
 
     }
     catch (\CiviCRM_API3_Exception $ex) {
-      // Do nothing.
+      error_log("Exception caught while sending authorization email: " . $ex->getMessage());
     }
   }
 
@@ -237,7 +237,7 @@ class CollectionCampHelper extends AutoSubscriber {
 
     }
     catch (\CiviCRM_API3_Exception $ex) {
-      // Do nothing.
+      error_log("Exception caught while sending unauthorization email: " . $ex->getMessage());
     }
   }
 
