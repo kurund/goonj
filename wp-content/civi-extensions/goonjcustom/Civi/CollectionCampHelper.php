@@ -206,6 +206,9 @@ class CollectionCampHelper extends AutoSubscriber {
     }
   }
 
+  /**
+   * Send Authorization Email to contact
+   */
     private static function sendAuthorizationEmail($contactId) {
       try {
           $emailParams = [
@@ -221,6 +224,9 @@ class CollectionCampHelper extends AutoSubscriber {
       }
     }
 
+  /**
+   * Send UnAuthorization Email to contact
+   */
     private static function sendUnAuthorizationEmail($contactId) {
       try {
           $emailParams = [
