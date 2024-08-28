@@ -195,12 +195,10 @@ class CollectionCampHelper extends AutoSubscriber {
     // Check for status change.
     if ($currentStatus !== $newStatus) {
       if ($newStatus === 'authorized') {
-        error_log("send Authorization email");
         // Send the authorization email.
         self::sendAuthorizationEmail($contactId);
       }
       elseif ($newStatus === 'unauthorized') {
-        error_log("send Unauthorization email");
         // Send the un-authorization email.
         self::sendUnAuthorizationEmail($contactId);
       }
