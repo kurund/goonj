@@ -213,7 +213,6 @@ class CollectionCampHelper extends AutoSubscriber {
   private static function sendAuthorizationEmail($contactId) {
     try {
       $emailParams = [
-      // For testing: Use your own contact ID with the associated email address. For example, contact ID 8355 is assigned to tarun.joshi@coloredcow.com. This will send a test email to that address.
         'contact_id' => $contactId,
       // Template ID for the authorization email.
         'template_id' => 78,
@@ -233,7 +232,6 @@ class CollectionCampHelper extends AutoSubscriber {
   private static function sendUnAuthorizationEmail($contactId) {
     try {
       $emailParams = [
-      // For testing: Use your own contact ID with the associated email address. For example, contact ID 8355 is assigned to tarun.joshi@coloredcow.com. This will send a test email to that address.
         'contact_id' => $contactId,
       // Template ID for the unauthorization email.
         'template_id' => 77,
