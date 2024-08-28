@@ -217,7 +217,7 @@ class CollectionCampHelper extends AutoSubscriber {
           $result = civicrm_api3('Email', 'send', $emailParams);
 
       } catch (\CiviCRM_API3_Exception $ex) {
-          error_log("Exception caught while sending authorization email: " . $ex->getMessage());
+         // Do nothing.
       }
     }
 
@@ -232,7 +232,7 @@ class CollectionCampHelper extends AutoSubscriber {
           $result = civicrm_api3('Email', 'send', $emailParams);
 
       } catch (\CiviCRM_API3_Exception $ex) {
-          error_log("Exception caught while sending authorization email: " . $ex->getMessage());
+          // Do nothing.
       }
     }
 
