@@ -214,7 +214,6 @@ class CollectionCampHelper extends AutoSubscriber {
           $emailParams = [
               'contact_id' => $contactId, // For testing: Use your own contact ID with the associated email address. For example, contact ID 8355 is assigned to tarun.joshi@coloredcow.com. This will send a test email to that address.
               'template_id' => 78, // Template ID for the authorization email
-              'subject' => "Authorization Notification",
           ];
 
           $result = civicrm_api3('Email', 'send', $emailParams);
@@ -232,7 +231,6 @@ class CollectionCampHelper extends AutoSubscriber {
           $emailParams = [
               'contact_id' => $contactId, // For testing: Use your own contact ID with the associated email address. For example, contact ID 8355 is assigned to tarun.joshi@coloredcow.com. This will send a test email to that address.
               'template_id' => 77, // Template ID for the unauthorization email
-              'subject' => "UnAuthorization Notification",
           ];
 
           $result = civicrm_api3('Email', 'send', $emailParams);
