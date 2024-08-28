@@ -181,6 +181,7 @@ class CollectionCampService extends AutoSubscriber {
     }
 
     $newStatus = $objectRef['Collection_Camp_Core_Details.Status'] ?? '';
+    $subType = $objectRef['subtype'] ?? '';
 
     if (!$newStatus) {
       return;
@@ -198,10 +199,10 @@ class CollectionCampService extends AutoSubscriber {
     // Check for status change.
     if ($currentStatus !== $newStatus) {
       if ($newStatus === 'authorized') {
-        self::sendAuthorizationEmail($contactId);
+        self::sendAuthorizationEmail($contactId, $subType);
       }
       elseif ($newStatus === 'unauthorized') {
-        self::sendUnAuthorizationEmail($contactId);
+        self::sendUnAuthorizationEmail($contactId, $subType);
       }
     }
   }
@@ -209,12 +210,19 @@ class CollectionCampService extends AutoSubscriber {
   /**
    * Send Authorization Email to contact.
    */
-  private static function sendAuthorizationEmail($contactId) {
+  private static function sendAuthorizationEmail($contactId, $subType) {
     try {
+      // Determine the template based on subtype.
+      $templateId = $subType == 4 ? 78 : ($subType == 5 ? 82 : null);
+
+      if ($templateId === null) {
+        return;
+      }
+
       $emailParams = [
         'contact_id' => $contactId,
       // Template ID for the authorization email.
-        'template_id' => 78,
+        'template_id' => $templateId,
       ];
 
       $result = civicrm_api3('Email', 'send', $emailParams);
@@ -228,12 +236,19 @@ class CollectionCampService extends AutoSubscriber {
   /**
    * Send UnAuthorization Email to contact.
    */
-  private static function sendUnAuthorizationEmail($contactId) {
+  private static function sendUnAuthorizationEmail($contactId, $subType) {
     try {
+      // Determine the template based on subtype.
+      $templateId = $subType == 4 ? 77 : ($subType == 5 ? 81 : null);
+
+      if ($templateId === null) {
+        return;
+      }
+
       $emailParams = [
         'contact_id' => $contactId,
       // Template ID for the unauthorization email.
-        'template_id' => 77,
+        'template_id' => $templateId,
       ];
 
       $result = civicrm_api3('Email', 'send', $emailParams);
