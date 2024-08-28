@@ -212,7 +212,7 @@ class CollectionCampService extends AutoSubscriber {
    */
   private static function sendAuthorizationEmail($contactId, $subType) {
     try {
-      // Determine the template based on subtype.
+      // Determine the template based on dynamic subtype.
       $templateId = $subType == 4 ? 78 : ($subType == 5 ? 83 : null);
 
       if ($templateId === null) {
@@ -238,7 +238,7 @@ class CollectionCampService extends AutoSubscriber {
    */
   private static function sendUnAuthorizationEmail($contactId, $subType) {
     try {
-      // Determine the template based on subtype.
+      // Determine the template based on dynamic subtype.
       $templateId = $subType == 4 ? 77 : ($subType == 5 ? 82 : null);
 
       if ($templateId === null) {
