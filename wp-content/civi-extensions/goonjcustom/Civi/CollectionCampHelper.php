@@ -201,7 +201,7 @@ class CollectionCampHelper extends AutoSubscriber {
         } elseif ($newStatus === 'unauthorized') {
             error_log("send Unauthorization email");
             // Send the un-authorization email
-            // self::sendUnAuthorizationEmail($contactId);
+            self::sendUnAuthorizationEmail($contactId);
         }
     }
   }
@@ -212,6 +212,28 @@ class CollectionCampHelper extends AutoSubscriber {
               'contact_id' => $contactId, // For testing: Use your own contact ID with the associated email address. For example, contact ID 8355 is assigned to tarun.joshi@coloredcow.com. This will send a test email to that address.
               'template_id' => 72, // Template ID for the authorization email
               'subject' => "Authorization Notification",
+          ];
+
+          error_log("emailParams: " . print_r($emailParams, TRUE));
+
+          $result = civicrm_api3('Email', 'send', $emailParams);
+
+          if (!empty($result['is_error'])) {
+              error_log("Error sending authorization email for Contact ID: " . $contactId);
+          } else {
+              error_log("Authorization email sent for Contact ID: " . $contactId);
+          }
+      } catch (\CiviCRM_API3_Exception $ex) {
+          error_log("Exception caught while sending authorization email: " . $ex->getMessage());
+      }
+    }
+
+    private static function sendUnAuthorizationEmail($contactId) {
+      try {
+          $emailParams = [
+              'contact_id' => $contactId, // For testing: Use your own contact ID with the associated email address. For example, contact ID 8355 is assigned to tarun.joshi@coloredcow.com. This will send a test email to that address.
+              'template_id' => 72, // Template ID for the authorization email
+              'subject' => "UnAuthorization Notification",
           ];
 
           error_log("emailParams: " . print_r($emailParams, TRUE));
