@@ -174,70 +174,77 @@ class CollectionCampHelper extends AutoSubscriber {
    */
   public static function handleAuthorizationEmails(string $op, string $objectName, $objectId, &$objectRef) {
     if ($objectName != 'Eck_Collection_Camp' || !$objectId) {
-        return;
+      return;
     }
 
     $newStatus = $objectRef['Collection_Camp_Core_Details.Status'] ?? '';
 
     if (!$newStatus) {
-        return;
+      return;
     }
 
-    $collectionCamps = \Civi\Api4\EckEntity::get('Collection_Camp', TRUE)
-        ->addSelect('Collection_Camp_Core_Details.Status', 'Collection_Camp_Core_Details.Contact_Id')
-        ->addWhere('id', '=', $objectId)
-        ->execute();
+    $collectionCamps = EckEntity::get('Collection_Camp', TRUE)
+      ->addSelect('Collection_Camp_Core_Details.Status', 'Collection_Camp_Core_Details.Contact_Id')
+      ->addWhere('id', '=', $objectId)
+      ->execute();
 
     $currentCollectionCamp = $collectionCamps->first();
     $currentStatus = $currentCollectionCamp['Collection_Camp_Core_Details.Status'];
     $contactId = $currentCollectionCamp['Collection_Camp_Core_Details.Contact_Id'];
 
-    // Check for status change
+    // Check for status change.
     if ($currentStatus !== $newStatus) {
-        if ($newStatus === 'authorized') {
-            error_log("send Authorization email");
-            // Send the authorization email
-            self::sendAuthorizationEmail($contactId);
-        } elseif ($newStatus === 'unauthorized') {
-            error_log("send Unauthorization email");
-            // Send the un-authorization email
-            self::sendUnAuthorizationEmail($contactId);
-        }
+      if ($newStatus === 'authorized') {
+        error_log("send Authorization email");
+        // Send the authorization email.
+        self::sendAuthorizationEmail($contactId);
+      }
+      elseif ($newStatus === 'unauthorized') {
+        error_log("send Unauthorization email");
+        // Send the un-authorization email.
+        self::sendUnAuthorizationEmail($contactId);
+      }
     }
   }
 
   /**
-   * Send Authorization Email to contact
+   * Send Authorization Email to contact.
    */
-    private static function sendAuthorizationEmail($contactId) {
-      try {
-          $emailParams = [
-              'contact_id' => $contactId, // For testing: Use your own contact ID with the associated email address. For example, contact ID 8355 is assigned to tarun.joshi@coloredcow.com. This will send a test email to that address.
-              'template_id' => 78, // Template ID for the authorization email
-          ];
+  private static function sendAuthorizationEmail($contactId) {
+    try {
+      $emailParams = [
+      // For testing: Use your own contact ID with the associated email address. For example, contact ID 8355 is assigned to tarun.joshi@coloredcow.com. This will send a test email to that address.
+        'contact_id' => $contactId,
+      // Template ID for the authorization email.
+        'template_id' => 78,
+      ];
 
-          $result = civicrm_api3('Email', 'send', $emailParams);
+      $result = civicrm_api3('Email', 'send', $emailParams);
 
-      } catch (\CiviCRM_API3_Exception $ex) {
-         // Do nothing.
-      }
     }
+    catch (\CiviCRM_API3_Exception $ex) {
+      // Do nothing.
+    }
+  }
 
   /**
-   * Send UnAuthorization Email to contact
+   * Send UnAuthorization Email to contact.
    */
-    private static function sendUnAuthorizationEmail($contactId) {
-      try {
-          $emailParams = [
-              'contact_id' => $contactId, // For testing: Use your own contact ID with the associated email address. For example, contact ID 8355 is assigned to tarun.joshi@coloredcow.com. This will send a test email to that address.
-              'template_id' => 77, // Template ID for the unauthorization email
-          ];
+  private static function sendUnAuthorizationEmail($contactId) {
+    try {
+      $emailParams = [
+      // For testing: Use your own contact ID with the associated email address. For example, contact ID 8355 is assigned to tarun.joshi@coloredcow.com. This will send a test email to that address.
+        'contact_id' => $contactId,
+      // Template ID for the unauthorization email.
+        'template_id' => 77,
+      ];
 
-          $result = civicrm_api3('Email', 'send', $emailParams);
+      $result = civicrm_api3('Email', 'send', $emailParams);
 
-      } catch (\CiviCRM_API3_Exception $ex) {
-          // Do nothing.
-      }
     }
+    catch (\CiviCRM_API3_Exception $ex) {
+      // Do nothing.
+    }
+  }
 
 }
