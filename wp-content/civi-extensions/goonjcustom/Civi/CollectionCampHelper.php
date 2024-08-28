@@ -173,7 +173,6 @@ class CollectionCampHelper extends AutoSubscriber {
    *   The reference to the object.
    */
   public static function handleAuthorizationEmails(string $op, string $objectName, $objectId, &$objectRef) {
-
     if ($objectName != 'Eck_Collection_Camp' || !$objectId) {
         return;
     }
@@ -185,23 +184,48 @@ class CollectionCampHelper extends AutoSubscriber {
     }
 
     $collectionCamps = \Civi\Api4\EckEntity::get('Collection_Camp', TRUE)
-        ->addSelect('Collection_Camp_Core_Details.Status')
+        ->addSelect('Collection_Camp_Core_Details.Status', 'Collection_Camp_Core_Details.Contact_Id')
         ->addWhere('id', '=', $objectId)
         ->execute();
 
     $currentCollectionCamp = $collectionCamps->first();
     $currentStatus = $currentCollectionCamp['Collection_Camp_Core_Details.Status'];
+    $contactId = $currentCollectionCamp['Collection_Camp_Core_Details.Contact_Id'];
 
     // Check for status change
     if ($currentStatus !== $newStatus) {
         if ($newStatus === 'authorized') {
             error_log("send Authorization email");
             // Send the authorization email
+            self::sendAuthorizationEmail($contactId);
         } elseif ($newStatus === 'unauthorized') {
             error_log("send Unauthorization email");
             // Send the un-authorization email
+            // self::sendUnAuthorizationEmail($contactId);
         }
     }
-}
+  }
+
+    private static function sendAuthorizationEmail($contactId) {
+      try {
+          $emailParams = [
+              'contact_id' => $contactId, // For testing: Use your own contact ID with the associated email address. For example, contact ID 8355 is assigned to tarun.joshi@coloredcow.com. This will send a test email to that address.
+              'template_id' => 72, // Template ID for the authorization email
+              'subject' => "Authorization Notification",
+          ];
+
+          error_log("emailParams: " . print_r($emailParams, TRUE));
+
+          $result = civicrm_api3('Email', 'send', $emailParams);
+
+          if (!empty($result['is_error'])) {
+              error_log("Error sending authorization email for Contact ID: " . $contactId);
+          } else {
+              error_log("Authorization email sent for Contact ID: " . $contactId);
+          }
+      } catch (\CiviCRM_API3_Exception $ex) {
+          error_log("Exception caught while sending authorization email: " . $ex->getMessage());
+      }
+    }
 
 }
