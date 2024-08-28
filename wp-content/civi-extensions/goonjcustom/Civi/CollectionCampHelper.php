@@ -17,6 +17,7 @@ class CollectionCampHelper extends AutoSubscriber {
   public static function getSubscribedEvents() {
     return [
       '&hook_civicrm_post' => 'generateCollectionCampCode',
+      '&hook_civicrm_pre' => 'handleAuthorizationEmails',
     ];
   }
 
@@ -158,5 +159,49 @@ class CollectionCampHelper extends AutoSubscriber {
     }
     return $collectionCampData['Collection_Camp_Intent_Details.State'] ?? NULL;
   }
+
+  /**
+   * This hook is called after a db write on entities.
+   *
+   * @param string $op
+   *   The type of operation being performed.
+   * @param string $objectName
+   *   The name of the object.
+   * @param int $objectId
+   *   The unique identifier for the object.
+   * @param object $objectRef
+   *   The reference to the object.
+   */
+  public static function handleAuthorizationEmails(string $op, string $objectName, $objectId, &$objectRef) {
+
+    if ($objectName != 'Eck_Collection_Camp' || !$objectId) {
+        return;
+    }
+
+    $newStatus = $objectRef['Collection_Camp_Core_Details.Status'] ?? '';
+
+    if (!$newStatus) {
+        return;
+    }
+
+    $collectionCamps = \Civi\Api4\EckEntity::get('Collection_Camp', TRUE)
+        ->addSelect('Collection_Camp_Core_Details.Status')
+        ->addWhere('id', '=', $objectId)
+        ->execute();
+
+    $currentCollectionCamp = $collectionCamps->first();
+    $currentStatus = $currentCollectionCamp['Collection_Camp_Core_Details.Status'];
+
+    // Check for status change
+    if ($currentStatus !== $newStatus) {
+        if ($newStatus === 'authorized') {
+            error_log("send Authorization email");
+            // Send the authorization email
+        } elseif ($newStatus === 'unauthorized') {
+            error_log("send Unauthorization email");
+            // Send the un-authorization email
+        }
+    }
+}
 
 }
