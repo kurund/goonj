@@ -256,7 +256,7 @@ class CollectionCampHelper extends AutoSubscriber {
    * @param object $objectRef
    *   The reference to the object.
    */
-  public static function generateCollectionCampQr() {
+  public static function generateCollectionCampQr(string $op, string $objectName, $objectId, &$objectRef) {
     if ($objectName != 'Eck_Collection_Camp' || !$objectId) {
       return;
     }
