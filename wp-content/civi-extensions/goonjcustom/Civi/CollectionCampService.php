@@ -11,6 +11,12 @@ use Civi\Core\Service\AutoSubscriber;
  */
 class CollectionCampService extends AutoSubscriber {
 
+  const AUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP = 78;
+  const AUTHORIZED_TEMPLATE_ID_DROPPING_CENTER = 83;
+  const UNAUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP = 77;
+  const UNAUTHORIZED_TEMPLATE_ID_DROPPING_CENTER = 82;
+
+
   /**
    *
    */
@@ -213,7 +219,7 @@ class CollectionCampService extends AutoSubscriber {
   private static function sendAuthorizationEmail($contactId, $subType) {
     try {
       // Determine the template based on dynamic subtype.
-      $templateId = $subType == 4 ? 78 : ($subType == 5 ? 83 : null);
+      $templateId = $subType == 4 ? self::AUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP : ($subType == 5 ? self::AUTHORIZED_TEMPLATE_ID_DROPPING_CENTER : null);
 
       if ($templateId === null) {
         return;
@@ -239,7 +245,7 @@ class CollectionCampService extends AutoSubscriber {
   private static function sendUnAuthorizationEmail($contactId, $subType) {
     try {
       // Determine the template based on dynamic subtype.
-      $templateId = $subType == 4 ? 77 : ($subType == 5 ? 82 : null);
+      $templateId = $subType == 4 ? self::UNAUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP : ($subType == 5 ? self::UNAUTHORIZED_TEMPLATE_ID_DROPPING_CENTER : null);
 
       if ($templateId === null) {
         return;
