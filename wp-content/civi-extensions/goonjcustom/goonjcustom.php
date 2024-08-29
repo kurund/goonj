@@ -265,7 +265,7 @@ function goonjcustom_civicrm_tabset($tabsetName, &$tabs, $context) {
   if ($tabsetName !== 'civicrm/eck/entity' || empty($context)) {
     return;
   }
-  
+
   $entityID = $context['entity_id'];
 
   $url = CRM_Utils_System::url(
