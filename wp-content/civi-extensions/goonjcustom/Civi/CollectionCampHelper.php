@@ -20,7 +20,7 @@ class CollectionCampHelper extends AutoSubscriber {
       '&hook_civicrm_pre' => [
         ['handleAuthorizationEmails'],
         ['generateCollectionCampQr'],
-      ]
+      ],
     ];
   }
 
@@ -267,7 +267,6 @@ class CollectionCampHelper extends AutoSubscriber {
       return;
     }
 
-    
   }
 
 }
