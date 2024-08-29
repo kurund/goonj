@@ -9,7 +9,7 @@ use Civi\Core\Service\AutoSubscriber;
 /**
  *
  */
-class CollectionCampHelper extends AutoSubscriber {
+class CollectionCampService extends AutoSubscriber {
 
   /**
    *
