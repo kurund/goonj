@@ -221,7 +221,7 @@ class CollectionCampService extends AutoSubscriber {
       // Determine the template based on dynamic subtype.
       $templateId = $subType == 4 ? self::AUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP : ($subType == 5 ? self::AUTHORIZED_TEMPLATE_ID_DROPPING_CENTER : null);
 
-      if ($templateId === null) {
+      if (!$templateId) {
         return;
       }
 
@@ -247,7 +247,7 @@ class CollectionCampService extends AutoSubscriber {
       // Determine the template based on dynamic subtype.
       $templateId = $subType == 4 ? self::UNAUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP : ($subType == 5 ? self::UNAUTHORIZED_TEMPLATE_ID_DROPPING_CENTER : null);
 
-      if ($templateId === null) {
+      if (!$templateId) {
         return;
       }
 
