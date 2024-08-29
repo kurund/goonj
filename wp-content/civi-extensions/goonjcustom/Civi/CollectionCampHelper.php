@@ -17,7 +17,10 @@ class CollectionCampHelper extends AutoSubscriber {
   public static function getSubscribedEvents() {
     return [
       '&hook_civicrm_post' => 'generateCollectionCampCode',
-      '&hook_civicrm_pre' => 'handleAuthorizationEmails',
+      '&hook_civicrm_pre' => [
+        ['handleAuthorizationEmails'],
+        ['generateCollectionCampQr'],
+      ]
     ];
   }
 
@@ -239,6 +242,32 @@ class CollectionCampHelper extends AutoSubscriber {
     catch (\CiviCRM_API3_Exception $ex) {
       error_log("Exception caught while sending unauthorization email: " . $ex->getMessage());
     }
+  }
+
+  /**
+   * This hook is called after a db write on entities.
+   *
+   * @param string $op
+   *   The type of operation being performed.
+   * @param string $objectName
+   *   The name of the object.
+   * @param int $objectId
+   *   The unique identifier for the object.
+   * @param object $objectRef
+   *   The reference to the object.
+   */
+  public static function generateCollectionCampQr() {
+    if ($objectName != 'Eck_Collection_Camp' || !$objectId) {
+      return;
+    }
+
+    $newStatus = $objectRef['Collection_Camp_Core_Details.Status'] ?? '';
+
+    if (!$newStatus) {
+      return;
+    }
+
+    
   }
 
 }
