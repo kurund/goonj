@@ -275,13 +275,12 @@ function goonjcustom_civicrm_tabset($tabsetName, &$tabs, $context) {
 
   // URL for the Contribution tab.
   $contributionUrl = CRM_Utils_System::url(
-        "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fcollection-camp%2Fmaterial-contributions#?cc_id=$entityID"
+        "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fcollection-camp%2Fmaterial-contributions",
+        "#?cc_id=$entityID"
   );
 
-  \Civi::log()->info($contributionUrl);
-
   // Add the Contribution tab.
-  $tabs['ContributionUrl'] = [
+  $tabs['contribution'] = [
     'title' => ts('Contribution'),
     'link' => $contributionUrl,
     'valid' => 1,
