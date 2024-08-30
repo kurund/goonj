@@ -26,13 +26,6 @@ class CRM_Goonjcustom_CivirulesAction_GenerateQrCodeForContact extends CRM_Civir
 				$contactId = $triggerData->getContactId();
 
 				try {
-						// Todo - Switch to apiv4
-
-						$contact = \Civi\Api4\Contact::get(true)
-								->addWhere('id', '=', $contactId)
-								->setLimit(25)
-								->execute();
-
 						$baseUrl = CRM_Core_Config::singleton()->userFrameworkBaseURL;
 
 						$url = "{$baseUrl}actions/processing-center/{$contactId}";
@@ -51,17 +44,16 @@ class CRM_Goonjcustom_CivirulesAction_GenerateQrCodeForContact extends CRM_Civir
 						// Remove the base64 header and decode the image data.
 						$qrcode = str_replace('data:image/png;base64,', '', $qrcode);
 						$qrcode = base64_decode($qrcode);
-
-						ob_start();
-						var_dump($triggerData);
-						\Civi::log()->info(ob_get_clean());
-
-						//progmatically save the qr code into the qr custom filed of the contact.
-						//progmaticaaly change the qr code generated field to yes .
-
-						if (!$contact || empty($contact['email'])) {
-								return false;
-						}
+						$result = civicrm_api3('Attachment', 'create', [
+							'field_name' => 'custom_204',
+							'entity_id'  => $contactId,
+							'name'       => 'QRCode.png',
+							'mime_type'  => 'image/png',
+							'content'    => $qrcode,
+						]);
+		
+						$attachment = $result['values'][$result['id']];
+						echo sprintf("<a href='%s'>View %s</a>", $attachment['url'], $attachment['name']);
 				} catch (\CiviCRM_API3_Exception $e) {
 						return false;
 				}
