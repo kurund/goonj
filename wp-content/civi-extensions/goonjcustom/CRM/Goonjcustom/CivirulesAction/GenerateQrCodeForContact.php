@@ -30,8 +30,8 @@ class CRM_Goonjcustom_CivirulesAction_GenerateQrCodeForContact extends CRM_Civir
 
     try {
       $baseUrl = CRM_Core_Config::singleton()->userFrameworkBaseURL;
-
       $url = "{$baseUrl}actions/processing-center/{$contactId}";
+
       $options = new QROptions(
                     [
                       'version'    => 5,
@@ -41,22 +41,27 @@ class CRM_Goonjcustom_CivirulesAction_GenerateQrCodeForContact extends CRM_Civir
                       'scale'      => 10,
                     ]
             );
-
       $qrcode = (new QRCode($options))->render($url);
 
-      // Remove the base64 header and decode the image data.
-      $qrcode = str_replace('data:image/png;base64,', '', $qrcode);
-      $qrcode = base64_decode($qrcode);
+      // Generate a unique file name for the QR code using CiviCRM utility.
+      $fileName = CRM_Utils_File::makeFileName("qr_code_{$contactId}.png");
+      // Create a temporary file using CiviCRM's utility function.
+      $tempFilePath = CRM_Utils_File::tempnam($fileName);
+      // Save the QR code content to the temporary file.
+      file_put_contents($tempFilePath, $qrcode);
+
       $result = civicrm_api3('Attachment', 'create', [
+        'name' => $fileName,
+        'mime_type' => 'image/png',
+        'entity_id' => $contactId,
         'field_name' => 'custom_211',
-        'entity_id'  => $contactId,
-        'name'       => 'QRCode.png',
-        'mime_type'  => 'image/png',
-        'content'    => $qrcode,
+        'content' => file_get_contents($tempFilePath),
       ]);
 
+      // Clean up the temporary file.
+      unlink($tempFilePath);
+
       $attachment = $result['values'][$result['id']];
-      echo sprintf("<a href='%s'>View %s</a>", $attachment['url'], $attachment['name']);
     }
     catch (\CiviCRM_API3_Exception $e) {
       return FALSE;
