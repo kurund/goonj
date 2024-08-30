@@ -9,7 +9,13 @@ use Civi\Core\Service\AutoSubscriber;
 /**
  *
  */
-class CollectionCampHelper extends AutoSubscriber {
+class CollectionCampService extends AutoSubscriber {
+
+  const AUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP = 78;
+  const AUTHORIZED_TEMPLATE_ID_DROPPING_CENTER = 83;
+  const UNAUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP = 77;
+  const UNAUTHORIZED_TEMPLATE_ID_DROPPING_CENTER = 82;
+
 
   /**
    *
@@ -181,6 +187,7 @@ class CollectionCampHelper extends AutoSubscriber {
     }
 
     $newStatus = $objectRef['Collection_Camp_Core_Details.Status'] ?? '';
+    $subType = $objectRef['subtype'] ?? '';
 
     if (!$newStatus) {
       return;
@@ -198,10 +205,10 @@ class CollectionCampHelper extends AutoSubscriber {
     // Check for status change.
     if ($currentStatus !== $newStatus) {
       if ($newStatus === 'authorized') {
-        self::sendAuthorizationEmail($contactId);
+        self::sendAuthorizationEmail($contactId, $subType);
       }
       elseif ($newStatus === 'unauthorized') {
-        self::sendUnAuthorizationEmail($contactId);
+        self::sendUnAuthorizationEmail($contactId, $subType);
       }
     }
   }
@@ -209,12 +216,19 @@ class CollectionCampHelper extends AutoSubscriber {
   /**
    * Send Authorization Email to contact.
    */
-  private static function sendAuthorizationEmail($contactId) {
+  private static function sendAuthorizationEmail($contactId, $subType) {
     try {
+      // Determine the template based on dynamic subtype.
+      $templateId = $subType == 4 ? self::AUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP : ($subType == 5 ? self::AUTHORIZED_TEMPLATE_ID_DROPPING_CENTER : null);
+
+      if (!$templateId) {
+        return;
+      }
+
       $emailParams = [
         'contact_id' => $contactId,
       // Template ID for the authorization email.
-        'template_id' => 78,
+        'template_id' => $templateId,
       ];
 
       $result = civicrm_api3('Email', 'send', $emailParams);
@@ -228,12 +242,19 @@ class CollectionCampHelper extends AutoSubscriber {
   /**
    * Send UnAuthorization Email to contact.
    */
-  private static function sendUnAuthorizationEmail($contactId) {
+  private static function sendUnAuthorizationEmail($contactId, $subType) {
     try {
+      // Determine the template based on dynamic subtype.
+      $templateId = $subType == 4 ? self::UNAUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP : ($subType == 5 ? self::UNAUTHORIZED_TEMPLATE_ID_DROPPING_CENTER : null);
+
+      if (!$templateId) {
+        return;
+      }
+
       $emailParams = [
         'contact_id' => $contactId,
       // Template ID for the unauthorization email.
-        'template_id' => 77,
+        'template_id' => $templateId,
       ];
 
       $result = civicrm_api3('Email', 'send', $emailParams);
@@ -256,7 +277,7 @@ class CollectionCampHelper extends AutoSubscriber {
    * @param object $objectRef
    *   The reference to the object.
    */
-  public static function generateCollectionCampQr() {
+  public static function generateCollectionCampQr(string $op, string $objectName, $objectId, &$objectRef) {
     if ($objectName != 'Eck_Collection_Camp' || !$objectId) {
       return;
     }
