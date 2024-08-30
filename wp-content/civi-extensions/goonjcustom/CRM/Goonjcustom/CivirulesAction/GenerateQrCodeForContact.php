@@ -8,6 +8,7 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
+use Civi\Api4\Contact;
 
 /**
  * @file
@@ -48,15 +49,39 @@ class CRM_Goonjcustom_CivirulesAction_GenerateQrCodeForContact extends CRM_Civir
       // Create a temporary file using CiviCRM's utility function.
       $tempFilePath = CRM_Utils_File::tempnam($fileName);
       // Save the QR code content to the temporary file.
-      file_put_contents($tempFilePath, $qrcode);
+      $numBytes = file_put_contents($tempFilePath, $qrcode);
 
-      $result = civicrm_api3('Attachment', 'create', [
+      \Civi::log()->info($fileName);
+      \Civi::log()->info($tempFilePath);
+      \Civi::log()->info($numBytes);
+
+      // $customFields = \Civi\Api4\CustomField::get(TRUE)
+      // ->addWhere('custom_group_id', '=', 40)
+      // ->addWhere('name', '=', 'QR_Code')
+      // ->setLimit(25)
+      // ->execute();
+      $params = [
         'name' => $fileName,
         'mime_type' => 'image/png',
         'entity_id' => $contactId,
         'field_name' => 'custom_211',
         'content' => file_get_contents($tempFilePath),
-      ]);
+      ];
+
+      ob_start();
+      var_dump($params);
+      \Civi::log()->info(ob_get_clean());
+
+      $result = civicrm_api3('Attachment', 'create', $params);
+
+      $results = Contact::update(TRUE)
+        ->addValue('Goonj_Processing_Center.QR_Code_Generated', 1)
+        ->addWhere('id', '=', 2699)
+        ->execute();
+
+      ob_start();
+      var_dump($result);
+      \Civi::log()->info(ob_get_clean());
 
       // Clean up the temporary file.
       unlink($tempFilePath);
@@ -64,6 +89,16 @@ class CRM_Goonjcustom_CivirulesAction_GenerateQrCodeForContact extends CRM_Civir
       $attachment = $result['values'][$result['id']];
     }
     catch (\CiviCRM_API3_Exception $e) {
+
+      ob_start();
+      var_dump($e);
+      \Civi::log()->info(ob_get_clean());
+
+      $results = Contact::update(TRUE)
+        ->addValue('Goonj_Processing_Center.QR_Code_Generated', 1)
+        ->addWhere('id', '=', 2699)
+        ->execute();
+
       return FALSE;
     }
 

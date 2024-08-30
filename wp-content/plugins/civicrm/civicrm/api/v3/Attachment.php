@@ -140,6 +140,7 @@ function civicrm_api3_attachment_create($params) {
   $entityFileDao->save();
 
   $path = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $fileDao->uri;
+  \Civi::log()->info($path);
   if (is_string($content)) {
     file_put_contents($path, $content);
   }
