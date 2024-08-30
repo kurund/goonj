@@ -45,7 +45,7 @@ class CRM_Goonjcustom_CivirulesAction_GenerateQrCodeForContact extends CRM_Civir
 						$qrcode = str_replace('data:image/png;base64,', '', $qrcode);
 						$qrcode = base64_decode($qrcode);
 						$result = civicrm_api3('Attachment', 'create', [
-							'field_name' => 'custom_204',
+							'field_name' => 'custom_211',
 							'entity_id'  => $contactId,
 							'name'       => 'QRCode.png',
 							'mime_type'  => 'image/png',
