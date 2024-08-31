@@ -8,7 +8,6 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
-use Civi\Api4\Contact;
 
 /**
  * @file
@@ -38,67 +37,42 @@ class CRM_Goonjcustom_CivirulesAction_GenerateQrCodeForContact extends CRM_Civir
                       'version'    => 5,
                       'outputType' => QRCode::OUTPUT_IMAGE_PNG,
                       'eccLevel'   => QRCode::ECC_L,
-                    // Adjust the scale as needed.
                       'scale'      => 10,
                     ]
             );
       $qrcode = (new QRCode($options))->render($url);
 
-      // Generate a unique file name for the QR code using CiviCRM utility.
       $fileName = CRM_Utils_File::makeFileName("qr_code_{$contactId}.png");
-      // Create a temporary file using CiviCRM's utility function.
       $tempFilePath = CRM_Utils_File::tempnam($fileName);
-      // Save the QR code content to the temporary file.
       $numBytes = file_put_contents($tempFilePath, $qrcode);
 
-      \Civi::log()->info($fileName);
-      \Civi::log()->info($tempFilePath);
-      \Civi::log()->info($numBytes);
+      if (!$numBytes) {
+        CRM_Core_Error::debug_log_message('Failed to write QR code to temporary file for contact ID ' . $contactId);
+        return FALSE;
+      }
 
-      // $customFields = \Civi\Api4\CustomField::get(TRUE)
-      // ->addWhere('custom_group_id', '=', 40)
-      // ->addWhere('name', '=', 'QR_Code')
-      // ->setLimit(25)
-      // ->execute();
       $params = [
+        'entity_id' => $contactId,
         'name' => $fileName,
         'mime_type' => 'image/png',
-        'entity_id' => $contactId,
         'field_name' => 'custom_211',
-        'content' => file_get_contents($tempFilePath),
+        'options' => [
+          'move-file' => $tempFilePath,
+        ],
       ];
-
-      ob_start();
-      var_dump($params);
-      \Civi::log()->info(ob_get_clean());
 
       $result = civicrm_api3('Attachment', 'create', $params);
 
-      $results = Contact::update(TRUE)
-        ->addValue('Goonj_Processing_Center.QR_Code_Generated', 1)
-        ->addWhere('id', '=', 2699)
-        ->execute();
-
-      ob_start();
-      var_dump($result);
-      \Civi::log()->info(ob_get_clean());
-
-      // Clean up the temporary file.
-      unlink($tempFilePath);
+      if (empty($result['id'])) {
+        CRM_Core_Error::debug_log_message('Failed to create attachment for contact ID ' . $contactId);
+        return FALSE;
+      }
 
       $attachment = $result['values'][$result['id']];
+      $attachmentUrl = $attachment['url'];
+
     }
     catch (\CiviCRM_API3_Exception $e) {
-
-      ob_start();
-      var_dump($e);
-      \Civi::log()->info(ob_get_clean());
-
-      $results = Contact::update(TRUE)
-        ->addValue('Goonj_Processing_Center.QR_Code_Generated', 1)
-        ->addWhere('id', '=', 2699)
-        ->execute();
-
       return FALSE;
     }
 
