@@ -26,8 +26,8 @@ $material_contribution_link = sprintf(
 
 
 if ( in_array( $target, array( 'collection-camp', 'dropping-center' ) ) ) :
-	$start_date = new DateTime( $action_target['Collection_Camp_Intent_Details.Start_Date'] );
-	$end_date   = new DateTime( $action_target['Collection_Camp_Intent_Details.End_Date'] );
+	$start_date = new DateTime( $action_target['start_date'] );
+	$end_date   = new DateTime( $action_target['end_date'] );
 	?>
 	<div class="wp-block-gb-heading-wrapper">
 		<h2 class="wp-block-gb-heading"><?php echo esc_html($heading_text); ?></h2>
@@ -56,6 +56,14 @@ if ( in_array( $target, array( 'collection-camp', 'dropping-center' ) ) ) :
 		</a>
 	</div>
 	<?php elseif ( 'processing-center' === $target ) : ?>
+		<table class="wp-block-gb-table">
+			<tbody>
+				<tr class="wp-block-gb-table-row">
+					<td class="wp-block-gb-table-cell wp-block-gb-table-header">Address</td>
+					<td class="wp-block-gb-table-cell"><?php echo CRM_Utils_Address::format( $action_target['address'] ); ?></td>
+				</tr>
+			</tbody>
+		</table>
 		<div <?php echo get_block_wrapper_attributes(); ?>>
 			<a href="" class="wp-block-gb-action-button">
 				<?php esc_html_e( 'Contribution', 'goonj-blocks' ); ?>

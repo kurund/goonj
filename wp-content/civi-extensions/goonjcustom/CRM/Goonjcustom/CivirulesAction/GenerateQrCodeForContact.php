@@ -42,8 +42,13 @@ class CRM_Goonjcustom_CivirulesAction_GenerateQrCodeForContact extends CRM_Civir
             );
       $qrcode = (new QRCode($options))->render($url);
 
-      $fileName = CRM_Utils_File::makeFileName("qr_code_{$contactId}.png");
-      $tempFilePath = CRM_Utils_File::tempnam($fileName);
+      // Remove the base64 header and decode the image data.
+      $qrcode = str_replace('data:image/png;base64,', '', $qrcode);
+      $qrcode = base64_decode($qrcode);
+
+      $baseFileName = "qr_code_{$contactId}.png";
+      $fileName = CRM_Utils_File::makeFileName($baseFileName);
+      $tempFilePath = CRM_Utils_File::tempnam($baseFileName);
       $numBytes = file_put_contents($tempFilePath, $qrcode);
 
       if (!$numBytes) {
