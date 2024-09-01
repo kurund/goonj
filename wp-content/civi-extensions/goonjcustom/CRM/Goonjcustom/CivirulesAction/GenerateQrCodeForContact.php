@@ -8,6 +8,7 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
+use Civi\Api4\CustomField;
 
 /**
  * @file
@@ -56,11 +57,27 @@ class CRM_Goonjcustom_CivirulesAction_GenerateQrCodeForContact extends CRM_Civir
         return FALSE;
       }
 
+      $customFields = CustomField::get(TRUE)
+        ->addSelect('id')
+        ->addWhere('custom_group_id:name', '=', 'Contact_QR_Code')
+        ->addWhere('name', '=', 'QR_Code')
+        ->setLimit(1)
+        ->execute();
+
+      $qrField = $customFields->first();
+
+      if (!qrField) {
+        CRM_Core_Error::debug_log_message('No field to save QR Code for contact ID ' . $contactId);
+        return FALSE;
+      }
+
+      $qrFieldId = 'custom_' . $qrField['id'];
+
       $params = [
         'entity_id' => $contactId,
         'name' => $fileName,
         'mime_type' => 'image/png',
-        'field_name' => 'custom_211',
+        'field_name' => $qrFieldId,
         'options' => [
           'move-file' => $tempFilePath,
         ],
