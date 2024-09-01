@@ -7,8 +7,6 @@
 require_once 'goonjcustom.civix.php';
 
 use Civi\Api4\Contact;
-use Civi\Api4\EckEntity;
-use Civi\Api4\Event;
 use Civi\Token\Event\TokenRegisterEvent;
 use Civi\Token\Event\TokenValueEvent;
 use Symfony\Component\Config\Resource\FileResource;
@@ -89,14 +87,14 @@ function goonjcustom_evaluate_tokens(TokenValueEvent $e) {
 
     $stateId = $contacts[0]['address_primary.state_province_id'];
 
-    $processingCenters = EckEntity::get('Processing_Center', FALSE)
-      ->addSelect('*', 'custom.*')
-      ->addWhere('Processing_Center.Associated_States', 'IN', [$stateId])
-      ->execute();
-
+    // $processingCenters = EckEntity::get('Processing_Center', FALSE)
+    //   ->addSelect('*', 'custom.*')
+    //   ->addWhere('Processing_Center.Associated_States', 'IN', [$stateId])
+    //   ->execute();
     $inductionDetailsMarkup = 'The next step in your volunteering journey is to get inducted with Goonj.';
 
-    if ($processingCenters->rowCount > 0) {
+    // If ($processingCenters->rowCount > 0) {.
+    if (FALSE) {
       $inductionDetailsMarkup .= ' You can visit any of our following center(s) during the time specified to complete your induction:';
       $inductionDetailsMarkup .= '<ol>';
 
@@ -261,6 +259,9 @@ function goonjcustom_civicrm_pageRun(&$page) {
   );
 }
 
+/**
+ *
+ */
 function goonjcustom_civicrm_tabset($tabsetName, &$tabs, $context) {
   if ($tabsetName !== 'civicrm/eck/entity' || empty($context)) {
     return;
