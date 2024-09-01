@@ -27,7 +27,10 @@ class CRM_Goonjcustom_CivirulesAction_GenerateQrCodeForContact extends CRM_Civir
    * @access public
    */
   public function processAction(CRM_Civirules_TriggerData_TriggerData $triggerData) {
+    \Civi::log()->debug('1', []);
     $contactId = $triggerData->getContactId();
+
+    \Civi::log()->debug('1', ['contactId' => $contactId]);
 
     try {
       $baseUrl = CRM_Core_Config::singleton()->userFrameworkBaseURL;
@@ -52,6 +55,11 @@ class CRM_Goonjcustom_CivirulesAction_GenerateQrCodeForContact extends CRM_Civir
       $tempFilePath = CRM_Utils_File::tempnam($baseFileName);
       $numBytes = file_put_contents($tempFilePath, $qrcode);
 
+      \Civi::log()->debug('2', [
+        'numBytes' => $numBytes,
+        'tempFilePath' => $tempFilePath,
+      ]);
+
       if (!$numBytes) {
         CRM_Core_Error::debug_log_message('Failed to write QR code to temporary file for contact ID ' . $contactId);
         return FALSE;
@@ -64,7 +72,11 @@ class CRM_Goonjcustom_CivirulesAction_GenerateQrCodeForContact extends CRM_Civir
         ->setLimit(1)
         ->execute();
 
+      \Civi::log()->debug('3', ['customFields' => $customFields]);
+
       $qrField = $customFields->first();
+
+      \Civi::log()->debug('3', ['customFields' => $customFields]);
 
       if (!qrField) {
         CRM_Core_Error::debug_log_message('No field to save QR Code for contact ID ' . $contactId);
@@ -73,6 +85,7 @@ class CRM_Goonjcustom_CivirulesAction_GenerateQrCodeForContact extends CRM_Civir
 
       $qrFieldId = 'custom_' . $qrField['id'];
 
+      \Civi::log()->debug('4', ['customFields' => $qrFieldId]);
       $params = [
         'entity_id' => $contactId,
         'name' => $fileName,
