@@ -35,4 +35,13 @@ class CRM_Goonjcustom_Upgrader extends CRM_Extension_Upgrader_Base {
     return TRUE;
   }
 
+  /**
+   *
+   */
+  public function upgrade_1004(): bool {
+    $this->ctx->log->info('Applying update 1004');
+    $this->executeSqlFile('sql/generateQrCodeForContact.sql');
+    return TRUE;
+  }
+
 }
