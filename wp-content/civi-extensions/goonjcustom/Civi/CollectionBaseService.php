@@ -9,9 +9,7 @@ use Civi\Core\Service\AutoSubscriber;
  */
 class CollectionBaseService extends AutoSubscriber {
 
-  // See: CiviCRM > Administer > Communications > Schedule Reminders.
-  const CONTRIBUTION_RECEIPT_REMINDER_ID = 6;
-  const ACTIVITY_SOURCE_RECORD_TYPE_ID = 2;
+  const ENTITY_NAME = 'Collection_Camp';
 
   /**
    *
@@ -26,11 +24,14 @@ class CollectionBaseService extends AutoSubscriber {
    *
    */
   public static function collectionBaseTabset($tabsetName, &$tabs, $context) {
-    if ($tabsetName !== 'civicrm/eck/entity' || empty($context)) {
+      \Civi::log()->debug(self::ENTITY_NAME);
+
+    if ($tabsetName !== 'civicrm/eck/entity' || empty($context) || $context['entity_type']['name'] !== self::ENTITY_NAME) {
       return;
     }
 
     $entityID = $context['entity_id'];
+
 
     $url = \CRM_Utils_System::url(
           'civicrm/eck/entity/qr',
