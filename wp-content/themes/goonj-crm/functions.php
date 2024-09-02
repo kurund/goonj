@@ -314,7 +314,7 @@ function goonj_handle_user_identification_form() {
 		->execute();
 
 		if ($purpose === 'dropping-center') {
-			wp_redirect(get_home_url() . "/dropping-center/location/#?Collection_Camp_Core_Details.Contact_Id=" . $found_contacts['id']);
+			wp_redirect(get_home_url() . "/dropping-center/intent/#?Collection_Camp_Core_Details.Contact_Id=" . $found_contacts['id']);
 			exit;
 		}
 
