@@ -322,7 +322,6 @@ class CollectionCampService extends AutoSubscriber {
 
     foreach ($collectionCampEntries as $entry) {
       $collectionCampData = $entry['fields'] ?? NULL;
-      $entityId = $objectRef->entity_id;
       $startDate = $collectionCampData['Collection_Camp_Intent_Details.Start_Date'] ?? NULL;
       $contactName = $collectionCampData['Collection_Camp_Intent_Details.Name'] ?? NULL;
 
