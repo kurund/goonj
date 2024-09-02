@@ -135,7 +135,7 @@ function goonj_handle_user_identification_form() {
 	$email = $_POST['email'] ?? '';
 	$phone = $_POST['phone'] ?? '';
 
-	$is_purpose_requiring_email = !in_array($purpose, ['material-contribution', 'goonj-office-visit', 'processing-center-material-contribution']);
+	$is_purpose_requiring_email = !in_array($purpose, ['material-contribution', 'processing-center-office-visit', 'processing-center-material-contribution']);
 
 	if ( empty( $phone ) || ( $is_purpose_requiring_email && empty( $email ) ) ) {
 		return;
@@ -238,7 +238,7 @@ function goonj_handle_user_identification_form() {
 
 		if ( 'processing-center-material-contribution' === $purpose ) {
 			$institute_registration_form_path = sprintf(
-				'/office-visit/material-contribution/#?email=%s&phone=%s&target_id=%s',
+				'/processing-center-material-contribution/#?email=%s&phone=%s&target_id=%s',
 				$email,
 				$phone,
 				$target_id
