@@ -2,6 +2,8 @@
 
 namespace Civi;
 
+use Civi\Api4\EckEntity;
+use Civi\Api4\OptionValue;
 use Civi\Core\Service\AutoSubscriber;
 
 /**
@@ -9,9 +11,8 @@ use Civi\Core\Service\AutoSubscriber;
  */
 class DroppingCenterService extends AutoSubscriber {
 
-  // See: CiviCRM > Administer > Communications > Schedule Reminders.
-  const CONTRIBUTION_RECEIPT_REMINDER_ID = 6;
-  const ACTIVITY_SOURCE_RECORD_TYPE_ID = 2;
+  const ENTITY_NAME = 'Collection_Camp';
+  const ENTITY_SUBTYPE_NAME = 'Dropping_Center';
 
   /**
    *
@@ -26,7 +27,7 @@ class DroppingCenterService extends AutoSubscriber {
    *
    */
   public static function droppingCenterTabset($tabsetName, &$tabs, $context) {
-    if ($tabsetName !== 'civicrm/eck/entity' || empty($context)) {
+    if (!self::isViewingDroppingCenter($tabsetName, $context)) {
       return;
     }
 
@@ -42,6 +43,45 @@ class DroppingCenterService extends AutoSubscriber {
       'active' => 1,
       'current' => FALSE,
     ];
+  }
+
+  /**
+   *
+   */
+  private static function isViewingDroppingCenter($tabsetName, $context) {
+    if ($tabsetName !== 'civicrm/eck/entity' || empty($context) || $context['entity_type']['name'] !== self::ENTITY_NAME) {
+      return FALSE;
+    }
+
+    $entityId = $context['entity_id'];
+
+    $entityResults = EckEntity::get(self::ENTITY_NAME, TRUE)
+      ->addWhere('id', '=', $entityId)
+      ->execute();
+
+    $entity = $entityResults->first();
+
+    $entitySubtypeValue = $entity['subtype'];
+
+    $subtypeResults = OptionValue::get(TRUE)
+      ->addSelect('name')
+      ->addWhere('grouping', '=', self::ENTITY_NAME)
+      ->addWhere('value', '=', $entitySubtypeValue)
+      ->execute();
+
+    $subtype = $subtypeResults->first();
+
+    if (!$subtype) {
+      return FALSE;
+    }
+
+    $subtypeName = $subtype['name'];
+
+    if ($subtypeName !== self::ENTITY_SUBTYPE_NAME) {
+      return FALSE;
+    }
+
+    return TRUE;
   }
 
 }

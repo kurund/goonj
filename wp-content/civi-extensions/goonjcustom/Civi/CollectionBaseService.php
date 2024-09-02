@@ -24,14 +24,11 @@ class CollectionBaseService extends AutoSubscriber {
    *
    */
   public static function collectionBaseTabset($tabsetName, &$tabs, $context) {
-      \Civi::log()->debug(self::ENTITY_NAME);
-
     if ($tabsetName !== 'civicrm/eck/entity' || empty($context) || $context['entity_type']['name'] !== self::ENTITY_NAME) {
       return;
     }
 
     $entityID = $context['entity_id'];
-
 
     $url = \CRM_Utils_System::url(
           'civicrm/eck/entity/qr',
