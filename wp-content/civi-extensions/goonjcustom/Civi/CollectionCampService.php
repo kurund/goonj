@@ -16,7 +16,6 @@ class CollectionCampService extends AutoSubscriber {
   const UNAUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP = 77;
   const UNAUTHORIZED_TEMPLATE_ID_DROPPING_CENTER = 82;
 
-
   /**
    *
    */
@@ -219,7 +218,7 @@ class CollectionCampService extends AutoSubscriber {
   private static function sendAuthorizationEmail($contactId, $subType) {
     try {
       // Determine the template based on dynamic subtype.
-      $templateId = $subType == 4 ? self::AUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP : ($subType == 5 ? self::AUTHORIZED_TEMPLATE_ID_DROPPING_CENTER : null);
+      $templateId = $subType == 4 ? self::AUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP : ($subType == 5 ? self::AUTHORIZED_TEMPLATE_ID_DROPPING_CENTER : NULL);
 
       if (!$templateId) {
         return;
@@ -245,7 +244,7 @@ class CollectionCampService extends AutoSubscriber {
   private static function sendUnAuthorizationEmail($contactId, $subType) {
     try {
       // Determine the template based on dynamic subtype.
-      $templateId = $subType == 4 ? self::UNAUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP : ($subType == 5 ? self::UNAUTHORIZED_TEMPLATE_ID_DROPPING_CENTER : null);
+      $templateId = $subType == 4 ? self::UNAUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP : ($subType == 5 ? self::UNAUTHORIZED_TEMPLATE_ID_DROPPING_CENTER : NULL);
 
       if (!$templateId) {
         return;

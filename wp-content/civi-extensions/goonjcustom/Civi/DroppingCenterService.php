@@ -1,0 +1,87 @@
+<?php
+
+namespace Civi;
+
+use Civi\Api4\EckEntity;
+use Civi\Api4\OptionValue;
+use Civi\Core\Service\AutoSubscriber;
+
+/**
+ *
+ */
+class DroppingCenterService extends AutoSubscriber {
+
+  const ENTITY_NAME = 'Collection_Camp';
+  const ENTITY_SUBTYPE_NAME = 'Dropping_Center';
+
+  /**
+   *
+   */
+  public static function getSubscribedEvents() {
+    return [
+      '&hook_civicrm_tabset' => 'droppingCenterTabset',
+    ];
+  }
+
+  /**
+   *
+   */
+  public static function droppingCenterTabset($tabsetName, &$tabs, $context) {
+    if (!self::isViewingDroppingCenter($tabsetName, $context)) {
+      return;
+    }
+
+    $status = \CRM_Utils_System::url(
+      "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fdropping_center-status",
+    );
+
+    // Add the Status tab.
+    $tabs['status'] = [
+      'title' => ts('Status'),
+      'link' => $status,
+      'valid' => 1,
+      'active' => 1,
+      'current' => FALSE,
+    ];
+  }
+
+  /**
+   *
+   */
+  private static function isViewingDroppingCenter($tabsetName, $context) {
+    if ($tabsetName !== 'civicrm/eck/entity' || empty($context) || $context['entity_type']['name'] !== self::ENTITY_NAME) {
+      return FALSE;
+    }
+
+    $entityId = $context['entity_id'];
+
+    $entityResults = EckEntity::get(self::ENTITY_NAME, TRUE)
+      ->addWhere('id', '=', $entityId)
+      ->execute();
+
+    $entity = $entityResults->first();
+
+    $entitySubtypeValue = $entity['subtype'];
+
+    $subtypeResults = OptionValue::get(TRUE)
+      ->addSelect('name')
+      ->addWhere('grouping', '=', self::ENTITY_NAME)
+      ->addWhere('value', '=', $entitySubtypeValue)
+      ->execute();
+
+    $subtype = $subtypeResults->first();
+
+    if (!$subtype) {
+      return FALSE;
+    }
+
+    $subtypeName = $subtype['name'];
+
+    if ($subtypeName !== self::ENTITY_SUBTYPE_NAME) {
+      return FALSE;
+    }
+
+    return TRUE;
+  }
+
+}
