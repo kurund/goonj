@@ -135,9 +135,9 @@ function goonj_handle_user_identification_form() {
 	$email = $_POST['email'] ?? '';
 	$phone = $_POST['phone'] ?? '';
 
-	$is_material_contribution = $purpose !== 'material-contribution';
+	$is_purpose_requiring_email = !in_array($purpose, ['material-contribution', 'goonj-office-visit', 'office-visit-material-contribution']);
 
-	if ( empty( $phone ) || ( $is_material_contribution && empty( $email ) ) ) {
+	if ( empty( $phone ) || ( $is_purpose_requiring_email && empty( $email ) ) ) {
 		return;
 	}
 
@@ -231,6 +231,17 @@ function goonj_handle_user_identification_form() {
 				'/institute-registration/#?email=%s&phone=%s',
 				$email,
 				$phone,
+			);
+			wp_redirect( $institute_registration_form_path );
+			exit;
+		}
+
+		if ( 'office-visit-material-contribution' === $purpose ) {
+			$institute_registration_form_path = sprintf(
+				'/office-visit/material-contribution/#?email=%s&phone=%s&target_id=%s',
+				$email,
+				$phone,
+				$target_id
 			);
 			wp_redirect( $institute_registration_form_path );
 			exit;
