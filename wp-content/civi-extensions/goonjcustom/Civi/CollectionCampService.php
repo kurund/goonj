@@ -330,7 +330,6 @@ class CollectionCampService extends AutoSubscriber {
         ->addSelect('id')
         ->addWhere('Collection_Camp_Intent_Details.Start_Date', '=', $startDate)
         ->addWhere('Collection_Camp_Intent_Details.Name', '=', $contactName)
-        ->setLimit(1)
         ->execute();
 
       $collectionCampresult = $result->first();
@@ -344,7 +343,6 @@ class CollectionCampService extends AutoSubscriber {
       ->addWhere('contact_type', '=', 'Organization')
       ->addWhere('contact_sub_type', 'CONTAINS', 'Goonj_Office')
       ->addWhere('Goonj_Office_Details.Collection_Camp_Catchment', '=', $stateId)
-      ->setLimit(25)
       ->execute();
 
       $contactData = $contacts->first();
