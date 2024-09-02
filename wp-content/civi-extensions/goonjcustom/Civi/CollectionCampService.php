@@ -326,10 +326,10 @@ class CollectionCampService extends AutoSubscriber {
       $contactName = $collectionCampData['Collection_Camp_Intent_Details.Name'] ?? NULL;
 
       $result = \Civi\Api4\EckEntity::get('Collection_Camp')
-        ->addSelect('id')
-        ->addWhere('Collection_Camp_Intent_Details.Start_Date', '=', $startDate)
-        ->addWhere('Collection_Camp_Intent_Details.Name', '=', $contactName)
-        ->execute();
+      ->addSelect('id')
+      ->addWhere('Collection_Camp_Intent_Details.Start_Date', '=', $startDate)
+      ->addWhere('Collection_Camp_Intent_Details.Name', '=', $contactName)
+      ->execute();
 
       $collectionCampresult = $result->first();
       $collectionCampId = $collectionCampresult['id'] ?? NULL;
