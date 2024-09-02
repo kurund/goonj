@@ -23,7 +23,7 @@ class CollectionCampService extends AutoSubscriber {
     return [
       '&hook_civicrm_post' => [
         ['generateCollectionCampCode'],
-        ['saveCollectionCampState'],
+        ['updateCampStateAndPoc'],
       ],
       '&hook_civicrm_pre' => [
         ['handleAuthorizationEmails'],
@@ -304,7 +304,7 @@ class CollectionCampService extends AutoSubscriber {
    * @param object $objectRef
    *   The reference to the object.
    */
-  public static function saveCollectionCampState(string $op, string $objectName, int $objectId, &$objectRef) {
+  public static function updateCampStateAndPoc(string $op, string $objectName, int $objectId, &$objectRef) {
     // Check if the object name is 'AfformSubmission'.
     if ($objectName !== 'AfformSubmission') {
       return;
