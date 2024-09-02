@@ -336,7 +336,6 @@ class CollectionCampService extends AutoSubscriber {
       $collectionCampresult = $result->first();
       $collectionCampId = $collectionCampresult['id'] ?? NULL;
 
-
       // Access the state.
       $stateId = $collectionCampData['Collection_Camp_Intent_Details.State'] ?? NULL;
 
