@@ -348,9 +348,19 @@ class CollectionCampService extends AutoSubscriber {
       $contactData = $contacts->first();
       $contactId = $contactData['id'];
 
+      $pocRelationship = \Civi\Api4\Relationship::get(TRUE)
+      ->addSelect('contact_id_a')
+      ->addWhere('contact_id_b', '=', $contactId)
+      ->execute();
+
+      $pocRelationshipData = $pocRelationship->first();
+      $pocRelationshipcontactId = $pocRelationshipData['contact_id_a'];
+
+      // Autofills the Goonj Office and Coordinating Urban POC details
       $collectionCampresultData = \Civi\Api4\EckEntity::update('Collection_Camp', FALSE)
       ->addValue('Collection_Camp_Intent_Details.Goonj_Office', $contactId)
       ->addWhere('id', '=', $collectionCampId)
+      ->addValue('Collection_Camp_Intent_Details.Coordinating_Urban_POC', $pocRelationshipcontactId)
       ->execute();
 
     }
