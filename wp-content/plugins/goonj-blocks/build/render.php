@@ -30,7 +30,7 @@ $pu_visit_check_link = sprintf(
 );
 
 $pu_material_contribution_check_link = sprintf(
-	'/processing-center/material-contribution/check-user/?target_id=%s',
+	'/processing-center-material-contribution-check-user?target_id=%s',
 	$action_target['id']
 );
 
