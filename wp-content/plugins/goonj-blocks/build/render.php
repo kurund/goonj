@@ -29,8 +29,8 @@ $pu_visit_check_link = sprintf(
 	$action_target['id']
 );
 
-$pu_visit_material_contribution_check_link = sprintf(
-	'/office-visit/material-contribution-check-user/?target_id=%s',
+$pu_material_contribution_check_link = sprintf(
+	'/processing-center/?target_id=%s',
 	$action_target['id']
 );
 
@@ -77,7 +77,7 @@ if ( in_array( $target, array( 'collection-camp', 'dropping-center' ) ) ) :
 			<a href="<?php echo esc_url( $pu_visit_check_link ); ?>" class="wp-block-gb-action-button">
 				<?php esc_html_e( 'Office Visit', 'goonj-blocks' ); ?>
 			</a>
-			<a href="<?php echo esc_url( $pu_visit_material_contribution_check_link ); ?>" class="wp-block-gb-action-button">
+			<a href="<?php echo esc_url( $pu_material_contribution_check_link ); ?>" class="wp-block-gb-action-button">
 				<?php esc_html_e( 'Material Contribution', 'goonj-blocks' ); ?>
 			</a>
 			<a href="" class="wp-block-gb-action-button">
