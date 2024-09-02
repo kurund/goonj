@@ -55,7 +55,7 @@ class CollectionCampService extends AutoSubscriber {
     $decodedData = json_decode($data, TRUE);
 
     // Check if 'Eck_Collection_Camp1' exists.
-    $collectionCampEntries = $decodedData[''] ?? [];
+    $collectionCampEntries = $decodedData['Eck_Collection_Camp1'] ?? [];
     if (empty($collectionCampEntries)) {
       return;
     }
