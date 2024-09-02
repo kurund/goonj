@@ -16,7 +16,6 @@ class CollectionCampService extends AutoSubscriber {
   const UNAUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP = 77;
   const UNAUTHORIZED_TEMPLATE_ID_DROPPING_CENTER = 82;
 
-
   /**
    *
    */
@@ -27,7 +26,6 @@ class CollectionCampService extends AutoSubscriber {
         ['handleAuthorizationEmails'],
         ['generateCollectionCampQr'],
       ],
-      '&hook_civicrm_tabset' => 'collectionCampTabset',
     ];
   }
 
@@ -220,7 +218,7 @@ class CollectionCampService extends AutoSubscriber {
   private static function sendAuthorizationEmail($contactId, $subType) {
     try {
       // Determine the template based on dynamic subtype.
-      $templateId = $subType == 4 ? self::AUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP : ($subType == 5 ? self::AUTHORIZED_TEMPLATE_ID_DROPPING_CENTER : null);
+      $templateId = $subType == 4 ? self::AUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP : ($subType == 5 ? self::AUTHORIZED_TEMPLATE_ID_DROPPING_CENTER : NULL);
 
       if (!$templateId) {
         return;
@@ -246,7 +244,7 @@ class CollectionCampService extends AutoSubscriber {
   private static function sendUnAuthorizationEmail($contactId, $subType) {
     try {
       // Determine the template based on dynamic subtype.
-      $templateId = $subType == 4 ? self::UNAUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP : ($subType == 5 ? self::UNAUTHORIZED_TEMPLATE_ID_DROPPING_CENTER : null);
+      $templateId = $subType == 4 ? self::UNAUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP : ($subType == 5 ? self::UNAUTHORIZED_TEMPLATE_ID_DROPPING_CENTER : NULL);
 
       if (!$templateId) {
         return;
@@ -291,40 +289,4 @@ class CollectionCampService extends AutoSubscriber {
 
   }
 
-  public static function collectionCampTabset($tabsetName, &$tabs, $context) {
-    if ($tabsetName !== 'civicrm/eck/entity' || empty($context)) {
-      return;
-    }
-  
-    $entityID = $context['entity_id'];
-  
-    $url = \CRM_Utils_System::url(
-          'civicrm/eck/entity/qr',
-          "reset=1&snippet=5&force=1&id=$entityID&action=update"
-    );
-  
-    // URL for the Contribution tab.
-    $contributionUrl = \CRM_Utils_System::url(
-          "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fcollection-camp%2Fmaterial-contributions",
-    );
-    
-    // Add the Contribution tab.
-    $tabs['contribution'] = [
-      'title' => ts('Contribution'),
-      'link' => $contributionUrl,
-      'valid' => 1,
-      'active' => 1,
-      'current' => FALSE,
-    ];
-  
-    // Add a new QR tab along with URL.
-    $tabs['qr'] = [
-      'title' => ts('QR Codes'),
-      'link' => $url,
-      'valid' => 1,
-      'active' => 1,
-      'current' => FALSE,
-    ];  
-
-}
 }

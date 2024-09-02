@@ -258,4 +258,3 @@ function goonjcustom_civicrm_pageRun(&$page) {
         ]
   );
 }
-
