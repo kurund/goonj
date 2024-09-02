@@ -348,9 +348,8 @@ class CollectionCampService extends AutoSubscriber {
 
       $contactData = $contacts->first();
       $contactId = $contactData['id'];
-      error_log("contactId: " . print_r($contactId, TRUE));
 
-      $collectionCampresult = \Civi\Api4\EckEntity::update('Collection_Camp', FALSE)
+      $collectionCampresultData = \Civi\Api4\EckEntity::update('Collection_Camp', FALSE)
       ->addValue('Collection_Camp_Intent_Details.Goonj_Office', $contactId)
       ->addWhere('id', '=', $collectionCampId)
       ->execute();
