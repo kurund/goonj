@@ -278,6 +278,19 @@ function goonjcustom_civicrm_tabset($tabsetName, &$tabs, $context) {
   $contributionUrl = CRM_Utils_System::url(
         "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fcollection-camp%2Fmaterial-contributions",
   );
+  
+  $status = CRM_Utils_System::url(
+    "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fdropping_center-status",
+  );
+  
+  // Add the Status tab.
+  $tabs['status'] = [
+    'title' => ts('Status'),
+    'link' => $status,
+    'valid' => 1,
+    'active' => 1,
+    'current' => FALSE,
+  ];
 
   // Add the Contribution tab.
   $tabs['contribution'] = [
