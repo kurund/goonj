@@ -202,6 +202,29 @@ function goonj_handle_user_identification_form() {
 					$redirect_url = $individual_registration_form_path;
 					break;
 
+				//Contact does not exist and the purpose is processing center material contribution
+				//redirect to individual registration
+				case 'processing-center-material-contribution':
+					$individual_registration_form_path = sprintf(
+						'/processing-center/material-contribution/individual-registration/#?email=%s&phone=%s&target_id=%s',
+						$email,
+						$phone,
+						$target_id,
+					);
+					$redirect_url = $material_contribution_form_path;
+					break;
+
+				//Contact does not exist and the purpose is processing center office visit
+				//redirect to individual registration
+				case 'processing-center-office-visit':
+					$individual_registration_form_path = sprintf(
+						'/processing-center/office-visit/individual-registration/#?email=%s&phone=%s&target_id=%s',
+						$email,
+						$phone,
+						$target_id,
+					);
+					$redirect_url = $material_contribution_form_path;
+					break;
 				// Contact does not exist and the purpose is not defined.
 				// Redirect to volunteer registration with collection camp activity selected.
 				default:
@@ -237,13 +260,24 @@ function goonj_handle_user_identification_form() {
 		}
 
 		if ( 'processing-center-material-contribution' === $purpose ) {
-			$institute_registration_form_path = sprintf(
-				'/processing-center-material-contribution/#?email=%s&phone=%s&target_id=%s',
+			$material_form_path = sprintf(
+				'/processing-center/material-contribution/details/#?email=%s&phone=%s&target_id=%s',
 				$email,
 				$phone,
 				$target_id
 			);
-			wp_redirect( $institute_registration_form_path );
+			wp_redirect( $material_form_path );
+			exit;
+		}
+
+		if ( 'processing-center-office-visit' === $purpose ) {
+			$office_visit_form_path = sprintf(
+				'/processing-center/office-visit/details/#?email=%s&phone=%s&target_id=%s',
+				$email,
+				$phone,
+				$target_id
+			);
+			wp_redirect( $office_visit_form_path );
 			exit;
 		}
 
