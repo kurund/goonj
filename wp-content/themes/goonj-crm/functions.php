@@ -323,96 +323,10 @@ function goonj_collection_camp_landing_page() {
 }
 add_shortcode( 'goonj_collection_landing_page', 'goonj_collection_camp_landing_page' );
 
-add_action( 'init', 'goonj_custom_rewrite_rules' );
-function goonj_custom_rewrite_rules() {
-	add_rewrite_rule(
-		'^actions/collection-camp/([0-9]+)/?',
-		'index.php?pagename=actions&target=collection-camp&id=$matches[1]',
-		'top'
-	);
-
-	add_rewrite_rule(
-		'^actions/dropping-center/([0-9]+)/?',
-		'index.php?pagename=actions&target=dropping-center&id=$matches[1]',
-		'top'
-	);
-
-	add_rewrite_rule(
-		'^actions/processing-center/([0-9]+)/?',
-		'index.php?pagename=actions&target=processing-center&id=$matches[1]',
-		'top'
-	);
-}
-
 add_filter( 'query_vars', 'goonj_query_vars' );
 function goonj_query_vars( $vars ) {
-	$vars[] = 'target';
-	$vars[] = 'id';
 	$vars[] = 'target_id';
 	return $vars;
-}
-
-add_action( 'template_redirect', 'goonj_check_action_target_exists' );
-function goonj_check_action_target_exists() {
-	global $wp_query;
-
-	if (
-		! is_page( 'actions' ) ||
-		! get_query_var( 'target' ) ||
-		! get_query_var( 'id' )
-	) {
-		return;
-	}
-
-	$target = get_query_var( 'target' );
-	$id = intval( get_query_var( 'id' ) );
-
-	// Load CiviCRM.
-	if ( function_exists( 'civicrm_initialize' ) ) {
-		civicrm_initialize();
-	}
-
-	$is_404 = false;
-
-	$entity_fields = array(
-		'id',
-		'title',
-		'Collection_Camp_Intent_Details.Start_Date',
-		'Collection_Camp_Intent_Details.End_Date',
-	);
-
-	switch ( $target ) {
-		case 'collection-camp':
-			$result = \Civi\Api4\EckEntity::get('Collection_Camp', TRUE)
-				->selectRowCount()
-				->addSelect( ...$entity_fields )
-				->addWhere( 'id', '=', $id )
-				->setLimit( 1 )
-				->execute();
-
-			if ( $result->count() === 0 ) {
-				$is_404 = true;
-			} else {
-				$wp_query->set( 'action_target', $result->first() );
-			}
-			break;
-		case 'dropping-center':
-			// TBA.
-			break;
-		case 'processing-center':
-			// TBA.
-			break;
-		default:
-			$is_404 = true;
-	}
-
-	if ( $is_404 ) {
-		$wp_query->set_404();
-		status_header( 404 );
-		nocache_headers();
-		include get_query_template( '404' );
-		exit;
-	}
 }
 
 add_shortcode( 'goonj_collection_camp_past', 'goonj_collection_camp_past_data' );
