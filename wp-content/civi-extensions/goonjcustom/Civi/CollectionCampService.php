@@ -22,7 +22,10 @@ class CollectionCampService extends AutoSubscriber {
    */
   public static function getSubscribedEvents() {
     return [
-      '&hook_civicrm_post' => 'generateCollectionCampCode',
+      '&hook_civicrm_post' => [
+        ['generateCollectionCampCode'],
+        ['saveCollectionCampState'],
+      ],
       '&hook_civicrm_pre' => [
         ['handleAuthorizationEmails'],
         ['generateCollectionCampQr'],
@@ -53,7 +56,7 @@ class CollectionCampService extends AutoSubscriber {
     $decodedData = json_decode($data, TRUE);
 
     // Check if 'Eck_Collection_Camp1' exists.
-    $collectionCampEntries = $decodedData['Eck_Collection_Camp1'] ?? [];
+    $collectionCampEntries = $decodedData[''] ?? [];
     if (empty($collectionCampEntries)) {
       return;
     }
@@ -288,6 +291,68 @@ class CollectionCampService extends AutoSubscriber {
       return;
     }
 
+  }
+
+  /**
+   * This hook is called after a db write on entities.
+   *
+   * @param string $op
+   *   The type of operation being performed.
+   * @param string $objectName
+   *   The name of the object.
+   * @param int $objectId
+   *   The unique identifier for the object.
+   * @param object $objectRef
+   *   The reference to the object.
+   */
+  public static function saveCollectionCampState(string $op, string $objectName, int $objectId, &$objectRef) {
+    // Check if the object name is 'AfformSubmission'.
+    if ($objectName !== 'AfformSubmission') {
+      return;
+    }
+    error_log("op: " . print_r($op, TRUE));
+    error_log("objectRef: " . print_r($objectRef, TRUE));
+    error_log("objectId: " . print_r($objectId, TRUE));
+    error_log("objectRef: " . print_r($objectRef, TRUE));
+
+    // Extract the 'data' field.
+    $data = $objectRef->data;
+    $decodedData = json_decode($data, TRUE);
+
+    // Check if 'Eck_Collection_Camp1' exists.
+    $collectionCampEntries = $decodedData['Eck_Collection_Camp1'] ?? [];
+    if (empty($collectionCampEntries)) {
+      return;
+    }
+
+    foreach ($collectionCampEntries as $entry) {
+      $collectionCampData = $entry['fields'] ?? NULL;
+      $campId = $collectionCampData['id'] ?? NULL;
+      error_log("campId: " . print_r($campId, TRUE));
+
+
+      // Access the state.
+      $stateId = $collectionCampData['Collection_Camp_Intent_Details.State'] ?? NULL;
+
+      $contacts = \Civi\Api4\Contact::get(FALSE)
+      ->addSelect('Goonj_Office_Details.Collection_Camp_Catchment', '*', 'custom.*', 'display_name')
+      ->addWhere('contact_type', '=', 'Organization')
+      ->addWhere('contact_sub_type', 'CONTAINS', 'Goonj_Office')
+      ->addWhere('Goonj_Office_Details.Collection_Camp_Catchment', '=', $stateId)
+      ->setLimit(25)
+      ->execute();
+
+      $contactData = $contacts -> first();
+      $contactId = $contactData['id'];
+      error_log("contactId: " . print_r($contactId, TRUE));
+
+      $collectionCampresult = \Civi\Api4\EckEntity::update('Collection_Camp', FALSE)
+      ->addValue('Collection_Camp_Intent_Details.Goonj_Office', $contactId)
+      ->addWhere('id', '=', $campId) 
+      ->execute();
+      error_log("collectionCampresult: " . print_r($collectionCampresult, TRUE));
+
+    }
   }
 
 }
