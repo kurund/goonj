@@ -309,10 +309,6 @@ class CollectionCampService extends AutoSubscriber {
     if ($objectName !== 'AfformSubmission') {
       return;
     }
-    error_log("op: " . print_r($op, TRUE));
-    error_log("objectRef: " . print_r($objectRef, TRUE));
-    error_log("objectId: " . print_r($objectId, TRUE));
-    error_log("objectRef: " . print_r($objectRef, TRUE));
 
     // Extract the 'data' field.
     $data = $objectRef->data;
@@ -326,8 +322,19 @@ class CollectionCampService extends AutoSubscriber {
 
     foreach ($collectionCampEntries as $entry) {
       $collectionCampData = $entry['fields'] ?? NULL;
-      $campId = $collectionCampData['id'] ?? NULL;
-      error_log("campId: " . print_r($campId, TRUE));
+      $entityId = $objectRef->entity_id;
+      $startDate = $collectionCampData['Collection_Camp_Intent_Details.Start_Date'] ?? NULL;
+      $contactName = $collectionCampData['Collection_Camp_Intent_Details.Name'] ?? NULL;
+
+      $result = \Civi\Api4\EckEntity::get('Collection_Camp')
+        ->addSelect('id')
+        ->addWhere('Collection_Camp_Intent_Details.Start_Date', '=', $startDate)
+        ->addWhere('Collection_Camp_Intent_Details.Name', '=', $contactName)
+        ->setLimit(1)
+        ->execute();
+
+      $collectionCampresult = $result->first();
+      $collectionCampId = $collectionCampresult['id'] ?? NULL;
 
 
       // Access the state.
@@ -341,15 +348,14 @@ class CollectionCampService extends AutoSubscriber {
       ->setLimit(25)
       ->execute();
 
-      $contactData = $contacts -> first();
+      $contactData = $contacts->first();
       $contactId = $contactData['id'];
       error_log("contactId: " . print_r($contactId, TRUE));
 
       $collectionCampresult = \Civi\Api4\EckEntity::update('Collection_Camp', FALSE)
       ->addValue('Collection_Camp_Intent_Details.Goonj_Office', $contactId)
-      ->addWhere('id', '=', $campId) 
+      ->addWhere('id', '=', $collectionCampId)
       ->execute();
-      error_log("collectionCampresult: " . print_r($collectionCampresult, TRUE));
 
     }
   }
