@@ -303,10 +303,14 @@ function goonj_handle_user_identification_form() {
 		//   1. Trigger an email for Induction
 		//   2. Change volunteer status to "Waiting for Induction"
 		if ( ! goonj_is_volunteer_inducted( $found_contacts ) ) {
-			$redirect_url = ($purpose === 'dropping-center')
-			? home_url('/dropping-centre-waiting-induction/')
-			: home_url('/collection-camp/waiting-induction/');
-	
+			if ($purpose === 'dropping-center') {
+				$redirect_url = home_url('/dropping-centre-waiting-induction/');
+			} elseif ($purpose === 'volunteer-registration') {
+				$redirect_url = home_url('/volunteer-registration-waiting-induction/');
+			} else {
+				$redirect_url = home_url('/collection-camp/waiting-induction/');
+			}
+
 			wp_redirect($redirect_url);
 			exit;
 		}
