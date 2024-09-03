@@ -279,7 +279,7 @@ function goonj_handle_user_identification_form() {
 
 		if ( 'processing-center-office-visit' === $purpose ) {
 			$office_visit_form_path = sprintf(
-				'/processing-center/office-visit/details/#?email=%s&phone=%s&Material_Contribution.Goonj_Office=%s',
+				'/processing-center/office-visit/details/#?email=%s&phone=%s&Office_Visit.Goonj_Processing_Center=%s',
 				$email,
 				$phone,
 				$target_id
