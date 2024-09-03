@@ -211,7 +211,7 @@ function goonj_handle_user_identification_form() {
 						$phone,
 						$target_id,
 					);
-					$redirect_url = $material_contribution_form_path;
+					$redirect_url = $individual_registration_form_path;
 					break;
 
 				//Contact does not exist and the purpose is processing center office visit
@@ -223,7 +223,7 @@ function goonj_handle_user_identification_form() {
 						$phone,
 						$target_id,
 					);
-					$redirect_url = $material_contribution_form_path;
+					$redirect_url = $individual_registration_form_path;
 					break;
 				// Contact does not exist and the purpose is not defined.
 				// Redirect to volunteer registration with collection camp activity selected.
@@ -261,10 +261,11 @@ function goonj_handle_user_identification_form() {
 
 		if ( 'processing-center-material-contribution' === $purpose ) {
 			$material_form_path = sprintf(
-				'/processing-center/material-contribution/details/#?email=%s&phone=%s&target_id=%s',
+				'/processing-center/material-contribution/details/#?email=%s&phone=%s&Material_Contribution.Goonj_Office=%s&source_contact_id=%s',
 				$email,
 				$phone,
-				$target_id
+				$target_id,
+				$found_contacts['id']
 			);
 			wp_redirect( $material_form_path );
 			exit;
@@ -272,7 +273,7 @@ function goonj_handle_user_identification_form() {
 
 		if ( 'processing-center-office-visit' === $purpose ) {
 			$office_visit_form_path = sprintf(
-				'/processing-center/office-visit/details/#?email=%s&phone=%s&target_id=%s',
+				'/processing-center/office-visit/details/#?email=%s&phone=%s&Material_Contribution.Goonj_Office=%s',
 				$email,
 				$phone,
 				$target_id
