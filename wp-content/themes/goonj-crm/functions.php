@@ -304,7 +304,7 @@ function goonj_handle_user_identification_form() {
 			if ($purpose === 'dropping-center') {
 				$redirect_url = home_url('/dropping-centre-waiting-induction/');
 			} elseif ($purpose === 'volunteer-registration') {
-				$redirect_url = home_url('/volunteer-registration-waiting-induction/');
+				$redirect_url = home_url('/volunteer-registration/waiting-induction/');
 			} else {
 				$redirect_url = home_url('/collection-camp/waiting-induction/');
 			}
@@ -329,7 +329,7 @@ function goonj_handle_user_identification_form() {
 		}
 
 		if ($purpose === 'volunteer-registration') {
-			wp_redirect(get_home_url() . "/volunteer-registration-already-inducted/");
+			wp_redirect(get_home_url() . "/volunteer-registration/already-inducted/");
 			exit;
 		}
 
