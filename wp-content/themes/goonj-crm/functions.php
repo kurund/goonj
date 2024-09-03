@@ -181,6 +181,7 @@ function goonj_handle_user_identification_form() {
 			$phone,
 			'not-inducted-for-dropping-center'
 		);
+		$volunteer_registration_url = home_url('/volunteer-registration');
 
 		if ( empty( $found_contacts ) ) {
 			switch ( $purpose ) {
@@ -224,6 +225,11 @@ function goonj_handle_user_identification_form() {
 						$target_id,
 					);
 					$redirect_url = $individual_registration_form_path;
+					break;
+
+				// Redirect to volunteer registration.
+				case 'volunteer-registration':
+					$redirect_url = $volunteer_registration_url;
 					break;
 				// Contact does not exist and the purpose is not defined.
 				// Redirect to volunteer registration with collection camp activity selected.
@@ -296,10 +302,14 @@ function goonj_handle_user_identification_form() {
 		//   1. Trigger an email for Induction
 		//   2. Change volunteer status to "Waiting for Induction"
 		if ( ! goonj_is_volunteer_inducted( $found_contacts ) ) {
-			$redirect_url = ($purpose === 'dropping-center')
-			? home_url('/dropping-centre-waiting-induction/')
-			: home_url('/collection-camp/waiting-induction/');
-	
+			if ($purpose === 'dropping-center') {
+				$redirect_url = home_url('/dropping-centre-waiting-induction/');
+			} elseif ($purpose === 'volunteer-registration') {
+				$redirect_url = home_url('/volunteer-registration/waiting-induction/');
+			} else {
+				$redirect_url = home_url('/collection-camp/waiting-induction/');
+			}
+
 			wp_redirect($redirect_url);
 			exit;
 		}
@@ -316,6 +326,11 @@ function goonj_handle_user_identification_form() {
 
 		if ($purpose === 'dropping-center') {
 			wp_redirect(get_home_url() . "/dropping-center/intent/#?Collection_Camp_Core_Details.Contact_Id=" . $found_contacts['id']);
+			exit;
+		}
+
+		if ($purpose === 'volunteer-registration') {
+			wp_redirect(get_home_url() . "/volunteer-registration/already-inducted/");
 			exit;
 		}
 
