@@ -181,6 +181,9 @@ function goonj_handle_user_identification_form() {
 			$phone,
 			'not-inducted-for-dropping-center'
 		);
+		$volunteer_registration_form_path = sprintf(
+			'/volunteer-registration'
+		);
 
 		if ( empty( $found_contacts ) ) {
 			switch ( $purpose ) {
@@ -224,6 +227,11 @@ function goonj_handle_user_identification_form() {
 						$target_id,
 					);
 					$redirect_url = $material_contribution_form_path;
+					break;
+
+				// Redirect to volunteer registration.
+				case 'volunteer-registration':
+					$redirect_url = $volunteer_registration_form_path;
 					break;
 				// Contact does not exist and the purpose is not defined.
 				// Redirect to volunteer registration with collection camp activity selected.
