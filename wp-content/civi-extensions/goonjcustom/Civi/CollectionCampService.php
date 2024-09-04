@@ -2,6 +2,7 @@
 
 namespace Civi;
 
+use Civi\Api4\Contact;
 use Civi\Api4\EckEntity;
 use Civi\Api4\StateProvince;
 use Civi\Core\Service\AutoSubscriber;
@@ -325,11 +326,11 @@ class CollectionCampService extends AutoSubscriber {
       $startDate = $collectionCampData['Collection_Camp_Intent_Details.Start_Date'] ?? NULL;
       $contactName = $collectionCampData['Collection_Camp_Intent_Details.Name'] ?? NULL;
 
-      $result = \Civi\Api4\EckEntity::get('Collection_Camp')
-      ->addSelect('id')
-      ->addWhere('Collection_Camp_Intent_Details.Start_Date', '=', $startDate)
-      ->addWhere('Collection_Camp_Intent_Details.Name', '=', $contactName)
-      ->execute();
+      $result = EckEntity::get('Collection_Camp')
+        ->addSelect('id')
+        ->addWhere('Collection_Camp_Intent_Details.Start_Date', '=', $startDate)
+        ->addWhere('Collection_Camp_Intent_Details.Name', '=', $contactName)
+        ->execute();
 
       $collectionCampresult = $result->first();
       $collectionCampId = $collectionCampresult['id'] ?? NULL;
@@ -337,20 +338,20 @@ class CollectionCampService extends AutoSubscriber {
       // Access the state.
       $stateId = $collectionCampData['Collection_Camp_Intent_Details.State'] ?? NULL;
 
-      $contacts = \Civi\Api4\Contact::get(FALSE)
-      ->addSelect('Goonj_Office_Details.Collection_Camp_Catchment', '*', 'custom.*', 'display_name')
-      ->addWhere('contact_type', '=', 'Organization')
-      ->addWhere('contact_sub_type', 'CONTAINS', 'Goonj_Office')
-      ->addWhere('Goonj_Office_Details.Collection_Camp_Catchment', '=', $stateId)
-      ->execute();
+      $contacts = Contact::get(FALSE)
+        ->addSelect('Goonj_Office_Details.Collection_Camp_Catchment', '*', 'custom.*', 'display_name')
+        ->addWhere('contact_type', '=', 'Organization')
+        ->addWhere('contact_sub_type', 'CONTAINS', 'Goonj_Office')
+        ->addWhere('Goonj_Office_Details.Collection_Camp_Catchment', '=', $stateId)
+        ->execute();
 
       $contactData = $contacts->first();
       $contactId = $contactData['id'];
 
-      $collectionCampresultData = \Civi\Api4\EckEntity::update('Collection_Camp', FALSE)
-      ->addValue('Collection_Camp_Intent_Details.Goonj_Office', $contactId)
-      ->addWhere('id', '=', $collectionCampId)
-      ->execute();
+      $collectionCampresultData = EckEntity::update('Collection_Camp', FALSE)
+        ->addValue('Collection_Camp_Intent_Details.Goonj_Office', $contactId)
+        ->addWhere('id', '=', $collectionCampId)
+        ->execute();
 
     }
   }

@@ -1,24 +1,23 @@
 .d-block {
-    display: block;
+  display: block;
 }
 
 .p-2 {
-    padding: 12px;
+  padding: 12px;
 }
 
 .d-flex {
-    display: flex;
+  display: flex;
 }
 
 .flex-column {
-    flex-direction: column;
+  flex-direction: column;
 }
 
 .justify-content-center {
-    align-items: center;
+  align-items: center;
 }
 
 .text-white {
-    color: white !important;
+  color: white !important;
 }
-
