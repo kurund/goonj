@@ -279,10 +279,11 @@ function goonj_handle_user_identification_form() {
 
 		if ( 'processing-center-office-visit' === $purpose ) {
 			$office_visit_form_path = sprintf(
-				'/processing-center/office-visit/details/#?email=%s&phone=%s&Office_Visit.Goonj_Processing_Center=%s',
+				'/processing-center/office-visit/details/#?email=%s&phone=%s&Office_Visit.Goonj_Processing_Center=%s&source_contact_id=%s',
 				$email,
 				$phone,
-				$target_id
+				$target_id,
+				$found_contacts['id']
 			);
 			wp_redirect( $office_visit_form_path );
 			exit;
