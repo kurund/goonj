@@ -8,6 +8,7 @@ This repository contains the source code for Goonj's CRM built through CiviCRM.
 - [Installation](./docs/installation.md)
 - [Theme Styling](./docs/theme-styling.md)
 - [Deployment](./docs/deployment.md)
+- [Upgrading](./docs/upgrading.md)
 
 ### Author
 Developed by team at [ColoredCow](https://coloredcow.com).
