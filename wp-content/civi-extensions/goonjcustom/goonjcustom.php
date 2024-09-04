@@ -71,34 +71,52 @@ function goonjcustom_evaluate_tokens(TokenValueEvent $e) {
   foreach ($e->getRows() as $row) {
     /** @var TokenRow $row */
     $row->format('text/html');
+	// error_log("Row context: " . var_export($row->context, TRUE));
+
 
     $contactId = $row->context['contactId'];
+	error_log("contactId: " . print_r($contactId, TRUE));
+
 
     if (empty($contactId)) {
       $row->tokens('contact', 'inductionDetails', '');
       continue;
     }
 
-    $contacts = Contact::get(FALSE)
-      ->addSelect('address_primary.state_province_id')
-      ->addWhere('id', '=', $contactId)
-      ->setLimit(25)
-      ->execute();
+    $contacts = \Civi\Api4\Contact::get(FALSE)
+	->addSelect('address_primary.state_province_id')
+	->addWhere('id', '=', $contactId)
+	->execute();
 
-    $stateId = $contacts[0]['address_primary.state_province_id'];
+	$statedata = $contacts->first();
+	$stateId = $statedata['address_primary.state_province_id'];
+	// $stateId = $contacts[0]['address_primary.state_province_id'];
+	error_log("statedata: " . print_r($statedata, TRUE));
+	error_log("contacts: " . print_r($contacts, TRUE));
+
 
     // $processingCenters = EckEntity::get('Processing_Center', FALSE)
     //   ->addSelect('*', 'custom.*')
     //   ->addWhere('Processing_Center.Associated_States', 'IN', [$stateId])
     //   ->execute();
-    $inductionDetailsMarkup = 'The next step in your volunteering journey is to get inducted with Goonj.';
 
-    // If ($processingCenters->rowCount > 0) {.
+	$processingCenters = \Civi\Api4\Contact::get(FALSE)
+	->addWhere('contact_sub_type', 'CONTAINS', 'Goonj_Office')
+	->addWhere('contact_type', '=', 'Organization')
+	->addWhere('Goonj_Office_Details.Induction_Catchment', '=', $stateId)
+	->execute();
+    $inductionDetailsMarkup = 'The next step in your volunteering journey is to get inducted with Goonj.';
+	error_log("inductionDetailsMarkup: " . print_r($inductionDetailsMarkup, TRUE));
+
+
+    If ($processingCenters->rowCount > 0) {
     if (FALSE) {
       $inductionDetailsMarkup .= ' You can visit any of our following center(s) during the time specified to complete your induction:';
       $inductionDetailsMarkup .= '<ol>';
 
       foreach ($processingCenters as $processingCenter) {
+		error_log("processingCenter: " . print_r($inductionDetailsMarkup, TRUE));
+
         $inductionDetailsMarkup .= '<li><strong>' . $processingCenter['title'] . '</strong>' . $processingCenter['Processing_Center.Induction_Details'] . '</li>';
       }
 
@@ -110,6 +128,7 @@ function goonjcustom_evaluate_tokens(TokenValueEvent $e) {
 
     $row->tokens('contact', 'inductionDetails', $inductionDetailsMarkup);
   }
+}
 }
 
 /**
