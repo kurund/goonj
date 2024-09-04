@@ -266,12 +266,68 @@
 
       function disableForm(errorMsg) {
         $('af-form[ng-form="' + ctrl.getFormMeta().name + '"]')
-          .addClass('disabled')
-          .find('button[ng-click="afform.submit()"]').prop('disabled', true);
-        CRM.alert(errorMsg, ts('Sorry'), 'error');
+          .addClass("disabled")
+          .find('button[ng-click="afform.submit()"]')
+          .prop("disabled", true);
+        CRM.alert(errorMsg, ts("Sorry"), "error");
       }
+      // NOTE: This function currently provides basic validation for email, phone number, and postal code fields.
+      // For now, we have implemented these simple checks to meet current project requirements.
+      // In the future, we need to change this.
+      function customValidateFields() {
+        var isValid = true;
+        var errorMessage = "";
 
-      this.submit = function() {
+        // Email validation
+        var emailField = $element.find("input[type='email']");
+        if (emailField.length) {
+            var emailValue = emailField.val().trim();
+            if (emailValue !== "") {
+                var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(emailValue)) {
+                    errorMessage += "Please enter a valid email.\n";
+                    isValid = false;
+                }
+            }
+          }
+          
+        // Phone number validation
+        var phoneNumberField = $element.find("af-field[name='phone'] input[type='text']");
+        if (phoneNumberField.length) {
+            var phoneNumberValue = phoneNumberField.val().trim();
+            if (phoneNumberValue !== "") {
+                var phonePattern = /^\d{10}$/;
+                if (!phonePattern.test(phoneNumberValue)) {
+                    errorMessage += "Please enter a valid 10-digit mobile number.\n";
+                    isValid = false;
+                }
+            }
+        }
+    
+        // Postal code validation
+        var postalCodeField = $element.find("af-field[name='postal_code'] input[type='text']");
+        if (postalCodeField.length) {
+            var postalCodeValue = postalCodeField.val().trim();
+            if (postalCodeValue !== "") {
+                var postalCodePattern = /^\d{6}$/;
+                if (!postalCodePattern.test(postalCodeValue)) {
+                    errorMessage += "Please enter a valid 6-digit postal code.\n";
+                    isValid = false;
+                }
+            }
+        }
+    
+        if (!isValid) {
+            CRM.alert(errorMessage, ts("Form Error"));
+        }
+    
+        return isValid;
+    }
+    
+      this.submit = function () {
+        if (!customValidateFields()) {
+          return;
+        }
         // validate required fields on the form
         if (!ctrl.ngForm.$valid || !validateFileFields()) {
           CRM.alert(ts('Please fill all required fields.'), ts('Form Error'));
