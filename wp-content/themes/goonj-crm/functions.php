@@ -246,7 +246,7 @@ function goonj_handle_user_identification_form() {
 
 		if ( 'material-contribution' === $purpose ) {
 			$material_contribution_form_path = sprintf(
-				'/material-contribution/#?email=%s&phone=%s&Source_Tracking.Event=%s&source_contact_id=%s',
+				'/material-contribution/#?email=%s&phone=%s&Material_Contribution.Collection_Camp_ID=%s&source_contact_id=%s',
 				$email,
 				$phone,
 				$target_id,
