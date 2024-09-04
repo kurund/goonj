@@ -47,12 +47,12 @@ function goonjcustom_civicrm_enable(): void {
 function goonjcustom_civicrm_container(ContainerBuilder $container) {
   $container->addResource(new FileResource(__FILE__));
   $container->findDefinition('dispatcher')->addMethodCall(
-		'addListener',
-		['civi.token.list', 'goonjcustom_register_tokens']
+        'addListener',
+        ['civi.token.list', 'goonjcustom_register_tokens']
   )->setPublic(TRUE);
   $container->findDefinition('dispatcher')->addMethodCall(
-		'addListener',
-		['civi.token.eval', 'goonjcustom_evaluate_tokens']
+        'addListener',
+        ['civi.token.eval', 'goonjcustom_evaluate_tokens']
   )->setPublic(TRUE);
 }
 
@@ -61,7 +61,7 @@ function goonjcustom_civicrm_container(ContainerBuilder $container) {
  */
 function goonjcustom_register_tokens(TokenRegisterEvent $e) {
   $e->entity('contact')
-	->register('inductionDetails', ts('Induction details'));
+    ->register('inductionDetails', ts('Induction details'));
 }
 
 /**
@@ -137,24 +137,24 @@ function goonjcustom_evaluate_tokens(TokenValueEvent $e) {
  */
 function goonjcustom_civicrm_buildForm($formName, $form) {
   if ($formName == 'CRM_Activity_Form_Activity') {
-	$activityTypeId = $form->getVar('_activityTypeId');
-	// @todo find better way than hardcoding
-	if ($activityTypeId === 57) {
-	  $fieldsToRemove = [
-		'subject',
-		'engagement_level',
-		'location',
-		'duration',
-		'priority_id',
-	  ];
+    $activityTypeId = $form->getVar('_activityTypeId');
+    // @todo find better way than hardcoding
+    if ($activityTypeId === 57) {
+        $fieldsToRemove = [
+        'subject',
+        'engagement_level',
+        'location',
+        'duration',
+        'priority_id',
+        ];
 
-	  foreach ($fieldsToRemove as $field) {
-		if (isset($form->_elementIndex[$field])) {
-		  $form->removeElement($field);
-		}
-	  }
+        foreach ($fieldsToRemove as $field) {
+        if (isset($form->_elementIndex[$field])) {
+            $form->removeElement($field);
+        }
+        }
 
-	  CRM_Core_Region::instance('page-body')->add([
+        CRM_Core_Region::instance('page-body')->add([
 		'script' => "
 					CRM.$(function($) {
 						function updateCustomGroupVisibility() {
