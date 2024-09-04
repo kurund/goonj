@@ -5,6 +5,7 @@ namespace Civi;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\EckEntity;
+use Civi\Api4\Relationship;
 use Civi\Api4\StateProvince;
 use Civi\Core\Service\AutoSubscriber;
 
@@ -18,6 +19,7 @@ class CollectionCampService extends AutoSubscriber {
   const UNAUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP = 77;
   const UNAUTHORIZED_TEMPLATE_ID_DROPPING_CENTER = 82;
   const FALLBACK_OFFICE_NAME = 'Delhi';
+  const RELATIONSHIP_TYPE_NAME = 'Collection Camp Coordinator is';
 
   /**
    *
@@ -101,7 +103,7 @@ class CollectionCampService extends AutoSubscriber {
       }
 
       // Fetch the state abbreviation.
-      $stateProvinces = StateProvince::get(TRUE)
+      $stateProvinces = StateProvince::get(FALSE)
         ->addWhere('id', '=', $stateId)
         ->setLimit(1)
         ->execute();
@@ -198,7 +200,7 @@ class CollectionCampService extends AutoSubscriber {
       return;
     }
 
-    $collectionCamps = EckEntity::get('Collection_Camp', TRUE)
+    $collectionCamps = EckEntity::get('Collection_Camp', FALSE)
       ->addSelect('Collection_Camp_Core_Details.Status', 'Collection_Camp_Core_Details.Contact_Id')
       ->addWhere('id', '=', $objectId)
       ->execute();
@@ -339,8 +341,36 @@ class CollectionCampService extends AutoSubscriber {
       $stateOffice = self::getFallbackOffice();
     }
 
+    $stateOfficeId = $stateOffice['id'];
+
     EckEntity::update('Collection_Camp', FALSE)
-      ->addValue('Collection_Camp_Intent_Details.Goonj_Office', $stateOffice['id'])
+      ->addValue('Collection_Camp_Intent_Details.Goonj_Office', $stateOfficeId)
+      ->addWhere('id', '=', $collectionCampId)
+      ->execute();
+
+    $coordinators = Relationship::get(FALSE)
+      ->addWhere('contact_id_b', '=', $stateOfficeId)
+      ->addWhere('relationship_type_id:name', '=', self::RELATIONSHIP_TYPE_NAME)
+      ->addWhere('is_current', '=', TRUE)
+      ->execute();
+
+    $coordinatorCount = $coordinators->count();
+
+    if ($coordinatorCount === 0) {
+      $coordinator = self::getFallbackCoordinator();
+    }
+    elseif ($coordinatorCount > 1) {
+      $randomIndex = rand(0, $coordinatorCount - 1);
+      $coordinator = $coordinators->itemAt($randomIndex);
+    }
+    else {
+      $coordinator = $coordinators->first();
+    }
+
+    $coordinatorId = $coordinator['contact_id_a'];
+
+    EckEntity::update('Collection_Camp', FALSE)
+      ->addValue('Collection_Camp_Intent_Details.Coordinating_Urban_POC', $coordinatorId)
       ->addWhere('id', '=', $collectionCampId)
       ->execute();
 
@@ -390,6 +420,25 @@ class CollectionCampService extends AutoSubscriber {
       ->execute();
 
     return $fallbackOffices->first();
+  }
+
+  /**
+   *
+   */
+  private static function getFallbackCoordinator() {
+    $fallbackOffice = self::getFallbackOffice();
+    $fallbackCoordinators = Relationship::get(FALSE)
+      ->addWhere('contact_id_b', '=', $fallbackOffice['id'])
+      ->addWhere('relationship_type_id:name', '=', self::RELATIONSHIP_TYPE_NAME)
+      ->addWhere('is_current', '=', FALSE)
+      ->execute();
+
+    $coordinatorCount = $coordinators->count();
+
+    $randomIndex = rand(0, $coordinatorCount - 1);
+    $coordinator = $coordinators->itemAt($randomIndex);
+
+    return $coordinator;
   }
 
 }
