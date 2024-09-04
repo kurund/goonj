@@ -181,7 +181,7 @@ function goonj_handle_user_identification_form() {
 			$phone,
 			'not-inducted-for-dropping-center'
 		);
-		$volunteer_registration_url = home_url('/volunteer-registration');
+		$volunteer_registration_url = home_url('/volunteer-registration/form');
 
 		if ( empty( $found_contacts ) ) {
 			switch ( $purpose ) {
@@ -270,8 +270,7 @@ function goonj_handle_user_identification_form() {
 				'/processing-center/material-contribution/details/#?email=%s&phone=%s&Material_Contribution.Goonj_Office=%s&source_contact_id=%s',
 				$email,
 				$phone,
-				$target_id,
-				$found_contacts['id']
+				$target_id
 			);
 			wp_redirect( $material_form_path );
 			exit;
