@@ -88,7 +88,7 @@ function goonjcustom_evaluate_tokens(TokenValueEvent $e) {
 	$stateId = $statedata['address_primary.state_province_id'];
 
 	$processingCenters = \Civi\Api4\Contact::get(FALSE)
-	->addSelect('Goonj_Office_Details.Days_for_Induction', '*', 'custom.*')
+	->addSelect('Goonj_Office_Details.Days_for_Induction', '*', 'custom.*', 'addressee_id', 'id')
 	->addWhere('contact_sub_type', 'CONTAINS', 'Goonj_Office')
 	->addWhere('contact_type', '=', 'Organization')
 	->addWhere('Goonj_Office_Details.Induction_Catchment', 'CONTAINS', $stateId)
@@ -102,8 +102,17 @@ function goonjcustom_evaluate_tokens(TokenValueEvent $e) {
 		$inductionDetailsMarkup .= '<ol>';
 
 		foreach ($processingCenters as $processingCenter) {
+			$centerID = $processingCenter['id'];
+			// Fetch the primary address for the current center
+			$addressesData = \Civi\Api4\Address::get(false)
+            ->addWhere('contact_id', '=', $centerID)
+            ->addWhere('is_primary', '=', true)
+            ->setLimit(1)
+            ->execute();
+			$address = $addressesData->first();
+			$contactAddress = $address['street_address'];
 
-		$inductionDetailsMarkup .= '<li><strong>' . $processingCenter['organization_name'] . '</strong>: ' . $processingCenter['Goonj_Office_Details.Days_for_Induction'] . '</li>';
+			$inductionDetailsMarkup .= '<li><strong>' . $processingCenter['organization_name'] . '</strong><br /><span style="margin-top: 10px; display: block;">' . $contactAddress . '</span> ' . $processingCenter['Goonj_Office_Details.Days_for_Induction'] . '</li>';
 
 		}
 
