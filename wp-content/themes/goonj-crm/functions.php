@@ -246,10 +246,11 @@ function goonj_handle_user_identification_form() {
 
 		if ( 'material-contribution' === $purpose ) {
 			$material_contribution_form_path = sprintf(
-				'/material-contribution/#?email=%s&phone=%s&Source_Tracking.Event=%s',
+				'/material-contribution/#?email=%s&phone=%s&Source_Tracking.Event=%s&source_contact_id=%s',
 				$email,
 				$phone,
 				$target_id,
+				$found_contacts['id']
 			);
 			wp_redirect( $material_contribution_form_path );
 			exit;
