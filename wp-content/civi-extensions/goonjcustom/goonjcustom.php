@@ -47,12 +47,12 @@ function goonjcustom_civicrm_enable(): void {
 function goonjcustom_civicrm_container(ContainerBuilder $container) {
   $container->addResource(new FileResource(__FILE__));
   $container->findDefinition('dispatcher')->addMethodCall(
-        'addListener',
-        ['civi.token.list', 'goonjcustom_register_tokens']
+		'addListener',
+		['civi.token.list', 'goonjcustom_register_tokens']
   )->setPublic(TRUE);
   $container->findDefinition('dispatcher')->addMethodCall(
-        'addListener',
-        ['civi.token.eval', 'goonjcustom_evaluate_tokens']
+		'addListener',
+		['civi.token.eval', 'goonjcustom_evaluate_tokens']
   )->setPublic(TRUE);
 }
 
@@ -61,7 +61,7 @@ function goonjcustom_civicrm_container(ContainerBuilder $container) {
  */
 function goonjcustom_register_tokens(TokenRegisterEvent $e) {
   $e->entity('contact')
-    ->register('inductionDetails', ts('Induction details'));
+	->register('inductionDetails', ts('Induction details'));
 }
 
 /**
@@ -69,53 +69,53 @@ function goonjcustom_register_tokens(TokenRegisterEvent $e) {
  */
 function goonjcustom_evaluate_tokens(TokenValueEvent $e) {
   foreach ($e->getRows() as $row) {
-    /** @var TokenRow $row */
-    $row->format('text/html');
+	/** @var TokenRow $row */
+	$row->format('text/html');
 
-    $contactId = $row->context['contactId'];
+	$contactId = $row->context['contactId'];
 
-    if (empty($contactId)) {
-      $row->tokens('contact', 'inductionDetails', '');
-      continue;
-    }
+	if (empty($contactId)) {
+	  $row->tokens('contact', 'inductionDetails', '');
+	  continue;
+	}
 
-    $contacts = \Civi\Api4\Contact::get(FALSE)
-    ->addSelect('address_primary.state_province_id')
-    ->addWhere('id', '=', $contactId)
-    ->execute();
+	$contacts = \Civi\Api4\Contact::get(FALSE)
+	->addSelect('address_primary.state_province_id')
+	->addWhere('id', '=', $contactId)
+	->execute();
 
-    $statedata = $contacts->first();
-    $stateId = $statedata['address_primary.state_province_id'];
+	$statedata = $contacts->first();
+	$stateId = $statedata['address_primary.state_province_id'];
 
-    $processingCenters = \Civi\Api4\Contact::get(FALSE)
-    ->addSelect('Goonj_Office_Details.Days_for_Induction', '*', 'custom.*')
-    ->addWhere('contact_sub_type', 'CONTAINS', 'Goonj_Office')
-    ->addWhere('contact_type', '=', 'Organization')
-    ->addWhere('Goonj_Office_Details.Induction_Catchment', 'CONTAINS', $stateId)
-    ->execute();
+	$processingCenters = \Civi\Api4\Contact::get(FALSE)
+	->addSelect('Goonj_Office_Details.Days_for_Induction', '*', 'custom.*')
+	->addWhere('contact_sub_type', 'CONTAINS', 'Goonj_Office')
+	->addWhere('contact_type', '=', 'Organization')
+	->addWhere('Goonj_Office_Details.Induction_Catchment', 'CONTAINS', $stateId)
+	->execute();
 
-    $inductionDetailsMarkup = 'The next step in your volunteering journey is to get inducted with Goonj.';
+	$inductionDetailsMarkup = 'The next step in your volunteering journey is to get inducted with Goonj.';
 
-    If ($processingCenters->rowCount > 0) {
-    if (TRUE) {
-        $inductionDetailsMarkup .= ' You can visit any of our following center(s) during the time specified to complete your induction:';
-        $inductionDetailsMarkup .= '<ol>';
+	If ($processingCenters->rowCount > 0) {
+	if (TRUE) {
+		$inductionDetailsMarkup .= ' You can visit any of our following center(s) during the time specified to complete your induction:';
+		$inductionDetailsMarkup .= '<ol>';
 
-        foreach ($processingCenters as $processingCenter) {
+		foreach ($processingCenters as $processingCenter) {
 
-        $inductionDetailsMarkup .= '<li><strong>' . $processingCenter['organization_name'] . '</strong>: ' . $processingCenter['Goonj_Office_Details.Days_for_Induction'] . '</li>';
+		$inductionDetailsMarkup .= '<li><strong>' . $processingCenter['organization_name'] . '</strong>: ' . $processingCenter['Goonj_Office_Details.Days_for_Induction'] . '</li>';
 
-        }
+		}
 
-        $inductionDetailsMarkup .= '</ol>';
-    }
-    else {
-        $inductionDetailsMarkup .= ' Unfortunately, we don\'t currently have a processing center near to the location you have provided. Someone from our team will reach out and will share the details of induction.';
-    }
+		$inductionDetailsMarkup .= '</ol>';
+	}
+	else {
+		$inductionDetailsMarkup .= ' Unfortunately, we don\'t currently have a processing center near to the location you have provided. Someone from our team will reach out and will share the details of induction.';
+	}
 
-    $row->tokens('contact', 'inductionDetails', $inductionDetailsMarkup);
-    }
-    }
+	$row->tokens('contact', 'inductionDetails', $inductionDetailsMarkup);
+	}
+	}
 }
 
 /**
@@ -128,48 +128,48 @@ function goonjcustom_evaluate_tokens(TokenValueEvent $e) {
  */
 function goonjcustom_civicrm_buildForm($formName, $form) {
   if ($formName == 'CRM_Activity_Form_Activity') {
-    $activityTypeId = $form->getVar('_activityTypeId');
-    // @todo find better way than hardcoding
-    if ($activityTypeId === 57) {
-      $fieldsToRemove = [
-        'subject',
-        'engagement_level',
-        'location',
-        'duration',
-        'priority_id',
-      ];
+	$activityTypeId = $form->getVar('_activityTypeId');
+	// @todo find better way than hardcoding
+	if ($activityTypeId === 57) {
+	  $fieldsToRemove = [
+		'subject',
+		'engagement_level',
+		'location',
+		'duration',
+		'priority_id',
+	  ];
 
-      foreach ($fieldsToRemove as $field) {
-        if (isset($form->_elementIndex[$field])) {
-          $form->removeElement($field);
-        }
-      }
+	  foreach ($fieldsToRemove as $field) {
+		if (isset($form->_elementIndex[$field])) {
+		  $form->removeElement($field);
+		}
+	  }
 
-      CRM_Core_Region::instance('page-body')->add([
-        'script' => "
-                    CRM.$(function($) {
-                        function updateCustomGroupVisibility() {
-                            var selectedText = $('#status_id').find('option:selected').text();
-                            var customGroup = $('.custom-group-INDUCTION_DETAILS');
+	  CRM_Core_Region::instance('page-body')->add([
+		'script' => "
+					CRM.$(function($) {
+						function updateCustomGroupVisibility() {
+							var selectedText = $('#status_id').find('option:selected').text();
+							var customGroup = $('.custom-group-INDUCTION_DETAILS');
 
-                            if (selectedText === 'Completed') {
-                                customGroup.show();
-                                // TODO - need to add logic to handle required fields
-                            } else {
-                                customGroup.hide();
-                                // TODO - need to add logic to handle required fields
-                            }
-                        }
-                        $('#status_id').change(function() {
-                            updateCustomGroupVisibility();
-                        });
+							if (selectedText === 'Completed') {
+								customGroup.show();
+								// TODO - need to add logic to handle required fields
+							} else {
+								customGroup.hide();
+								// TODO - need to add logic to handle required fields
+							}
+						}
+						$('#status_id').change(function() {
+							updateCustomGroupVisibility();
+						});
 
-                        // It takes time to load the form fields so adding a delay to run the js once form is loaded.
-                        setTimeout(updateCustomGroupVisibility, 500);
-                    });
-                ",
-      ]);
-    }
+						// It takes time to load the form fields so adding a delay to run the js once form is loaded.
+						setTimeout(updateCustomGroupVisibility, 500);
+					});
+				",
+	  ]);
+	}
   }
 }
 
@@ -179,88 +179,88 @@ function goonjcustom_civicrm_buildForm($formName, $form) {
 function goonjcustom_civicrm_pageRun(&$page) {
   // Check if we are on the activity edit form page.
   CRM_Core_Region::instance('page-footer')->add(
-        [
-          'script' => '
-              (function($) {
-                  $(document).ajaxComplete(function(event, xhr, settings) {
-                    var isInductionActivity = false;
-                    var isCollectionCampActivity = false;
-                    var isActivityViewType61 = false;
-                    var urlParams = new URLSearchParams(settings.url);
-                    var activityTypeId57 = "57";
-                    var activityTypeId61 = "61";
+		[
+		  'script' => '
+			  (function($) {
+				  $(document).ajaxComplete(function(event, xhr, settings) {
+					var isInductionActivity = false;
+					var isCollectionCampActivity = false;
+					var isActivityViewType61 = false;
+					var urlParams = new URLSearchParams(settings.url);
+					var activityTypeId57 = "57";
+					var activityTypeId61 = "61";
 
-                    if ((urlParams.get("atype") === activityTypeId57 && urlParams.get("action") === "view") ||
-                        (urlParams.get("subType") === activityTypeId57 && urlParams.get("action") === "2")) {
-                        isInductionActivity = true;
-                    }
+					if ((urlParams.get("atype") === activityTypeId57 && urlParams.get("action") === "view") ||
+						(urlParams.get("subType") === activityTypeId57 && urlParams.get("action") === "2")) {
+						isInductionActivity = true;
+					}
 
-                    if ((urlParams.get("atype") === activityTypeId61 && urlParams.get("action") === "view") ||
-                        (urlParams.get("subType") === activityTypeId61 && urlParams.get("action") === "2")) {
-                        isCollectionCampActivity = true;
-                    }
+					if ((urlParams.get("atype") === activityTypeId61 && urlParams.get("action") === "view") ||
+						(urlParams.get("subType") === activityTypeId61 && urlParams.get("action") === "2")) {
+						isCollectionCampActivity = true;
+					}
 
-                    if (urlParams.get("subType") === activityTypeId61 && urlParams.get("action") === "view") {
-                        isActivityViewType61 = true;
-                    }
+					if (urlParams.get("subType") === activityTypeId61 && urlParams.get("action") === "view") {
+						isActivityViewType61 = true;
+					}
 
-                    if (isInductionActivity || isCollectionCampActivity || isActivityViewType61) {
-                        var fieldsToHide = [];
+					if (isInductionActivity || isCollectionCampActivity || isActivityViewType61) {
+						var fieldsToHide = [];
 
-                        if (isInductionActivity) {
-                            fieldsToHide = [
-                                ".crm-activity-form-block-subject",
-                                ".crm-activity-form-block-campaign_id",
-                                ".crm-activity-form-block-engagement_level",
-                                ".crm-activity-form-block-duration",
-                                ".crm-activity-form-block-priority_id",
-                                ".crm-activity-form-block-location",
-                                ".crm-activity-form-block-attachment",
-                                ".crm-activity-form-block-recurring_activity",
-                                ".crm-activity-form-block-schedule_followup",
-                            ];
-                        } else if (isCollectionCampActivity) {
-                            fieldsToHide = [
-                                ".crm-activity-form-block-subject",
-                                ".crm-activity-form-block-engagement_level",
-                                ".crm-activity-form-block-duration",
-                                ".crm-activity-form-block-priority_id",
-                                ".crm-activity-form-block-location",
-                                ".crm-activity-form-block-attachment",
-                                ".crm-activity-form-block-recurring_activity",
-                                ".crm-activity-form-block-schedule_followup",
-                                ".crm-activity-form-block-target_contact_id",
-                                ".crm-activity-form-block-assignee_contact_id",
-                                ".crm-activity-form-block-activity_date_time",
-                                ".crm-activity-form-block-details",
-                            ];
-                        } else if (isActivityViewType61) {
-                            fieldsToHide = [
-                                ".crm-activity-form-block-target_contact_id",
-                                ".crm-activity-form-block-assignee_contact_id",
-                                ".crm-activity-form-block-engagement_level",
-                                ".crm-activity-form-block-duration",
-                                ".crm-activity-form-block-details",
-                                ".crm-activity-form-block-priority_id",
-                                ".crm-activity-form-block-subject",
-                                ".crm-activity-form-block-location",
-                                ".crm-activity-form-block-campaign_id",
-                            ];
-                        }
+						if (isInductionActivity) {
+							fieldsToHide = [
+								".crm-activity-form-block-subject",
+								".crm-activity-form-block-campaign_id",
+								".crm-activity-form-block-engagement_level",
+								".crm-activity-form-block-duration",
+								".crm-activity-form-block-priority_id",
+								".crm-activity-form-block-location",
+								".crm-activity-form-block-attachment",
+								".crm-activity-form-block-recurring_activity",
+								".crm-activity-form-block-schedule_followup",
+							];
+						} else if (isCollectionCampActivity) {
+							fieldsToHide = [
+								".crm-activity-form-block-subject",
+								".crm-activity-form-block-engagement_level",
+								".crm-activity-form-block-duration",
+								".crm-activity-form-block-priority_id",
+								".crm-activity-form-block-location",
+								".crm-activity-form-block-attachment",
+								".crm-activity-form-block-recurring_activity",
+								".crm-activity-form-block-schedule_followup",
+								".crm-activity-form-block-target_contact_id",
+								".crm-activity-form-block-assignee_contact_id",
+								".crm-activity-form-block-activity_date_time",
+								".crm-activity-form-block-details",
+							];
+						} else if (isActivityViewType61) {
+							fieldsToHide = [
+								".crm-activity-form-block-target_contact_id",
+								".crm-activity-form-block-assignee_contact_id",
+								".crm-activity-form-block-engagement_level",
+								".crm-activity-form-block-duration",
+								".crm-activity-form-block-details",
+								".crm-activity-form-block-priority_id",
+								".crm-activity-form-block-subject",
+								".crm-activity-form-block-location",
+								".crm-activity-form-block-campaign_id",
+							];
+						}
 
-                        fieldsToHide.forEach(function(field) {
-                            $(field).css("display", "none");
-                        });
+						fieldsToHide.forEach(function(field) {
+							$(field).css("display", "none");
+						});
 
-                        if (isInductionActivity) {
-                            var inductionFields = $(".custom-group-Induction_Fields tr");
-                            $(".crm-activity-form-block-activity_date_time").after(inductionFields);
-                            $(".custom-group-Induction_Fields").remove();
-                        }
-                    }
-                    });
-                })(CRM.$);
-            ',
-        ]
+						if (isInductionActivity) {
+							var inductionFields = $(".custom-group-Induction_Fields tr");
+							$(".crm-activity-form-block-activity_date_time").after(inductionFields);
+							$(".custom-group-Induction_Fields").remove();
+						}
+					}
+					});
+				})(CRM.$);
+			',
+		]
   );
 }
