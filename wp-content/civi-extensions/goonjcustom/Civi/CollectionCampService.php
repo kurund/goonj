@@ -3,6 +3,7 @@
 namespace Civi;
 
 use Civi\Api4\Contact;
+use Civi\Api4\CustomField;
 use Civi\Api4\EckEntity;
 use Civi\Api4\StateProvince;
 use Civi\Core\Service\AutoSubscriber;
@@ -16,6 +17,7 @@ class CollectionCampService extends AutoSubscriber {
   const AUTHORIZED_TEMPLATE_ID_DROPPING_CENTER = 83;
   const UNAUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP = 77;
   const UNAUTHORIZED_TEMPLATE_ID_DROPPING_CENTER = 82;
+  const FALLBACK_OFFICE_NAME = 'Delhi';
 
   /**
    *
@@ -24,12 +26,12 @@ class CollectionCampService extends AutoSubscriber {
     return [
       '&hook_civicrm_post' => [
         ['generateCollectionCampCode'],
-        ['updateCampStateAndPoc'],
       ],
       '&hook_civicrm_pre' => [
         ['handleAuthorizationEmails'],
         ['generateCollectionCampQr'],
       ],
+      '&hook_civicrm_custom' => 'setOfficeDetails',
     ];
   }
 
@@ -294,66 +296,100 @@ class CollectionCampService extends AutoSubscriber {
   }
 
   /**
-   * This hook is called after a db write on entities.
+   * This hook is called after the database write on a custom table.
    *
    * @param string $op
    *   The type of operation being performed.
    * @param string $objectName
-   *   The name of the object.
+   *   The custom group ID.
    * @param int $objectId
-   *   The unique identifier for the object.
+   *   The entityID of the row in the custom table.
    * @param object $objectRef
-   *   The reference to the object.
+   *   The parameters that were sent into the calling function.
    */
-  public static function updateCampStateAndPoc(string $op, string $objectName, int $objectId, &$objectRef) {
-    // Check if the object name is 'AfformSubmission'.
-    if ($objectName !== 'AfformSubmission') {
+  public static function setOfficeDetails($op, $groupID, $entityID, &$params) {
+    if ($op !== 'create') {
       return;
     }
 
-    // Extract the 'data' field.
-    $data = $objectRef->data;
-    $decodedData = json_decode($data, TRUE);
-
-    // Check if 'Eck_Collection_Camp1' exists.
-    $collectionCampEntries = $decodedData['Eck_Collection_Camp1'] ?? [];
-    if (empty($collectionCampEntries)) {
+    if (!($stateField = self::findStateField($params))) {
       return;
     }
 
-    foreach ($collectionCampEntries as $entry) {
-      $collectionCampData = $entry['fields'] ?? NULL;
-      $startDate = $collectionCampData['Collection_Camp_Intent_Details.Start_Date'] ?? NULL;
-      $contactName = $collectionCampData['Collection_Camp_Intent_Details.Name'] ?? NULL;
+    $stateId = $stateField['value'];
+    $collectionCampId = $stateField['entity_id'];
 
-      $result = EckEntity::get('Collection_Camp')
-        ->addSelect('id')
-        ->addWhere('Collection_Camp_Intent_Details.Start_Date', '=', $startDate)
-        ->addWhere('Collection_Camp_Intent_Details.Name', '=', $contactName)
-        ->execute();
-
-      $collectionCampresult = $result->first();
-      $collectionCampId = $collectionCampresult['id'] ?? NULL;
-
-      // Access the state.
-      $stateId = $collectionCampData['Collection_Camp_Intent_Details.State'] ?? NULL;
-
-      $contacts = Contact::get(FALSE)
-        ->addSelect('Goonj_Office_Details.Collection_Camp_Catchment', '*', 'custom.*', 'display_name')
-        ->addWhere('contact_type', '=', 'Organization')
-        ->addWhere('contact_sub_type', 'CONTAINS', 'Goonj_Office')
-        ->addWhere('Goonj_Office_Details.Collection_Camp_Catchment', '=', $stateId)
-        ->execute();
-
-      $contactData = $contacts->first();
-      $contactId = $contactData['id'];
-
-      $collectionCampresultData = EckEntity::update('Collection_Camp', FALSE)
-        ->addValue('Collection_Camp_Intent_Details.Goonj_Office', $contactId)
-        ->addWhere('id', '=', $collectionCampId)
-        ->execute();
-
+    if (!$stateId) {
+      \CRM_Core_Error::debug_log_message('Cannot assign Goonj Office to collection camp: ' . $collectionCamp['id']);
+      \CRM_Core_Error::debug_log_message('No state provided on the intent for collection camp: ' . $collectionCamp['id']);
+      return FALSE;
     }
+
+    $officesFound = Contact::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('contact_type', '=', 'Organization')
+      ->addWhere('contact_sub_type', 'CONTAINS', 'Goonj_Office')
+      ->addWhere('Goonj_Office_Details.Collection_Camp_Catchment', 'CONTAINS', $stateId)
+      ->execute();
+
+    $stateOffice = $officesFound->first();
+
+    // If no state office is found, assign the fallback state office.
+    if (!$stateOffice) {
+      $stateOffice = self::getFallbackOffice();
+    }
+
+    EckEntity::update('Collection_Camp', FALSE)
+      ->addValue('Collection_Camp_Intent_Details.Goonj_Office', $stateOffice['id'])
+      ->addWhere('id', '=', $collectionCampId)
+      ->execute();
+
+    return TRUE;
+
+  }
+
+  /**
+   *
+   */
+  private static function findStateField(array $array) {
+    $filteredItems = array_filter($array, fn($item) => $item['entity_table'] === 'civicrm_eck_collection_camp');
+
+    if (empty($filteredItems)) {
+      return FALSE;
+    }
+
+    $collectionCampStateFields = CustomField::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('name', '=', 'state')
+      ->addWhere('custom_group_id:name', '=', 'Collection_Camp_Intent_Details')
+      ->execute()
+      ->first();
+
+    if (!$collectionCampStateFields) {
+      return FALSE;
+    }
+
+    $stateFieldId = $collectionCampStateFields['id'];
+
+    $stateItemIndex = array_search(TRUE, array_map(fn($item) =>
+        $item['entity_table'] === 'civicrm_eck_collection_camp' &&
+        $item['custom_field_id'] == $stateFieldId,
+        $filteredItems
+    ));
+
+    return $stateItemIndex !== FALSE ? $filteredItems[$stateItemIndex] : FALSE;
+  }
+
+  /**
+   *
+   */
+  private static function getFallbackOffice() {
+    $fallbackOffices = Contact::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('organization_name', 'CONTAINS', self::FALLBACK_OFFICE_NAME)
+      ->execute();
+
+    return $fallbackOffices->first();
   }
 
 }
