@@ -52,7 +52,6 @@ class CRM_Goonjcustom_CivirulesAction_GenerateQrCodeForContact extends CRM_Civir
       $tempFilePath = CRM_Utils_File::tempnam($baseFileName);
       $numBytes = file_put_contents($tempFilePath, $qrcode);
 
-
       if (!$numBytes) {
         CRM_Core_Error::debug_log_message('Failed to write QR code to temporary file for contact ID ' . $contactId);
         return FALSE;
