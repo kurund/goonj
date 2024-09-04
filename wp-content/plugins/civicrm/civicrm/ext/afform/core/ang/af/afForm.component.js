@@ -279,48 +279,49 @@
         // Email validation
         var emailField = $element.find("input[type='email']");
         if (emailField.length) {
-          var emailValue = emailField.val();
-          var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          if (!emailPattern.test(emailValue)) {
-            errorMessage +=
-              "Please enter a valid email.\n";
-            isValid = false;
+            var emailValue = emailField.val().trim();
+            if (emailValue !== "") {
+                var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(emailValue)) {
+                    errorMessage += "Please enter a valid email.\n";
+                    isValid = false;
+                }
+            }
           }
-        }
-
+          
         // Phone number validation
-        var phoneNumberField = $element.find(
-          "af-field[name='phone'] input[type='text']"
-        );
+        var phoneNumberField = $element.find("af-field[name='phone'] input[type='text']");
         if (phoneNumberField.length) {
-          var phoneNumberValue = phoneNumberField.val();
-          var phonePattern = /^\d{10}$/;
-          if (!phonePattern.test(phoneNumberValue)) {
-            errorMessage += "Please enter a valid 10-digit mobile number.\n";
-            isValid = false;
-          }
+            var phoneNumberValue = phoneNumberField.val().trim();
+            if (phoneNumberValue !== "") {
+                var phonePattern = /^\d{10}$/;
+                if (!phonePattern.test(phoneNumberValue)) {
+                    errorMessage += "Please enter a valid 10-digit mobile number.\n";
+                    isValid = false;
+                }
+            }
         }
-
+    
         // Postal code validation
-        var postalCodeField = $element.find(
-          "af-field[name='postal_code'] input[type='text']"
-        );
+        var postalCodeField = $element.find("af-field[name='postal_code'] input[type='text']");
         if (postalCodeField.length) {
-          var postalCodeValue = postalCodeField.val();
-          var postalCodePattern = /^\d{6}$/;
-          if (!postalCodePattern.test(postalCodeValue)) {
-            errorMessage += "Please enter a valid 6-digit postal code.\n";
-            isValid = false;
-          }
+            var postalCodeValue = postalCodeField.val().trim();
+            if (postalCodeValue !== "") {
+                var postalCodePattern = /^\d{6}$/;
+                if (!postalCodePattern.test(postalCodeValue)) {
+                    errorMessage += "Please enter a valid 6-digit postal code.\n";
+                    isValid = false;
+                }
+            }
         }
-
+    
         if (!isValid) {
-          CRM.alert(errorMessage, ts("Form Error"));
+            CRM.alert(errorMessage, ts("Form Error"));
         }
-
+    
         return isValid;
-      }
-
+    }
+    
       this.submit = function () {
         if (!customValidateFields()) {
           return;
