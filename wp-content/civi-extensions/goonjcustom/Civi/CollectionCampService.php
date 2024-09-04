@@ -103,7 +103,7 @@ class CollectionCampService extends AutoSubscriber {
       }
 
       // Fetch the state abbreviation.
-      $stateProvinces = StateProvince::get(TRUE)
+      $stateProvinces = StateProvince::get(FALSE)
         ->addWhere('id', '=', $stateId)
         ->setLimit(1)
         ->execute();
@@ -200,7 +200,7 @@ class CollectionCampService extends AutoSubscriber {
       return;
     }
 
-    $collectionCamps = EckEntity::get('Collection_Camp', TRUE)
+    $collectionCamps = EckEntity::get('Collection_Camp', FALSE)
       ->addSelect('Collection_Camp_Core_Details.Status', 'Collection_Camp_Core_Details.Contact_Id')
       ->addWhere('id', '=', $objectId)
       ->execute();
@@ -348,9 +348,10 @@ class CollectionCampService extends AutoSubscriber {
       ->addWhere('id', '=', $collectionCampId)
       ->execute();
 
-    $coordinators = Relationship::get(TRUE)
+    $coordinators = Relationship::get(FALSE)
       ->addWhere('contact_id_b', '=', $stateOfficeId)
       ->addWhere('relationship_type_id:name', '=', self::RELATIONSHIP_TYPE_NAME)
+      ->addWhere('is_current', '=', TRUE)
       ->execute();
 
     $coordinatorCount = $coordinators->count();
@@ -426,9 +427,10 @@ class CollectionCampService extends AutoSubscriber {
    */
   private static function getFallbackCoordinator() {
     $fallbackOffice = self::getFallbackOffice();
-    $fallbackCoordinators = Relationship::get(TRUE)
+    $fallbackCoordinators = Relationship::get(FALSE)
       ->addWhere('contact_id_b', '=', $fallbackOffice['id'])
       ->addWhere('relationship_type_id:name', '=', self::RELATIONSHIP_TYPE_NAME)
+      ->addWhere('is_current', '=', FALSE)
       ->execute();
 
     $coordinatorCount = $coordinators->count();
