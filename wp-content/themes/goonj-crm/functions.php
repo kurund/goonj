@@ -271,7 +271,8 @@ function goonj_handle_user_identification_form() {
 				'/processing-center/material-contribution/details/#?email=%s&phone=%s&Material_Contribution.Goonj_Office=%s&source_contact_id=%s',
 				$email,
 				$phone,
-				$target_id
+				$target_id,
+				$found_contacts['id']
 			);
 			wp_redirect( $material_form_path );
 			exit;
