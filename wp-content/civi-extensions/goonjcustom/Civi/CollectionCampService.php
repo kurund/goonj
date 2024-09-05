@@ -473,21 +473,35 @@ class CollectionCampService extends AutoSubscriber {
       $joins = $entry['joins'] ?? NULL;
       $stateProvinceId = $joins['Address'][0]['state_province_id'];
       $email = $joins['Email'][0]['email'];
-      error_log("email: " . print_r($email, TRUE));
-      error_log("stateProvinceId: " . print_r($stateProvinceId, TRUE));
-
-      $email = \Civi\Api4\Email::get(FALSE)
-      ->addWhere('email', '=', $email)
-      ->execute();
-
-      $emailData = $email->first();
-      error_log("email: " . print_r($email, TRUE));
-
-      $contactId = $emailData['contact_id'];
 
       if (!$stateProvinceId || !$email) {
         continue;
       }
+
+      // Implement a delay and retry mechanism
+      $maxRetries = 5;
+      $retryDelay = 1; // seconds
+
+      $contactId = NULL;
+      for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+          $emailData = \Civi\Api4\Email::get(FALSE)
+              ->addWhere('email', '=', $email)
+              ->execute();
+
+          $contactData = $emailData->first();
+          $contactId = $contactData['contact_id'] ?? NULL;
+          if ($contactId) {
+              break;
+          }
+
+          // Wait before retrying
+          sleep($retryDelay);
+      }
+
+      if (empty($contactId)) {
+          continue;
+      }
+      error_log("contactId: " . print_r($contactId, TRUE));
 
       $groups = \Civi\Api4\Group::get(FALSE)
       ->addSelect('custom.*', 'id')
@@ -496,18 +510,19 @@ class CollectionCampService extends AutoSubscriber {
       ->execute();
 
       $groupData = $groups->first();
-      $groupId = $groupData['id'];
+      $groupId = $groupData['id'] ?? NULL;
+
+      if (empty($groupId)) {
+          continue;
+      }
 
       $groupContactResult = \Civi\Api4\GroupContact::create(FALSE)
       ->addValue('contact_id', $contactId)
       ->addValue('group_id', $groupId)
       ->addValue('status', 'Added')
       ->execute();
-      
-      error_log("groupContactResult: " . print_r($groupContactResult, TRUE));
 
     }
-
   }
 
 }
