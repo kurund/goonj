@@ -323,13 +323,13 @@
 
         // Check if End is in the past
         if (startDate < today) {
-            errorMessage += `Collections Start Date ${startDateValue} cannot be in the past.\n`;
+            errorMessage += `Collection Camp Start Date ${startDateValue} cannot be in the past.\n`;
             isValid = false;
         }
         
         // Check if End Date is before Start Date
         if (endDate < startDate) {
-            errorMessage += `Collection End Date ${endDateValue} cannot be before Start Date.\n`;
+            errorMessage += `Collection Camp End Date ${endDateValue} cannot be before Start Date.\n`;
             isValid = false;
         }
     }
