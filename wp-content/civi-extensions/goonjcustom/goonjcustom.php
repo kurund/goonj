@@ -68,49 +68,64 @@ function goonjcustom_register_tokens(TokenRegisterEvent $e) {
  *
  */
 function goonjcustom_evaluate_tokens(TokenValueEvent $e) {
-  foreach ($e->getRows() as $row) {
-    /** @var TokenRow $row */
-    $row->format('text/html');
-
-    $contactId = $row->context['contactId'];
-
-    if (empty($contactId)) {
-      $row->tokens('contact', 'inductionDetails', '');
-      continue;
-    }
-
-    $contacts = Contact::get(FALSE)
-      ->addSelect('address_primary.state_province_id')
-      ->addWhere('id', '=', $contactId)
-      ->setLimit(25)
-      ->execute();
-
-    $stateId = $contacts[0]['address_primary.state_province_id'];
-
-    // $processingCenters = EckEntity::get('Processing_Center', FALSE)
-    //   ->addSelect('*', 'custom.*')
-    //   ->addWhere('Processing_Center.Associated_States', 'IN', [$stateId])
-    //   ->execute();
-    $inductionDetailsMarkup = 'The next step in your volunteering journey is to get inducted with Goonj.';
-
-    // If ($processingCenters->rowCount > 0) {.
-    if (FALSE) {
-      $inductionDetailsMarkup .= ' You can visit any of our following center(s) during the time specified to complete your induction:';
-      $inductionDetailsMarkup .= '<ol>';
-
-      foreach ($processingCenters as $processingCenter) {
-        $inductionDetailsMarkup .= '<li><strong>' . $processingCenter['title'] . '</strong>' . $processingCenter['Processing_Center.Induction_Details'] . '</li>';
-      }
-
-      $inductionDetailsMarkup .= '</ol>';
-    }
-    else {
-      $inductionDetailsMarkup .= ' Unfortunately, we don\'t currently have a processing center near to the location you have provided. Someone from our team will reach out and will share the details of induction.';
-    }
-
-    $row->tokens('contact', 'inductionDetails', $inductionDetailsMarkup);
+	foreach ($e->getRows() as $row) {
+	  /** @var TokenRow $row */
+	  $row->format('text/html');
+  
+	  $contactId = $row->context['contactId'];
+  
+	  if (empty($contactId)) {
+		$row->tokens('contact', 'inductionDetails', '');
+		continue;
+	  }
+  
+	  $contacts = \Civi\Api4\Contact::get(FALSE)
+	  ->addSelect('address_primary.state_province_id')
+	  ->addWhere('id', '=', $contactId)
+	  ->execute();
+  
+	  $statedata = $contacts->first();
+	  $stateId = $statedata['address_primary.state_province_id'];
+  
+	  $processingCenters = \Civi\Api4\Contact::get(FALSE)
+	  ->addSelect('Goonj_Office_Details.Days_for_Induction', '*', 'custom.*', 'addressee_id', 'id')
+	  ->addWhere('contact_sub_type', 'CONTAINS', 'Goonj_Office')
+	  ->addWhere('contact_type', '=', 'Organization')
+	  ->addWhere('Goonj_Office_Details.Induction_Catchment', 'CONTAINS', $stateId)
+	  ->execute();
+  
+	  $inductionDetailsMarkup = 'The next step in your volunteering journey is to get inducted with Goonj.';
+  
+	  If ($processingCenters->rowCount > 0) {
+	  if (TRUE) {
+		  $inductionDetailsMarkup .= ' You can visit any of our following center(s) during the time specified to complete your induction:';
+		  $inductionDetailsMarkup .= '<ol>';
+  
+		  foreach ($processingCenters as $processingCenter) {
+			  $centerID = $processingCenter['id'];
+			  // Fetch the primary address for the current center
+			  $addressesData = \Civi\Api4\Address::get(false)
+			  ->addWhere('contact_id', '=', $centerID)
+			  ->addWhere('is_primary', '=', true)
+			  ->setLimit(1)
+			  ->execute();
+			  $address = $addressesData->first();
+			  $contactAddress = $address['street_address'];
+  
+			  $inductionDetailsMarkup .= '<li><strong>' . $processingCenter['organization_name'] . '</strong><br /><span style="margin-top: 10px; display: block;">' . $contactAddress . '</span> ' . $processingCenter['Goonj_Office_Details.Days_for_Induction'] . '</li>';
+  
+		  }
+  
+		  $inductionDetailsMarkup .= '</ol>';
+	  }
+	  else {
+		  $inductionDetailsMarkup .= ' Unfortunately, we don\'t currently have a processing center near to the location you have provided. Someone from our team will reach out and will share the details of induction.';
+	  }
+  
+	  $row->tokens('contact', 'inductionDetails', $inductionDetailsMarkup);
+	  }
+	  }
   }
-}
 
 /**
  * Implements hook_civicrm_buildForm().
@@ -125,22 +140,22 @@ function goonjcustom_civicrm_buildForm($formName, $form) {
     $activityTypeId = $form->getVar('_activityTypeId');
     // @todo find better way than hardcoding
     if ($activityTypeId === 57) {
-      $fieldsToRemove = [
+        $fieldsToRemove = [
         'subject',
         'engagement_level',
         'location',
         'duration',
         'priority_id',
-      ];
+        ];
 
-      foreach ($fieldsToRemove as $field) {
+        foreach ($fieldsToRemove as $field) {
         if (isset($form->_elementIndex[$field])) {
-          $form->removeElement($field);
+            $form->removeElement($field);
         }
-      }
+        }
 
-      CRM_Core_Region::instance('page-body')->add([
-        'script' => "
+        CRM_Core_Region::instance('page-body')->add([
+		'script' => "
 					CRM.$(function($) {
 						function updateCustomGroupVisibility() {
 							var selectedText = $('#status_id').find('option:selected').text();
@@ -162,8 +177,8 @@ function goonjcustom_civicrm_buildForm($formName, $form) {
 						setTimeout(updateCustomGroupVisibility, 500);
 					});
 				",
-      ]);
-    }
+	  ]);
+	}
   }
 }
 
@@ -173,8 +188,8 @@ function goonjcustom_civicrm_buildForm($formName, $form) {
 function goonjcustom_civicrm_pageRun(&$page) {
   // Check if we are on the activity edit form page.
   CRM_Core_Region::instance('page-footer')->add(
-        [
-          'script' => '
+		[
+		  'script' => '
 			  (function($) {
 				  $(document).ajaxComplete(function(event, xhr, settings) {
 					var isInductionActivity = false;
@@ -255,6 +270,6 @@ function goonjcustom_civicrm_pageRun(&$page) {
 					});
 				})(CRM.$);
 			',
-        ]
+		]
   );
 }
