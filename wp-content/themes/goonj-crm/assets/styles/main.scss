@@ -404,3 +404,14 @@ form input {
 .justify-content-center{
   justify-content: center;
 }
+
+@media (min-width: 375px) and (max-width: 768px) { 
+  .wp-block-gb-goonj-blocks {
+      width: 90% !important;
+      gap: 5px !important;
+      justify-content: center !important;
+  }
+  .wp-block-gb-goonj-blocks .wp-block-gb-action-button {
+    padding: 16px 12px !important;
+  }
+}
