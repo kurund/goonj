@@ -364,7 +364,6 @@ class CollectionCampService extends AutoSubscriber {
       ];
 
       $result = civicrm_api3('Attachment', 'create', $params);
-      error_log("params: " . print_r($params, TRUE));
 
       if (empty($result['id'])) {
         CRM_Core_Error::debug_log_message('Failed to create attachment for contact ID ' . $contactId);
