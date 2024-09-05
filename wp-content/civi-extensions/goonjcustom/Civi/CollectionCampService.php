@@ -347,7 +347,7 @@ class CollectionCampService extends AutoSubscriber {
       $numBytes = file_put_contents($tempFilePath, $qrcode);
 
       if (!$numBytes) {
-        CRM_Core_Error::debug_log_message('Failed to write QR code to temporary file for contact ID ' . $collectionCampId);
+        CRM_Core_Error::debug_log_message('Failed to write QR code to temporary file for collection camp ID ' . $collectionCampId);
         return FALSE;
       }
 
@@ -361,13 +361,13 @@ class CollectionCampService extends AutoSubscriber {
       $qrField = $customFields->first();
 
       if (!$qrField) {
-        CRM_Core_Error::debug_log_message('No field to save QR Code for contact ID ' . $collectionCampId);
+        CRM_Core_Error::debug_log_message('No field to save QR Code for collection camp ID ' . $collectionCampId);
         return FALSE;
       }
 
       $qrFieldId = 'custom_' . $qrField['id'];
 
-      // Save the QR code as an attachment linked to the contact.
+      // Save the QR code as an attachment linked to the collection camp.
       $params = [
         'entity_id' => $collectionCampId,
         'name' => $fileName,
@@ -384,7 +384,7 @@ class CollectionCampService extends AutoSubscriber {
 
 
       if (empty($result['id'])) {
-        CRM_Core_Error::debug_log_message('Failed to create attachment for contact ID ' . $collectionCampId);
+        CRM_Core_Error::debug_log_message('Failed to create attachment for collection camp ID ' . $collectionCampId);
         return FALSE;
       }
 
