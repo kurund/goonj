@@ -310,17 +310,16 @@ class CollectionCampService extends AutoSubscriber {
     $currentCollectionCamp = $collectionCamps->first();
     $currentStatus = $currentCollectionCamp['Collection_Camp_Core_Details.Status'];
     $collectionCampId = $currentCollectionCamp['id'];
-    $contactId = $currentCollectionCamp['Collection_Camp_Core_Details.Contact_Id'];
 
     // Check for status change.
     if ($currentStatus !== $newStatus) {
       if ($newStatus === 'authorized') {
-        self::generateQrCode($contactId, $collectionCampId);
+        self::generateQrCode($collectionCampId);
       }
     }
   }
 
-  public static function generateQrCode($contactId, $collectionCampId) {
+  public static function generateQrCode($collectionCampId) {
     try {
       $baseUrl = CRM_Core_Config::singleton()->userFrameworkBaseURL;
       $url = "{$baseUrl}actions/collection-camp/{$collectionCampId}";
@@ -339,7 +338,7 @@ class CollectionCampService extends AutoSubscriber {
 
       $qrcode = base64_decode($qrcode);
   
-      $baseFileName = "qr_code_{$contactId}.png";
+      $baseFileName = "qr_code_{$collectionCampId}.png";
 
       $fileName = CRM_Utils_File::makeFileName($baseFileName);
 
@@ -348,25 +347,28 @@ class CollectionCampService extends AutoSubscriber {
       $numBytes = file_put_contents($tempFilePath, $qrcode);
 
       if (!$numBytes) {
-        CRM_Core_Error::debug_log_message('Failed to write QR code to temporary file for contact ID ' . $contactId);
+        CRM_Core_Error::debug_log_message('Failed to write QR code to temporary file for contact ID ' . $collectionCampId);
         return FALSE;
       }
 
       // Save the QR code as an attachment linked to the contact.
       $params = [
-        'entity_id' => $contactId,
+        'entity_id' => $collectionCampId,
         'name' => $fileName,
         'mime_type' => 'image/png',
-        'field_name' => 'custom_215',
+        'field_name' => 'custom_258',
         'options' => [
           'move-file' => $tempFilePath,
         ],
       ];
+      error_log("params: " . print_r($params, TRUE));
 
       $result = civicrm_api3('Attachment', 'create', $params);
+      error_log("result: " . print_r($result, TRUE));
+
 
       if (empty($result['id'])) {
-        CRM_Core_Error::debug_log_message('Failed to create attachment for contact ID ' . $contactId);
+        CRM_Core_Error::debug_log_message('Failed to create attachment for contact ID ' . $collectionCampId);
         return FALSE;
       }
 
