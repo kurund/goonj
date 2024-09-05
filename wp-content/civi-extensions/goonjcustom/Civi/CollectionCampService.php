@@ -77,9 +77,16 @@ class CollectionCampService extends AutoSubscriber {
     $stateContactGroup = $stateContactGroups->first();
 
     if (!$stateContactGroup) {
-      \CRM_Core_Error::debug_log_message('Cannot assign chapter group to: ' . self::$individualId);
-      \CRM_Core_Error::debug_log_message('No chapter group found for state ID: ' . $stateId);
-      return FALSE;
+      \CRM_Core_Error::debug_log_message('No chapter contact group found for state ID: ' . $stateId);
+
+      $fallbackGroups = Group::get(FALSE)
+        ->addWhere('Chapter_Contact_Group.Use_Case', '=', 'chapter-contacts')
+        ->addWhere('Chapter_Contact_Group.Fallback_Chapter', '=', 1)
+        ->execute();
+
+      $stateContactGroup = $fallbackGroups->first();
+
+      \Civi::log()->info('Assigning fallback chapter contact group: ' . $stateContactGroup['title']);
     }
 
     $groupId = $stateContactGroup['id'];
