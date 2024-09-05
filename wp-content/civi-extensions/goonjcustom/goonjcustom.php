@@ -41,18 +41,6 @@ function goonjcustom_civicrm_enable(): void {
 }
 
 /**
- * Implements hook_civicrm_managed().
- *
- * Generate a list of entities to create/deactivate/delete when this module
- * is installed, disabled, uninstalled.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_managed
- */
-function goonjcustom_civicrm_managed(&$entities) {
-  _goonjcustom_civix_civicrm_managed($entities);
-}
-
-/**
  * Add token services to the container.
  *
  * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
