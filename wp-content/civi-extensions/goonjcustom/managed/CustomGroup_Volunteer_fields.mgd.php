@@ -3,7 +3,7 @@ use CRM_Goonjcustom_ExtensionUtil as E;
 
 return [
   [
-    'name' => 'CustomGroup_Volunteer_fields',
+    'name' => 'Volunteer_fields',
     'entity' => 'CustomGroup',
     'cleanup' => 'unused',
     'update' => 'unmodified',
