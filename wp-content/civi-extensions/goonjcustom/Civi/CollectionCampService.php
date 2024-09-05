@@ -5,6 +5,9 @@ namespace Civi;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\EckEntity;
+use Civi\Api4\Email;
+use Civi\Api4\Group;
+use Civi\Api4\GroupContact;
 use Civi\Api4\Relationship;
 use Civi\Api4\StateProvince;
 use Civi\Core\Service\AutoSubscriber;
@@ -35,6 +38,7 @@ class CollectionCampService extends AutoSubscriber {
         ['generateCollectionCampQr'],
       ],
       '&hook_civicrm_custom' => 'setOfficeDetails',
+      '&hook_civicrm_fieldOptions' => 'setIndianStateOptions',
     ];
   }
 
@@ -434,12 +438,49 @@ class CollectionCampService extends AutoSubscriber {
       ->addWhere('is_current', '=', FALSE)
       ->execute();
 
-    $coordinatorCount = $coordinators->count();
+    $coordinatorCount = $fallbackCoordinators->count();
 
     $randomIndex = rand(0, $coordinatorCount - 1);
-    $coordinator = $coordinators->itemAt($randomIndex);
+    $coordinator = $fallbackCoordinators->itemAt($randomIndex);
 
     return $coordinator;
+  }
+
+  /**
+   *
+   */
+  public static function setIndianStateOptions(string $entity, string $field, array &$options, array $params) {
+    if ($entity !== 'Eck_Collection_Camp') {
+      return;
+    }
+
+    $intentStateFields = CustomField::get(FALSE)
+      ->addWhere('custom_group_id:name', '=', 'Collection_Camp_Intent_Details')
+      ->addWhere('name', '=', 'State')
+      ->execute();
+
+    $stateField = $intentStateFields->first();
+
+    $statefieldId = $stateField['id'];
+
+    if ($field !== "custom_$statefieldId") {
+      return;
+    }
+
+    $indianStates = StateProvince::get(FALSE)
+      ->addWhere('country_id.iso_code', '=', 'IN')
+      ->addOrderBy('name', 'ASC')
+      ->execute();
+
+    $stateOptions = [];
+    foreach ($indianStates as $state) {
+      if ($state['is_active']) {
+        $stateOptions[$state['id']] = $state['name'];
+      }
+    }
+
+    $options = $stateOptions;
+
   }
 
   /**
@@ -478,48 +519,49 @@ class CollectionCampService extends AutoSubscriber {
         continue;
       }
 
-      // Implement a delay and retry mechanism
+      // Implement a delay and retry mechanism.
       $maxRetries = 5;
-      $retryDelay = 1; // seconds
+      // Seconds.
+      $retryDelay = 1;
 
       $contactId = NULL;
       for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
-          $emailData = \Civi\Api4\Email::get(FALSE)
-              ->addWhere('email', '=', $email)
-              ->execute();
+        $emailData = Email::get(FALSE)
+          ->addWhere('email', '=', $email)
+          ->execute();
 
-          $contactData = $emailData->first();
-          $contactId = $contactData['contact_id'] ?? NULL;
-          if ($contactId) {
-              break;
-          }
+        $contactData = $emailData->first();
+        $contactId = $contactData['contact_id'] ?? NULL;
+        if ($contactId) {
+          break;
+        }
 
-          // Wait before retrying
-          sleep($retryDelay);
+        // Wait before retrying.
+        sleep($retryDelay);
       }
 
       if (empty($contactId)) {
-          continue;
+        continue;
       }
 
-      $groups = \Civi\Api4\Group::get(FALSE)
-      ->addSelect('custom.*', 'id')
-      ->addWhere('Chapter_Contact_Group.Use_Case', '=', 'contact_catchment')
-      ->addWhere('Chapter_Contact_Group.Contact_Catchment', 'CONTAINS', $stateProvinceId)
-      ->execute();
+      $groups = Group::get(FALSE)
+        ->addSelect('custom.*', 'id')
+        ->addWhere('Chapter_Contact_Group.Use_Case', '=', 'contact_catchment')
+        ->addWhere('Chapter_Contact_Group.Contact_Catchment', 'CONTAINS', $stateProvinceId)
+        ->execute();
 
       $groupData = $groups->first();
       $groupId = $groupData['id'] ?? NULL;
 
       if (empty($groupId)) {
-          continue;
+        continue;
       }
 
-      $groupContactResult = \Civi\Api4\GroupContact::create(FALSE)
-      ->addValue('contact_id', $contactId)
-      ->addValue('group_id', $groupId)
-      ->addValue('status', 'Added')
-      ->execute();
+      $groupContactResult = GroupContact::create(FALSE)
+        ->addValue('contact_id', $contactId)
+        ->addValue('group_id', $groupId)
+        ->addValue('status', 'Added')
+        ->execute();
 
     }
   }
