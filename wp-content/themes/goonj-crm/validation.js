@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Validate email
     const emailValue = emailInput.value;
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
+    if (emailValue !== "" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
       valid = false;
       showError(emailInput, "The e-mail address entered is invalid.");
     }
