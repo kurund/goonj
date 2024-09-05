@@ -92,7 +92,7 @@ function gb_goonj_blocks_check_action_target_exists() {
 			$result = \Civi\Api4\EckEntity::get( 'Collection_Camp', false )
 				->selectRowCount()
 				->addSelect( ...$entity_fields )
-				->addWhere( 'Collection_Camp_Core_Details.Contact_Id', '=', $id )
+				->addWhere( 'id', '=', $id )
 				->setLimit( 1 )
 				->execute();
 

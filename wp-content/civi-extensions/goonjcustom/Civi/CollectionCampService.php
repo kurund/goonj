@@ -309,20 +309,21 @@ class CollectionCampService extends AutoSubscriber {
 
     $currentCollectionCamp = $collectionCamps->first();
     $currentStatus = $currentCollectionCamp['Collection_Camp_Core_Details.Status'];
+    $collectionCampId = $currentCollectionCamp['id'];
     $contactId = $currentCollectionCamp['Collection_Camp_Core_Details.Contact_Id'];
 
     // Check for status change.
     if ($currentStatus !== $newStatus) {
       if ($newStatus === 'authorized') {
-        self::generateQrCode($contactId);
+        self::generateQrCode($contactId, $collectionCampId);
       }
     }
   }
 
-  public static function generateQrCode($contactId) {
+  public static function generateQrCode($contactId, $collectionCampId) {
     try {
       $baseUrl = CRM_Core_Config::singleton()->userFrameworkBaseURL;
-      $url = "{$baseUrl}actions/collection-camp/{$contactId}";
+      $url = "{$baseUrl}actions/collection-camp/{$collectionCampId}";
   
       $options = new QROptions([
         'version'    => 5,
