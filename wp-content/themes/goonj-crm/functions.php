@@ -181,7 +181,11 @@ function goonj_handle_user_identification_form() {
 			$phone,
 			'not-inducted-for-dropping-center'
 		);
-		$volunteer_registration_url = home_url('/volunteer-registration/form');
+		$volunteer_registration_url = sprintf(
+			'/volunteer-registration/form/#?email=%s&phone=%s',
+			$email,
+			$phone,
+		);
 
 		if ( empty( $found_contacts ) ) {
 			switch ( $purpose ) {
