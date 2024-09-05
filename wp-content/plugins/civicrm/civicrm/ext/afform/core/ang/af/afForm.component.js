@@ -304,10 +304,11 @@
             }
         }
 
-        // collection camp start date and end date validation
-        var startDateValue = $element.find("af-field[name='Collection_Camp_Intent_Details.Start_Date'] .crm-form-date-wrapper input.crm-form-date").val();
-        var endDateValue = $element.find("af-field[name='Collection_Camp_Intent_Details.End_Date'] .crm-form-date-wrapper input.crm-form-date").val();
-        
+    // Collection camp start date and end date validation
+    var startDateValue = $element.find("af-field[name='Collection_Camp_Intent_Details.Start_Date'] .crm-form-date-wrapper input.crm-form-date").val();
+    var endDateValue = $element.find("af-field[name='Collection_Camp_Intent_Details.End_Date'] .crm-form-date-wrapper input.crm-form-date").val();
+    
+    if (startDateValue && endDateValue) {
         var today = new Date();
         today.setHours(0, 0, 0, 0); 
         
@@ -322,17 +323,44 @@
 
         // Check if End is in the past
         if (startDate < today) {
-          errorMessage += `Collections Start Date ${startDateValue} cannot be in the past.\n`;
-          isValid = false;
-        
+            errorMessage += `Collections Start Date ${startDateValue} cannot be in the past.\n`;
+            isValid = false;
         }
         
         // Check if End Date is before Start Date
         if (endDate < startDate) {
-          errorMessage += `Collection End Date ${endDateValue} cannot be before Start Date.\n`;
-          isValid = false;
-        
-        }  
+            errorMessage += `Collection End Date ${endDateValue} cannot be before Start Date.\n`;
+            isValid = false;
+        }
+    }
+
+    // Birth date validation
+    var birthDateField = $element.find("af-field[name='birth_date'] input[type='text']");
+    if (birthDateField.length) {
+        var birthDateValue = birthDateField.val().trim();
+        if (birthDateValue !== "") {
+            var birthDateParts = birthDateValue.split('/');
+            if (birthDateParts.length === 3) {
+                var birthDate = new Date(birthDateParts[2], birthDateParts[1] - 1, birthDateParts[0]);
+                var today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                if (birthDate.toDateString() === today.toDateString()) {
+                  errorMessage += `Date of Birth cannot be today.\n`;
+                    isValid = false;
+                }
+                
+                if (birthDate > today) {
+                  errorMessage += `Date of Birth cannot be in the future.\n`;
+                    isValid = false;
+                }
+            } else {
+                errorMessage += "Invalid Date of Birth format.\n";
+                isValid = false;
+            }
+        }
+    }
+     
          
         // Postal code validation
         var postalCodeField = $element.find("af-field[name='postal_code'] input[type='text']");
