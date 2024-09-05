@@ -356,7 +356,7 @@ class CollectionCampService extends AutoSubscriber {
         'entity_id' => $collectionCampId,
         'name' => $fileName,
         'mime_type' => 'image/png',
-        'field_name' => 'custom_258',
+        'field_name' => 'custom_256',
         'options' => [
           'move-file' => $tempFilePath,
         ],
