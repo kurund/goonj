@@ -7,6 +7,8 @@ require_once __DIR__ . '/../../../../wp-content/civi-extensions/goonjcustom/vend
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\EckEntity;
+use Civi\Api4\Group;
+use Civi\Api4\GroupContact;
 use Civi\Api4\Relationship;
 use Civi\Api4\StateProvince;
 use Civi\Core\Service\AutoSubscriber;
@@ -28,6 +30,8 @@ class CollectionCampService extends AutoSubscriber {
   const FALLBACK_OFFICE_NAME = 'Delhi';
   const RELATIONSHIP_TYPE_NAME = 'Collection Camp Coordinator is';
 
+  private static $individualId = NULL;
+
   /**
    *
    */
@@ -35,13 +39,71 @@ class CollectionCampService extends AutoSubscriber {
     return [
       '&hook_civicrm_post' => [
         ['generateCollectionCampCode'],
+        ['individualCreated'],
+        ['assignChapterGroupToIndividual'],
       ],
       '&hook_civicrm_pre' => [
         ['handleAuthorizationEmails'],
         ['generateCollectionCampQr'],
       ],
       '&hook_civicrm_custom' => 'setOfficeDetails',
+      '&hook_civicrm_fieldOptions' => 'setIndianStateOptions',
     ];
+  }
+
+  /**
+   *
+   */
+  public static function individualCreated(string $op, string $objectName, int $objectId, &$objectRef) {
+    if ($op !== 'create' || $objectName !== 'Individual') {
+      return FALSE;
+    }
+
+    self::$individualId = $objectId;
+  }
+
+  /**
+   *
+   */
+  public static function assignChapterGroupToIndividual(string $op, string $objectName, int $objectId, &$objectRef) {
+    if ($op !== 'create' || $objectName !== 'Address') {
+      return FALSE;
+    }
+
+    if (self::$individualId !== $objectRef->contact_id || !$objectRef->is_primary) {
+      return FALSE;
+    }
+
+    $stateId = $objectRef->state_province_id;
+
+    $stateContactGroups = Group::get(FALSE)
+      ->addWhere('Chapter_Contact_Group.Use_Case', '=', 'chapter-contacts')
+      ->addWhere('Chapter_Contact_Group.Contact_Catchment', 'IN', [$stateId])
+      ->execute();
+
+    $stateContactGroup = $stateContactGroups->first();
+
+    if (!$stateContactGroup) {
+      \CRM_Core_Error::debug_log_message('No chapter contact group found for state ID: ' . $stateId);
+
+      $fallbackGroups = Group::get(FALSE)
+        ->addWhere('Chapter_Contact_Group.Use_Case', '=', 'chapter-contacts')
+        ->addWhere('Chapter_Contact_Group.Fallback_Chapter', '=', 1)
+        ->execute();
+
+      $stateContactGroup = $fallbackGroups->first();
+
+      \Civi::log()->info('Assigning fallback chapter contact group: ' . $stateContactGroup['title']);
+    }
+
+    $groupId = $stateContactGroup['id'];
+
+    $groupContactResult = GroupContact::create(FALSE)
+      ->addValue('contact_id', self::$individualId)
+      ->addValue('group_id', $groupId)
+      ->addValue('status', 'Added')
+      ->execute();
+
   }
 
   /**
@@ -535,12 +597,49 @@ class CollectionCampService extends AutoSubscriber {
       ->addWhere('is_current', '=', FALSE)
       ->execute();
 
-    $coordinatorCount = $coordinators->count();
+    $coordinatorCount = $fallbackCoordinators->count();
 
     $randomIndex = rand(0, $coordinatorCount - 1);
-    $coordinator = $coordinators->itemAt($randomIndex);
+    $coordinator = $fallbackCoordinators->itemAt($randomIndex);
 
     return $coordinator;
+  }
+
+  /**
+   *
+   */
+  public static function setIndianStateOptions(string $entity, string $field, array &$options, array $params) {
+    if ($entity !== 'Eck_Collection_Camp') {
+      return;
+    }
+
+    $intentStateFields = CustomField::get(FALSE)
+      ->addWhere('custom_group_id:name', '=', 'Collection_Camp_Intent_Details')
+      ->addWhere('name', '=', 'State')
+      ->execute();
+
+    $stateField = $intentStateFields->first();
+
+    $statefieldId = $stateField['id'];
+
+    if ($field !== "custom_$statefieldId") {
+      return;
+    }
+
+    $indianStates = StateProvince::get(FALSE)
+      ->addWhere('country_id.iso_code', '=', 'IN')
+      ->addOrderBy('name', 'ASC')
+      ->execute();
+
+    $stateOptions = [];
+    foreach ($indianStates as $state) {
+      if ($state['is_active']) {
+        $stateOptions[$state['id']] = $state['name'];
+      }
+    }
+
+    $options = $stateOptions;
+
   }
 
 }
