@@ -433,10 +433,10 @@ class CollectionCampService extends AutoSubscriber {
       ->addWhere('is_current', '=', FALSE)
       ->execute();
 
-    $coordinatorCount = $coordinators->count();
+    $coordinatorCount = $fallbackCoordinators->count();
 
     $randomIndex = rand(0, $coordinatorCount - 1);
-    $coordinator = $coordinators->itemAt($randomIndex);
+    $coordinator = $fallbackCoordinators->itemAt($randomIndex);
 
     return $coordinator;
   }
