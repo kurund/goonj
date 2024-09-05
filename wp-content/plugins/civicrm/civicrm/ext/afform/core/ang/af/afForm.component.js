@@ -303,7 +303,37 @@
                 }
             }
         }
-    
+
+        // collection camp start date and end date validation
+        var startDateValue = $element.find("af-field[name='Collection_Camp_Intent_Details.Start_Date'] .crm-form-date-wrapper input.crm-form-date").val();
+        var endDateValue = $element.find("af-field[name='Collection_Camp_Intent_Details.End_Date'] .crm-form-date-wrapper input.crm-form-date").val();
+        
+        var today = new Date();
+        today.setHours(0, 0, 0, 0); 
+        
+        var startDateParts = startDateValue.split('/');
+        var endDateParts = endDateValue.split('/');
+        
+        var startDate = new Date(startDateParts[2], startDateParts[1] - 1, startDateParts[0]);
+        var endDate = new Date(endDateParts[2], endDateParts[1] - 1, endDateParts[0]);
+        
+        var errorMessage = '';
+        var isValid = true;
+
+        // Check if End is in the past
+        if (startDate < today) {
+          errorMessage += `Collections Start Date ${startDateValue} cannot be in the past.\n`;
+          isValid = false;
+        
+        }
+        
+        // Check if End Date is before Start Date
+        if (endDate < startDate) {
+          errorMessage += `Collection End Date ${endDateValue} cannot be before Start Date.\n`;
+          isValid = false;
+        
+        }  
+         
         // Postal code validation
         var postalCodeField = $element.find("af-field[name='postal_code'] input[type='text']");
         if (postalCodeField.length) {
