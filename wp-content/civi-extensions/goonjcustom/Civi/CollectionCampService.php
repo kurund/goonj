@@ -2,12 +2,19 @@
 
 namespace Civi;
 
+require_once __DIR__ . '/../../../../wp-content/civi-extensions/goonjcustom/vendor/autoload.php';
+
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\EckEntity;
 use Civi\Api4\Relationship;
 use Civi\Api4\StateProvince;
 use Civi\Core\Service\AutoSubscriber;
+use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\QROptions;
+use CRM_Core_Config;
+use CRM_Utils_File;
+use CRM_Core_Error;
 
 /**
  *
@@ -295,6 +302,83 @@ class CollectionCampService extends AutoSubscriber {
       return;
     }
 
+    $collectionCamps = EckEntity::get('Collection_Camp', TRUE)
+      ->addSelect('Collection_Camp_Core_Details.Status', 'Collection_Camp_Core_Details.Contact_Id')
+      ->addWhere('id', '=', $objectId)
+      ->execute();
+
+    $currentCollectionCamp = $collectionCamps->first();
+    $currentStatus = $currentCollectionCamp['Collection_Camp_Core_Details.Status'];
+    $contactId = $currentCollectionCamp['Collection_Camp_Core_Details.Contact_Id'];
+
+    // Check for status change.
+    if ($currentStatus !== $newStatus) {
+      if ($newStatus === 'authorized') {
+        self::generateQrCode($contactId);
+      }
+    }
+  }
+
+  public static function generateQrCode($contactId) {
+    try {
+      $baseUrl = CRM_Core_Config::singleton()->userFrameworkBaseURL;
+      $url = "{$baseUrl}actions/collection-camp/{$contactId}";
+  
+      $options = new QROptions([
+        'version'    => 5,
+        'outputType' => QRCode::OUTPUT_IMAGE_PNG,
+        'eccLevel'   => QRCode::ECC_L,
+        'scale'      => 10,
+      ]);
+  
+      $qrcode = (new QRCode($options))->render($url);
+  
+      // Remove the base64 header and decode the image data.
+      $qrcode = str_replace('data:image/png;base64,', '', $qrcode);
+
+      $qrcode = base64_decode($qrcode);
+  
+      $baseFileName = "qr_code_{$contactId}.png";
+
+      $fileName = CRM_Utils_File::makeFileName($baseFileName);
+
+      $tempFilePath = CRM_Utils_File::tempnam($baseFileName);
+
+      $numBytes = file_put_contents($tempFilePath, $qrcode);
+
+      if (!$numBytes) {
+        CRM_Core_Error::debug_log_message('Failed to write QR code to temporary file for contact ID ' . $contactId);
+        return FALSE;
+      }
+
+      // Save the QR code as an attachment linked to the contact.
+      $params = [
+        'entity_id' => $contactId,
+        'name' => $fileName,
+        'mime_type' => 'image/png',
+        'field_name' => 'custom_215',
+        'options' => [
+          'move-file' => $tempFilePath,
+        ],
+      ];
+
+      $result = civicrm_api3('Attachment', 'create', $params);
+      error_log("params: " . print_r($params, TRUE));
+
+      if (empty($result['id'])) {
+        CRM_Core_Error::debug_log_message('Failed to create attachment for contact ID ' . $contactId);
+        return FALSE;
+      }
+
+      $attachment = $result['values'][$result['id']];
+      $attachmentUrl = $attachment['url'];
+
+    } catch (\CiviCRM_API3_Exception $e) {
+      CRM_Core_Error::debug_log_message('Error generating QR code: ' . $e->getMessage());
+      return FALSE;
+    }
+
+    return TRUE;
   }
 
   /**
