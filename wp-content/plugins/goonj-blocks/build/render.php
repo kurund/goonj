@@ -35,8 +35,8 @@ $pu_material_contribution_check_link = sprintf(
 );
 
 if ( in_array( $target, array( 'collection-camp', 'dropping-center' ) ) ) :
-	$start_date = new DateTime( $action_target['start_date'] );
-	$end_date   = new DateTime( $action_target['end_date'] );
+	$start_date = new DateTime( $action_target['Collection_Camp_Intent_Details.Start_Date'] );
+	$end_date   = new DateTime( $action_target['Collection_Camp_Intent_Details.End_Date'] );
 	?>
 	<div class="wp-block-gb-heading-wrapper">
 		<h2 class="wp-block-gb-heading"><?php echo esc_html($heading_text); ?></h2>

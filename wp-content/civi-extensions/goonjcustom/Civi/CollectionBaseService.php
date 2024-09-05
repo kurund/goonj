@@ -28,13 +28,6 @@ class CollectionBaseService extends AutoSubscriber {
       return;
     }
 
-    $entityID = $context['entity_id'];
-
-    $url = \CRM_Utils_System::url(
-          'civicrm/eck/entity/qr',
-          "reset=1&snippet=5&force=1&id=$entityID&action=update"
-    );
-
     // URL for the Contribution tab.
     $contributionUrl = \CRM_Utils_System::url(
           "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fcollection-camp%2Fmaterial-contributions",
@@ -44,15 +37,6 @@ class CollectionBaseService extends AutoSubscriber {
     $tabs['contribution'] = [
       'title' => ts('Contribution'),
       'link' => $contributionUrl,
-      'valid' => 1,
-      'active' => 1,
-      'current' => FALSE,
-    ];
-
-    // Add a new QR tab along with URL.
-    $tabs['qr'] = [
-      'title' => ts('QR Codes'),
-      'link' => $url,
       'valid' => 1,
       'active' => 1,
       'current' => FALSE,
