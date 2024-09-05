@@ -4,6 +4,8 @@ namespace Civi;
 
 require_once __DIR__ . '/../../../../wp-content/civi-extensions/goonjcustom/vendor/autoload.php';
 
+use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\QROptions;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\EckEntity;
@@ -12,11 +14,6 @@ use Civi\Api4\GroupContact;
 use Civi\Api4\Relationship;
 use Civi\Api4\StateProvince;
 use Civi\Core\Service\AutoSubscriber;
-use chillerlan\QRCode\QRCode;
-use chillerlan\QRCode\QROptions;
-use CRM_Core_Config;
-use CRM_Utils_File;
-use CRM_Core_Error;
 
 /**
  *
@@ -381,35 +378,38 @@ class CollectionCampService extends AutoSubscriber {
     }
   }
 
+  /**
+   *
+   */
   public static function generateQrCode($collectionCampId) {
     try {
-      $baseUrl = CRM_Core_Config::singleton()->userFrameworkBaseURL;
+      $baseUrl = \CRM_Core_Config::singleton()->userFrameworkBaseURL;
       $url = "{$baseUrl}actions/collection-camp/{$collectionCampId}";
-  
+
       $options = new QROptions([
         'version'    => 5,
         'outputType' => QRCode::OUTPUT_IMAGE_PNG,
         'eccLevel'   => QRCode::ECC_L,
         'scale'      => 10,
       ]);
-  
+
       $qrcode = (new QRCode($options))->render($url);
-  
+
       // Remove the base64 header and decode the image data.
       $qrcode = str_replace('data:image/png;base64,', '', $qrcode);
 
       $qrcode = base64_decode($qrcode);
-  
+
       $baseFileName = "qr_code_{$collectionCampId}.png";
 
-      $fileName = CRM_Utils_File::makeFileName($baseFileName);
+      $fileName = \CRM_Utils_File::makeFileName($baseFileName);
 
-      $tempFilePath = CRM_Utils_File::tempnam($baseFileName);
+      $tempFilePath = \CRM_Utils_File::tempnam($baseFileName);
 
       $numBytes = file_put_contents($tempFilePath, $qrcode);
 
       if (!$numBytes) {
-        CRM_Core_Error::debug_log_message('Failed to write QR code to temporary file for collection camp ID ' . $collectionCampId);
+        \CRM_Core_Error::debug_log_message('Failed to write QR code to temporary file for collection camp ID ' . $collectionCampId);
         return FALSE;
       }
 
@@ -423,7 +423,7 @@ class CollectionCampService extends AutoSubscriber {
       $qrField = $customFields->first();
 
       if (!$qrField) {
-        CRM_Core_Error::debug_log_message('No field to save QR Code for collection camp ID ' . $collectionCampId);
+        \CRM_Core_Error::debug_log_message('No field to save QR Code for collection camp ID ' . $collectionCampId);
         return FALSE;
       }
 
@@ -439,22 +439,19 @@ class CollectionCampService extends AutoSubscriber {
           'move-file' => $tempFilePath,
         ],
       ];
-      error_log("params: " . print_r($params, TRUE));
 
       $result = civicrm_api3('Attachment', 'create', $params);
-      error_log("result: " . print_r($result, TRUE));
-
 
       if (empty($result['id'])) {
-        CRM_Core_Error::debug_log_message('Failed to create attachment for collection camp ID ' . $collectionCampId);
+        \CRM_Core_Error::debug_log_message('Failed to create attachment for collection camp ID ' . $collectionCampId);
         return FALSE;
       }
 
       $attachment = $result['values'][$result['id']];
       $attachmentUrl = $attachment['url'];
-
-    } catch (\CiviCRM_API3_Exception $e) {
-      CRM_Core_Error::debug_log_message('Error generating QR code: ' . $e->getMessage());
+    }
+    catch (\CiviCRM_API3_Exception $e) {
+      \CRM_Core_Error::debug_log_message('Error generating QR code: ' . $e->getMessage());
       return FALSE;
     }
 
