@@ -5,6 +5,8 @@ namespace Civi;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\EckEntity;
+use Civi\Api4\Group;
+use Civi\Api4\GroupContact;
 use Civi\Api4\Relationship;
 use Civi\Api4\StateProvince;
 use Civi\Core\Service\AutoSubscriber;
@@ -21,6 +23,8 @@ class CollectionCampService extends AutoSubscriber {
   const FALLBACK_OFFICE_NAME = 'Delhi';
   const RELATIONSHIP_TYPE_NAME = 'Collection Camp Coordinator is';
 
+  private static $individualId = NULL;
+
   /**
    *
    */
@@ -28,6 +32,8 @@ class CollectionCampService extends AutoSubscriber {
     return [
       '&hook_civicrm_post' => [
         ['generateCollectionCampCode'],
+        ['individualCreated'],
+        ['assignChapterGroupToIndividual'],
       ],
       '&hook_civicrm_pre' => [
         ['handleAuthorizationEmails'],
@@ -36,6 +42,54 @@ class CollectionCampService extends AutoSubscriber {
       '&hook_civicrm_custom' => 'setOfficeDetails',
       '&hook_civicrm_fieldOptions' => 'setIndianStateOptions',
     ];
+  }
+
+  /**
+   *
+   */
+  public static function individualCreated(string $op, string $objectName, int $objectId, &$objectRef) {
+    if ($op !== 'create' || $objectName !== 'Individual') {
+      return FALSE;
+    }
+
+    self::$individualId = $objectId;
+  }
+
+  /**
+   *
+   */
+  public static function assignChapterGroupToIndividual(string $op, string $objectName, int $objectId, &$objectRef) {
+    if ($op !== 'create' || $objectName !== 'Address') {
+      return FALSE;
+    }
+
+    if (self::$individualId !== $objectRef->contact_id || !$objectRef->is_primary) {
+      return FALSE;
+    }
+
+    $stateId = $objectRef->state_province_id;
+
+    $stateContactGroups = Group::get(FALSE)
+      ->addWhere('Chapter_Contact_Group.Use_Case', '=', 'chapter-contacts')
+      ->addWhere('Chapter_Contact_Group.Contact_Catchment', 'IN', [$stateId])
+      ->execute();
+
+    $stateContactGroup = $stateContactGroups->first();
+
+    if (!$stateContactGroup) {
+      \CRM_Core_Error::debug_log_message('Cannot assign chapter group to: ' . self::$individualId);
+      \CRM_Core_Error::debug_log_message('No chapter group found for state ID: ' . $stateId);
+      return FALSE;
+    }
+
+    $groupId = $stateContactGroup['id'];
+
+    $groupContactResult = GroupContact::create(FALSE)
+      ->addValue('contact_id', self::$individualId)
+      ->addValue('group_id', $groupId)
+      ->addValue('status', 'Added')
+      ->execute();
+
   }
 
   /**
