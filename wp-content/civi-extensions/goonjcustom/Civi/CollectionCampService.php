@@ -351,12 +351,28 @@ class CollectionCampService extends AutoSubscriber {
         return FALSE;
       }
 
+      $customFields = CustomField::get(TRUE)
+        ->addSelect('id')
+        ->addWhere('custom_group_id:name', '=', 'Collection_Camp_QR_Code')
+        ->addWhere('name', '=', 'QR_Code')
+        ->setLimit(1)
+        ->execute();
+
+      $qrField = $customFields->first();
+
+      if (!$qrField) {
+        CRM_Core_Error::debug_log_message('No field to save QR Code for contact ID ' . $collectionCampId);
+        return FALSE;
+      }
+
+      $qrFieldId = 'custom_' . $qrField['id'];
+
       // Save the QR code as an attachment linked to the contact.
       $params = [
         'entity_id' => $collectionCampId,
         'name' => $fileName,
         'mime_type' => 'image/png',
-        'field_name' => 'custom_256',
+        'field_name' => $qrFieldId,
         'options' => [
           'move-file' => $tempFilePath,
         ],
