@@ -464,12 +464,12 @@ class CollectionCampService extends AutoSubscriber {
     $data = $objectRef->data;
     $decodedData = json_decode($data, TRUE);
 
-    $collectionCampEntries = $decodedData['Individual1'] ?? [];
-    if (empty($collectionCampEntries)) {
+    $individualEntries = $decodedData['Individual1'] ?? [];
+    if (empty($individualEntries)) {
       return;
     }
 
-    foreach ($collectionCampEntries as $entry) {
+    foreach ($individualEntries as $entry) {
       $joins = $entry['joins'] ?? NULL;
       $stateProvinceId = $joins['Address'][0]['state_province_id'];
       $email = $joins['Email'][0]['email'];
