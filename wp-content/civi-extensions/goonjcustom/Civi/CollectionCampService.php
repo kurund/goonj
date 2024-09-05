@@ -28,6 +28,7 @@ class CollectionCampService extends AutoSubscriber {
     return [
       '&hook_civicrm_post' => [
         ['generateCollectionCampCode'],
+        ['assignContactToGroup'],
       ],
       '&hook_civicrm_pre' => [
         ['handleAuthorizationEmails'],
@@ -439,6 +440,74 @@ class CollectionCampService extends AutoSubscriber {
     $coordinator = $coordinators->itemAt($randomIndex);
 
     return $coordinator;
+  }
+
+  /**
+   * This hook is called after a db write on entities.
+   *
+   * @param string $op
+   *   The type of operation being performed.
+   * @param string $objectName
+   *   The name of the object.
+   * @param int $objectId
+   *   The unique identifier for the object.
+   * @param object $objectRef
+   *   The reference to the object.
+   */
+  public static function assignContactToGroup(string $op, string $objectName, int $objectId, &$objectRef) {
+    // Check if the object name is 'AfformSubmission'.
+    if ($objectName !== 'AfformSubmission') {
+      return;
+    }
+
+    // Extract the 'data' field.
+    $data = $objectRef->data;
+    $decodedData = json_decode($data, TRUE);
+
+    $collectionCampEntries = $decodedData['Individual1'] ?? [];
+    if (empty($collectionCampEntries)) {
+      return;
+    }
+
+    foreach ($collectionCampEntries as $entry) {
+      $joins = $entry['joins'] ?? NULL;
+      $stateProvinceId = $joins['Address'][0]['state_province_id'];
+      $email = $joins['Email'][0]['email'];
+      error_log("email: " . print_r($email, TRUE));
+      error_log("stateProvinceId: " . print_r($stateProvinceId, TRUE));
+
+      $email = \Civi\Api4\Email::get(FALSE)
+      ->addWhere('email', '=', $email)
+      ->execute();
+
+      $emailData = $email->first();
+      error_log("email: " . print_r($email, TRUE));
+
+      $contactId = $emailData['contact_id'];
+
+      if (!$stateProvinceId || !$email) {
+        continue;
+      }
+
+      $groups = \Civi\Api4\Group::get(FALSE)
+      ->addSelect('custom.*', 'id')
+      ->addWhere('Chapter_Contact_Group.Use_Case', '=', 'contact_catchment')
+      ->addWhere('Chapter_Contact_Group.Contact_Catchment', 'CONTAINS', $stateProvinceId)
+      ->execute();
+
+      $groupData = $groups->first();
+      $groupId = $groupData['id'];
+
+      $groupContactResult = \Civi\Api4\GroupContact::create(FALSE)
+      ->addValue('contact_id', $contactId)
+      ->addValue('group_id', $groupId)
+      ->addValue('status', 'Added')
+      ->execute();
+      
+      error_log("groupContactResult: " . print_r($groupContactResult, TRUE));
+
+    }
+
   }
 
 }
