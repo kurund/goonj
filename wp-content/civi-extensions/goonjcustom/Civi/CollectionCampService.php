@@ -501,7 +501,6 @@ class CollectionCampService extends AutoSubscriber {
       if (empty($contactId)) {
           continue;
       }
-      error_log("contactId: " . print_r($contactId, TRUE));
 
       $groups = \Civi\Api4\Group::get(FALSE)
       ->addSelect('custom.*', 'id')
