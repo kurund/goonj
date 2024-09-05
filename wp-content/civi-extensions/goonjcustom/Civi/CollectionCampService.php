@@ -5,7 +5,6 @@ namespace Civi;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\EckEntity;
-use Civi\Api4\Email;
 use Civi\Api4\Group;
 use Civi\Api4\GroupContact;
 use Civi\Api4\Relationship;
@@ -24,6 +23,8 @@ class CollectionCampService extends AutoSubscriber {
   const FALLBACK_OFFICE_NAME = 'Delhi';
   const RELATIONSHIP_TYPE_NAME = 'Collection Camp Coordinator is';
 
+  private static $individualId = NULL;
+
   /**
    *
    */
@@ -31,7 +32,8 @@ class CollectionCampService extends AutoSubscriber {
     return [
       '&hook_civicrm_post' => [
         ['generateCollectionCampCode'],
-        ['assignContactToGroup'],
+        ['individualCreated'],
+        ['assignChapterGroupToIndividual'],
       ],
       '&hook_civicrm_pre' => [
         ['handleAuthorizationEmails'],
@@ -40,6 +42,54 @@ class CollectionCampService extends AutoSubscriber {
       '&hook_civicrm_custom' => 'setOfficeDetails',
       '&hook_civicrm_fieldOptions' => 'setIndianStateOptions',
     ];
+  }
+
+  /**
+   *
+   */
+  public static function individualCreated(string $op, string $objectName, int $objectId, &$objectRef) {
+    if ($op !== 'create' || $objectName !== 'Individual') {
+      return FALSE;
+    }
+
+    self::$individualId = $objectId;
+  }
+
+  /**
+   *
+   */
+  public static function assignChapterGroupToIndividual(string $op, string $objectName, int $objectId, &$objectRef) {
+    if ($op !== 'create' || $objectName !== 'Address') {
+      return FALSE;
+    }
+
+    if (self::$individualId !== $objectRef->contact_id || !$objectRef->is_primary) {
+      return FALSE;
+    }
+
+    $stateId = $objectRef->state_province_id;
+
+    $stateContactGroups = Group::get(FALSE)
+      ->addWhere('Chapter_Contact_Group.Use_Case', '=', 'chapter-contacts')
+      ->addWhere('Chapter_Contact_Group.Contact_Catchment', 'IN', [$stateId])
+      ->execute();
+
+    $stateContactGroup = $stateContactGroups->first();
+
+    if (!$stateContactGroup) {
+      \CRM_Core_Error::debug_log_message('Cannot assign chapter group to: ' . self::$individualId);
+      \CRM_Core_Error::debug_log_message('No chapter group found for state ID: ' . $stateId);
+      return FALSE;
+    }
+
+    $groupId = $stateContactGroup['id'];
+
+    $groupContactResult = GroupContact::create(FALSE)
+      ->addValue('contact_id', self::$individualId)
+      ->addValue('group_id', $groupId)
+      ->addValue('status', 'Added')
+      ->execute();
+
   }
 
   /**
@@ -481,89 +531,6 @@ class CollectionCampService extends AutoSubscriber {
 
     $options = $stateOptions;
 
-  }
-
-  /**
-   * This hook is called after a db write on entities.
-   *
-   * @param string $op
-   *   The type of operation being performed.
-   * @param string $objectName
-   *   The name of the object.
-   * @param int $objectId
-   *   The unique identifier for the object.
-   * @param object $objectRef
-   *   The reference to the object.
-   */
-  public static function assignContactToGroup(string $op, string $objectName, int $objectId, &$objectRef) {
-    // Check if the object name is 'AfformSubmission'.
-    if ($objectName !== 'AfformSubmission') {
-      return;
-    }
-
-    // Extract the 'data' field.
-    $data = $objectRef->data;
-    $decodedData = json_decode($data, TRUE);
-
-    $individualEntries = $decodedData['Individual1'] ?? [];
-    if (empty($individualEntries)) {
-      return;
-    }
-
-    foreach ($individualEntries as $entry) {
-      $joins = $entry['joins'] ?? NULL;
-      $stateProvinceId = $joins['Address'][0]['state_province_id'];
-      $email = $joins['Email'][0]['email'];
-
-      if (!$stateProvinceId || !$email) {
-        continue;
-      }
-
-      // Implement a delay and retry mechanism.
-      $maxRetries = 5;
-      // Seconds.
-      $retryDelay = 1;
-
-      $contactId = NULL;
-      for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
-        $emailData = Email::get(FALSE)
-          ->addWhere('email', '=', $email)
-          ->execute();
-
-        $contactData = $emailData->first();
-        $contactId = $contactData['contact_id'] ?? NULL;
-        if ($contactId) {
-          break;
-        }
-
-        // Wait before retrying.
-        sleep($retryDelay);
-      }
-
-      if (empty($contactId)) {
-        continue;
-      }
-
-      $groups = Group::get(FALSE)
-        ->addSelect('custom.*', 'id')
-        ->addWhere('Chapter_Contact_Group.Use_Case', '=', 'contact_catchment')
-        ->addWhere('Chapter_Contact_Group.Contact_Catchment', 'CONTAINS', $stateProvinceId)
-        ->execute();
-
-      $groupData = $groups->first();
-      $groupId = $groupData['id'] ?? NULL;
-
-      if (empty($groupId)) {
-        continue;
-      }
-
-      $groupContactResult = GroupContact::create(FALSE)
-        ->addValue('contact_id', $contactId)
-        ->addValue('group_id', $groupId)
-        ->addValue('status', 'Added')
-        ->execute();
-
-    }
   }
 
 }
