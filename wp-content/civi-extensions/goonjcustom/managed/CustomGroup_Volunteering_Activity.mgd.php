@@ -3,25 +3,25 @@ use CRM_Goonjcustom_ExtensionUtil as E;
 
 return [
   [
-    'name' => 'CustomGroup_Collection_Camp_QR_Code',
+    'name' => 'CustomGroup_Volunteering_Activity',
     'entity' => 'CustomGroup',
     'cleanup' => 'unused',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
-        'name' => 'Collection_Camp_QR_Code',
-        'title' => E::ts('Collection Camp QR Code'),
-        'extends' => 'Eck_Collection_Camp',
+        'name' => 'Volunteering_Activity',
+        'title' => E::ts('Volunteering Activity'),
+        'extends' => 'Activity',
         'extends_entity_column_value' => [
-          '4',
+          '64',
         ],
         'style' => 'Inline',
         'help_pre' => '',
         'help_post' => '',
-        'weight' => 22,
+        'weight' => 18,
         'collapse_adv_display' => TRUE,
-        'created_date' => '2024-09-05 17:51:13',
+        'created_date' => '2024-08-23 16:52:29',
         'icon' => '',
       ],
       'match' => [
@@ -30,22 +30,23 @@ return [
     ],
   ],
   [
-    'name' => 'CustomGroup_Collection_Camp_QR_Code_CustomField_QR_Code',
+    'name' => 'CustomGroup_Volunteering_Activity_CustomField_Collection_Camp',
     'entity' => 'CustomField',
     'cleanup' => 'unused',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
-        'custom_group_id.name' => 'Collection_Camp_QR_Code',
-        'name' => 'QR_Code',
-        'label' => E::ts('QR Code'),
-        'data_type' => 'File',
-        'html_type' => 'File',
+        'custom_group_id.name' => 'Volunteering_Activity',
+        'name' => 'Collection_Camp',
+        'label' => E::ts('Collection Camp'),
+        'data_type' => 'EntityReference',
+        'html_type' => 'Autocomplete-Select',
         'text_length' => 255,
         'note_columns' => 60,
         'note_rows' => 4,
-        'column_name' => 'qr_code_256',
+        'column_name' => 'collection_camp_189',
+        'fk_entity' => 'Eck_Collection_Camp',
       ],
       'match' => [
         'name',
