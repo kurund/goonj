@@ -514,7 +514,7 @@ class CollectionCampService extends AutoSubscriber {
 
     EckEntity::update('Collection_Camp', FALSE)
       ->addValue('Collection_Camp_Intent_Details.Goonj_Office', $stateOfficeId)
-	  ->addValue('Collection_Camp_Intent_Details.Camp_Type', $isPublicDriveOpen)
+      ->addValue('Collection_Camp_Intent_Details.Camp_Type', $isPublicDriveOpen)
       ->addWhere('id', '=', $collectionCampId)
       ->execute();
 
