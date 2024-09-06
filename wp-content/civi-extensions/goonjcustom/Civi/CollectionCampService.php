@@ -9,6 +9,7 @@ use chillerlan\QRCode\QROptions;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\EckEntity;
+use Civi\Api4\Individual;
 use Civi\Api4\Group;
 use Civi\Api4\GroupContact;
 use Civi\Api4\Relationship;
@@ -26,6 +27,7 @@ class CollectionCampService extends AutoSubscriber {
   const UNAUTHORIZED_TEMPLATE_ID_DROPPING_CENTER = 82;
   const FALLBACK_OFFICE_NAME = 'Delhi';
   const RELATIONSHIP_TYPE_NAME = 'Collection Camp Coordinator is';
+  const VOLUNTEER_RELATIONSHIP_TYPE_NAME = 'Induction Coordinator of';
 
   private static $individualId = NULL;
 
@@ -43,7 +45,10 @@ class CollectionCampService extends AutoSubscriber {
         ['handleAuthorizationEmails'],
         ['generateCollectionCampQr'],
       ],
-      '&hook_civicrm_custom' => 'setOfficeDetails',
+      '&hook_civicrm_custom' => [
+        ['setOfficeDetails'],
+        ['setOfficeDetailsForVolunteer']
+      ],
       '&hook_civicrm_fieldOptions' => 'setIndianStateOptions',
     ];
   }
@@ -600,6 +605,7 @@ class CollectionCampService extends AutoSubscriber {
     $fallbackCoordinators = Relationship::get(FALSE)
       ->addWhere('contact_id_b', '=', $fallbackOffice['id'])
       ->addWhere('relationship_type_id:name', '=', self::RELATIONSHIP_TYPE_NAME)
+      ->addWhere('relationship_type_id:name', '=', self::VOLUNTEER_RELATIONSHIP_TYPE_NAME)
       ->addWhere('is_current', '=', FALSE)
       ->execute();
 
@@ -646,6 +652,118 @@ class CollectionCampService extends AutoSubscriber {
 
     $options = $stateOptions;
 
+  }
+
+   /**
+   * This hook is called after the database write on a custom table.
+   *
+   * @param string $op
+   *   The type of operation being performed.
+   * @param string $objectName
+   *   The custom group ID.
+   * @param int $objectId
+   *   The entityID of the row in the custom table.
+   * @param object $objectRef
+   *   The parameters that were sent into the calling function.
+   */
+  public static function setOfficeDetailsForVolunteer($op, $groupID, $entityID, &$params) {
+    if ($op !== 'create') {
+      return;
+    }
+
+    if (!($stateField = self::findStateFieldForVolunteer($params))) {
+      return;
+    }
+
+    $stateId = $stateField['value'];
+    $activityContactId = $stateField['entity_id'];
+
+    if (!$stateId) {
+      \CRM_Core_Error::debug_log_message('Cannot assign Goonj Office to volunteer: ' . $activityContactId);
+      \CRM_Core_Error::debug_log_message('No state provided on the intent for volunteer: ' . $activityContactId);
+      return FALSE;
+    }
+
+    $officesFound = Contact::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('contact_type', '=', 'Organization')
+      ->addWhere('contact_sub_type', 'CONTAINS', 'Goonj_Office')
+      ->addWhere('Goonj_Office_Details.Collection_Camp_Catchment', 'CONTAINS', $stateId)
+      ->execute();
+
+    $stateOffice = $officesFound->first();
+
+    // If no state office is found, assign the fallback state office.
+    if (!$stateOffice) {
+      $stateOffice = self::getFallbackOffice();
+    }
+
+    $stateOfficeId = $stateOffice['id'];
+
+    Individual::update(FALSE)
+      ->addValue('Volunteer_fields.Goonj_Office', $stateOfficeId)
+      ->addWhere('id', '=', $activityContactId)
+      ->execute();
+
+    $coordinators = Relationship::get(FALSE)
+    ->addWhere('contact_id_b', '=', $stateOfficeId)
+    ->addWhere('relationship_type_id:name', '=', self::VOLUNTEER_RELATIONSHIP_TYPE_NAME)
+    ->execute();
+
+    $coordinatorCount = $coordinators->count();
+
+    if ($coordinatorCount === 0) {
+      $coordinator = self::getFallbackCoordinator();
+    }
+    elseif ($coordinatorCount > 1) {
+      $randomIndex = rand(0, $coordinatorCount - 1);
+      $coordinator = $coordinators->itemAt($randomIndex);
+    }
+    else {
+      $coordinator = $coordinators->first();
+    }
+
+    $coordinatorId = $coordinator['contact_id_a'];
+
+    Individual::update(FALSE)
+      ->addValue('Volunteer_fields.Coordinating_Urban_POC', $coordinatorId)
+      ->addWhere('id', '=', $activityContactId)
+      ->execute();
+
+    return TRUE;
+
+  }
+
+  /**
+   *
+   */
+  private static function findStateFieldForVolunteer(array $array) {
+    $filteredItems = array_filter($array, fn($item) => $item['entity_table'] === 'civicrm_contact');
+
+    if (empty($filteredItems)) {
+      return FALSE;
+    }
+
+    $volunteerStateFields = CustomField::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('name', '=', 'state')
+      ->addWhere('custom_group_id:name', '=', 'Volunteer_fields')
+      ->execute()
+      ->first();
+
+    if (!$volunteerStateFields) {
+      return FALSE;
+    }
+
+    $stateFieldId = $volunteerStateFields['id'];
+
+    $stateItemIndex = array_search(TRUE, array_map(fn($item) =>
+        $item['entity_table'] === 'civicrm_contact' &&
+        $item['custom_field_id'] == $stateFieldId,
+        $filteredItems
+    ));
+
+    return $stateItemIndex !== FALSE ? $filteredItems[$stateItemIndex] : FALSE;
   }
 
 }
