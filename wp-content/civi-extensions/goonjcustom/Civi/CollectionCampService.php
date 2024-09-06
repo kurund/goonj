@@ -713,7 +713,7 @@ class CollectionCampService extends AutoSubscriber {
     $coordinatorCount = $coordinators->count();
 
     if ($coordinatorCount === 0) {
-      $coordinator = self::getFallbackCoordinator();
+      $coordinator = self::getActivityFallbackCoordinator();
     }
     elseif ($coordinatorCount > 1) {
       $randomIndex = rand(0, $coordinatorCount - 1);
@@ -764,6 +764,25 @@ class CollectionCampService extends AutoSubscriber {
     ));
 
     return $stateItemIndex !== FALSE ? $filteredItems[$stateItemIndex] : FALSE;
+  }
+
+  /**
+   *
+   */
+  private static function getActivityFallbackCoordinator() {
+    $fallbackOffice = self::getFallbackOffice();
+
+    $fallbackCoordinators = Relationship::get(FALSE)
+      ->addWhere('contact_id_b', '=', $fallbackOffice['id'])
+      ->addWhere('relationship_type_id:name', '=', self::VOLUNTEER_RELATIONSHIP_TYPE_NAME)
+      ->execute();
+
+    $coordinatorCount = $fallbackCoordinators->count();
+
+    $randomIndex = rand(0, $coordinatorCount - 1);
+    $coordinator = $fallbackCoordinators->itemAt($randomIndex);
+
+    return $coordinator;
   }
 
 }
