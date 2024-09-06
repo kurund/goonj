@@ -482,6 +482,14 @@ class CollectionCampService extends AutoSubscriber {
     $stateId = $stateField['value'];
     $collectionCampId = $stateField['entity_id'];
 
+	$collectionCamp = \Civi\Api4\EckEntity::get('Collection_Camp', TRUE)
+	->addSelect('Collection_Camp_Intent_Details.Will_your_collection_drive_be_open_for_general_public')
+	->addWhere('id', '=', $collectionCampId)
+	->execute();
+
+	$collectionCampData = $collectionCamp->first();
+	$isPublicDriveOpen = $collectionCampData['Collection_Camp_Intent_Details.Will_your_collection_drive_be_open_for_general_public'];
+
     if (!$stateId) {
       \CRM_Core_Error::debug_log_message('Cannot assign Goonj Office to collection camp: ' . $collectionCamp['id']);
       \CRM_Core_Error::debug_log_message('No state provided on the intent for collection camp: ' . $collectionCamp['id']);
@@ -506,6 +514,7 @@ class CollectionCampService extends AutoSubscriber {
 
     EckEntity::update('Collection_Camp', FALSE)
       ->addValue('Collection_Camp_Intent_Details.Goonj_Office', $stateOfficeId)
+	  ->addValue('Collection_Camp_Intent_Details.Camp_Type', $isPublicDriveOpen)
       ->addWhere('id', '=', $collectionCampId)
       ->execute();
 
