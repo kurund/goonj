@@ -360,20 +360,21 @@
             }
         }
     }
-     
-         
+    
         // Postal code validation
-        var postalCodeField = $element.find("af-field[name='postal_code'] input[type='text']");
+        var postalCodeLabel = $element.find("label:contains('Postal Code')");
+        var postalCodeField = postalCodeLabel.closest('af-field').find("input[type='text']");
         if (postalCodeField.length) {
-            var postalCodeValue = postalCodeField.val().trim();
-            if (postalCodeValue !== "") {
-                var postalCodePattern = /^\d{6}$/;
-                if (!postalCodePattern.test(postalCodeValue)) {
-                    errorMessage += "Please enter a valid 6-digit postal code.\n";
-                    isValid = false;
-                }
+          var postalCodeValue = postalCodeField.val().trim();
+          if (postalCodeValue !== "") {
+            var postalCodePattern = /^\d{6}$/;
+            if (!postalCodePattern.test(postalCodeValue)) {
+              errorMessage += "Please enter a valid 6-digit postal code.\n";
+              isValid = false;
             }
+          }
         }
+
     
         if (!isValid) {
             CRM.alert(errorMessage, ts("Form Error"));
