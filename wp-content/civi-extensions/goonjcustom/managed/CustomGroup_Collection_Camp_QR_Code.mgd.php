@@ -1,8 +1,6 @@
 <?php
 use CRM_Goonjcustom_ExtensionUtil as E;
 
-return [];
-
 return [
   [
     'name' => 'CustomGroup_Collection_Camp_QR_Code',
@@ -16,7 +14,7 @@ return [
         'title' => E::ts('Collection Camp QR Code'),
         'extends' => 'Eck_Collection_Camp',
         'extends_entity_column_value' => [
-          '4  ',
+          '1',
         ],
         'style' => 'Inline',
         'help_pre' => '',
