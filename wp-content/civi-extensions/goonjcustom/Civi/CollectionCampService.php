@@ -47,7 +47,6 @@ class CollectionCampService extends AutoSubscriber {
       ],
       '&hook_civicrm_custom' => [
         ['setOfficeDetails'],
-        ['setOfficeDetailsForVolunteer']
       ],
       '&hook_civicrm_fieldOptions' => 'setIndianStateOptions',
     ];
@@ -77,6 +76,9 @@ class CollectionCampService extends AutoSubscriber {
     }
 
     $stateId = $objectRef->state_province_id;
+
+    // Pass the state id and individual id
+    self::setOfficeDetailForVolunteer($stateId, self::$individualId);
 
     $stateContactGroups = Group::get(FALSE)
       ->addWhere('Chapter_Contact_Group.Use_Case', '=', 'chapter-contacts')
@@ -605,7 +607,6 @@ class CollectionCampService extends AutoSubscriber {
     $fallbackCoordinators = Relationship::get(FALSE)
       ->addWhere('contact_id_b', '=', $fallbackOffice['id'])
       ->addWhere('relationship_type_id:name', '=', self::RELATIONSHIP_TYPE_NAME)
-      ->addWhere('relationship_type_id:name', '=', self::VOLUNTEER_RELATIONSHIP_TYPE_NAME)
       ->addWhere('is_current', '=', FALSE)
       ->execute();
 
@@ -655,35 +656,9 @@ class CollectionCampService extends AutoSubscriber {
   }
 
    /**
-   * This hook is called after the database write on a custom table.
    *
-   * @param string $op
-   *   The type of operation being performed.
-   * @param string $objectName
-   *   The custom group ID.
-   * @param int $objectId
-   *   The entityID of the row in the custom table.
-   * @param object $objectRef
-   *   The parameters that were sent into the calling function.
    */
-  public static function setOfficeDetailsForVolunteer($op, $groupID, $entityID, &$params) {
-    if ($op !== 'create') {
-      return;
-    }
-
-    if (!($stateField = self::findStateFieldForVolunteer($params))) {
-      return;
-    }
-
-    $stateId = $stateField['value'];
-    $activityContactId = $stateField['entity_id'];
-
-    if (!$stateId) {
-      \CRM_Core_Error::debug_log_message('Cannot assign Goonj Office to volunteer: ' . $activityContactId);
-      \CRM_Core_Error::debug_log_message('No state provided on the intent for volunteer: ' . $activityContactId);
-      return FALSE;
-    }
-
+  public static function setOfficeDetailForVolunteer($stateId, int $individualId) {
     $officesFound = Contact::get(FALSE)
       ->addSelect('id')
       ->addWhere('contact_type', '=', 'Organization')
@@ -702,7 +677,7 @@ class CollectionCampService extends AutoSubscriber {
 
     Individual::update(FALSE)
       ->addValue('Volunteer_fields.Goonj_Office', $stateOfficeId)
-      ->addWhere('id', '=', $activityContactId)
+      ->addWhere('id', '=', $individualId)
       ->execute();
 
     $coordinators = Relationship::get(FALSE)
@@ -727,43 +702,11 @@ class CollectionCampService extends AutoSubscriber {
 
     Individual::update(FALSE)
       ->addValue('Volunteer_fields.Coordinating_Urban_POC', $coordinatorId)
-      ->addWhere('id', '=', $activityContactId)
+      ->addWhere('id', '=', $individualId)
       ->execute();
 
     return TRUE;
 
-  }
-
-  /**
-   *
-   */
-  private static function findStateFieldForVolunteer(array $array) {
-    $filteredItems = array_filter($array, fn($item) => $item['entity_table'] === 'civicrm_contact');
-
-    if (empty($filteredItems)) {
-      return FALSE;
-    }
-
-    $volunteerStateFields = CustomField::get(FALSE)
-      ->addSelect('id')
-      ->addWhere('name', '=', 'state')
-      ->addWhere('custom_group_id:name', '=', 'Volunteer_fields')
-      ->execute()
-      ->first();
-
-    if (!$volunteerStateFields) {
-      return FALSE;
-    }
-
-    $stateFieldId = $volunteerStateFields['id'];
-
-    $stateItemIndex = array_search(TRUE, array_map(fn($item) =>
-        $item['entity_table'] === 'civicrm_contact' &&
-        $item['custom_field_id'] == $stateFieldId,
-        $filteredItems
-    ));
-
-    return $stateItemIndex !== FALSE ? $filteredItems[$stateItemIndex] : FALSE;
   }
 
   /**
