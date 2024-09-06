@@ -14,7 +14,7 @@ return [
         'title' => E::ts('Dropping Centre'),
         'extends' => 'Eck_Collection_Camp',
         'extends_entity_column_value' => [
-          '5',
+          '2',
         ],
         'style' => 'Inline',
         'help_pre' => '',

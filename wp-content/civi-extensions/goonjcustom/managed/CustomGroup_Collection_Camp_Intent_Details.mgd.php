@@ -14,7 +14,7 @@ return [
         'title' => E::ts('Intent Details'),
         'extends' => 'Eck_Collection_Camp',
         'extends_entity_column_value' => [
-          '4',
+          '1',
         ],
         'style' => 'Inline',
         'help_pre' => '',
