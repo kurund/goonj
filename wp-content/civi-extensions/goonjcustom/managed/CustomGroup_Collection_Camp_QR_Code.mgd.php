@@ -1,6 +1,8 @@
 <?php
 use CRM_Goonjcustom_ExtensionUtil as E;
 
+return [];
+
 return [
   [
     'name' => 'CustomGroup_Collection_Camp_QR_Code',

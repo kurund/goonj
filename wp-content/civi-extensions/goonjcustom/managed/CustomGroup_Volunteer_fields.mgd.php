@@ -1,9 +1,6 @@
 <?php
 use CRM_Goonjcustom_ExtensionUtil as E;
 
-
-return [];
-
 return [
   [
     'name' => 'CustomGroup_Volunteer_fields',
