@@ -156,12 +156,13 @@ function goonjcustom_get_induction_scheduled_email_html($assignee) {
 
   $html = "
   <p>Dear $assigneeName,</p>
-  <p>This is a friendly reminder that you have volunteer inductions scheduled for today.</p>
-  <p>Here are the details for the volunteers being inducted:</p>
+  <p>Just a friendly reminder!</p>
+  <p>Today is the scheduled induction for our volunteers, and they’re eager to learn how they can contribute to Goonj’s mission. Below are the volunteers who will be joining your growing volunteer army! 😊</p>
   <ul>
     $volunteerDetailsHtml
   </ul>
-  <p>Best regards,<br>Goonj</p>";
+  <p>Looking forward to a great session! </p>
+  <p>Warm regards, </p>";
 
   return $html;
 }
