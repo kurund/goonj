@@ -355,9 +355,9 @@ class CollectionCampService extends AutoSubscriber {
       return;
     }
 
-    $oldStatus = $objectRef['Collection_Camp_Core_Details.Status'] ?? '';
+    $newStatus = $objectRef['Collection_Camp_Core_Details.Status'] ?? '';
 
-    if (!$oldStatus) {
+    if (!$newStatus) {
       return;
     }
 
@@ -371,8 +371,8 @@ class CollectionCampService extends AutoSubscriber {
     $collectionCampId = $currentCollectionCamp['id'];
 
     // Check for status change.
-    if ($currentStatus !== $oldStatus) {
-      if ($oldStatus === 'authorized') {
+    if ($currentStatus !== $newStatus) {
+      if ($newStatus === 'authorized') {
         self::generateQrCode($collectionCampId);
       }
     }
