@@ -277,10 +277,10 @@ class CollectionCampService extends AutoSubscriber {
 
     // Check for status change.
     if ($currentStatus !== $newStatus) {
-      if ($newStatus === 'authorized') {
+      if ($currentStatus === 'authorized') {
         self::sendAuthorizationEmail($contactId, $subType);
       }
-      elseif ($newStatus === 'unauthorized') {
+      elseif ($currentStatus === 'unauthorized') {
         self::sendUnAuthorizationEmail($contactId, $subType);
       }
     }
@@ -355,9 +355,9 @@ class CollectionCampService extends AutoSubscriber {
       return;
     }
 
-    $newStatus = $objectRef['Collection_Camp_Core_Details.Status'] ?? '';
+    $oldStatus = $objectRef['Collection_Camp_Core_Details.Status'] ?? '';
 
-    if (!$newStatus) {
+    if (!$oldStatus) {
       return;
     }
 
@@ -371,8 +371,8 @@ class CollectionCampService extends AutoSubscriber {
     $collectionCampId = $currentCollectionCamp['id'];
 
     // Check for status change.
-    if ($currentStatus !== $newStatus) {
-      if ($newStatus === 'authorized') {
+    if ($currentStatus !== $oldStatus) {
+      if ($oldStatus === 'authorized') {
         self::generateQrCode($collectionCampId);
       }
     }
