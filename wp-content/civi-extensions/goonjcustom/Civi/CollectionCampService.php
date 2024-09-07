@@ -277,10 +277,10 @@ class CollectionCampService extends AutoSubscriber {
 
     // Check for status change.
     if ($currentStatus !== $newStatus) {
-      if ($newStatus === 'authorized') {
+      if ($currentStatus === 'authorized') {
         self::sendAuthorizationEmail($contactId, $subType);
       }
-      elseif ($newStatus === 'unauthorized') {
+      elseif ($currentStatus === 'unauthorized') {
         self::sendUnAuthorizationEmail($contactId, $subType);
       }
     }
