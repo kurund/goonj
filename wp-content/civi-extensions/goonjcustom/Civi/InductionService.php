@@ -100,27 +100,41 @@ class InductionService extends AutoSubscriber {
 
     $coordinatorId = $coordinator['contact_id_a'];
 
+    $session = \CRM_Core_Session::singleton();
+    $currentUserId = $session->get('userID') ?: self::$volunteerId;
+
+    $sourceContactId = $currentUserId;
+    $targetContactId = ($currentUserId === self::$volunteerId) ? $currentUserId : [self::$volunteerId];
+
+    $placeholderActivityDate = self::getPlaceholderActivityDate();
+
     Activity::create(FALSE)
       ->addValue('activity_type_id:name', self::INDUCTION_ACTIVITY_TYPE_NAME)
       ->addValue('status_id:name', self::INDUCTION_DEFAULT_STATUS_NAME)
-      ->addValue('source_contact_id', 'user_contact_id')
-      ->addValue('target_contact_id', [self::$volunteerId])
+      ->addValue('source_contact_id', $sourceContactId)
+      ->addValue('target_contact_id', $targetContactId)
       ->addValue('Induction_Fields.Assign', $coordinatorId)
-      ->addValue('activity_date_time', '2024-09-24 23:00:00')
+      ->addValue('activity_date_time', $placeholderActivityDate)
       ->addValue('Induction_Fields.Goonj_Office', $officeId)
       ->execute();
+  }
 
-    \Civi::log()->debug(
-          'createInductionForVolunteer',
-          [
+  /**
+   * Calculate next Monday's date and time (11:00 AM)
+   *
+   * @return string The formatted date and time for next Monday at 11 AM
+   */
+  private static function getPlaceholderActivityDate() {
+    $date = new \DateTime();
+    $dayOfWeek = $date->format('N');
 
-            'officeId' => $officeId,
-            'coordinatorId' => $coordinatorId,
-            'volunteerCreated' => self::$volunteerId,
-            '$officesFound' => $officesFound,
-          ]
-      );
+    if ($dayOfWeek !== '1') {
+      $date->modify('next monday');
+    }
 
+    $date->setTime(11, 0);
+
+    return $date->format('Y-m-d H:i:s');
   }
 
 }

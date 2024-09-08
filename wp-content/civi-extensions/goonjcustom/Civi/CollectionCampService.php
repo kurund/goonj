@@ -27,7 +27,6 @@ class CollectionCampService extends AutoSubscriber {
   const FALLBACK_OFFICE_NAME = 'Delhi';
   const RELATIONSHIP_TYPE_NAME = 'Collection Camp Coordinator is';
 
-
   private static $individualId = NULL;
 
   /**
@@ -44,9 +43,7 @@ class CollectionCampService extends AutoSubscriber {
         ['handleAuthorizationEmails'],
         ['generateCollectionCampQr'],
       ],
-      '&hook_civicrm_custom' => [
-        ['setOfficeDetails'],
-      ],
+      '&hook_civicrm_custom' => 'setOfficeDetails',
       '&hook_civicrm_fieldOptions' => 'setIndianStateOptions',
     ];
   }
