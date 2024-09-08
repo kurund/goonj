@@ -11,7 +11,6 @@ use Civi\Api4\CustomField;
 use Civi\Api4\EckEntity;
 use Civi\Api4\Group;
 use Civi\Api4\GroupContact;
-use Civi\Api4\Individual;
 use Civi\Api4\Relationship;
 use Civi\Api4\StateProvince;
 use Civi\Core\Service\AutoSubscriber;
@@ -27,7 +26,7 @@ class CollectionCampService extends AutoSubscriber {
   const UNAUTHORIZED_TEMPLATE_ID_DROPPING_CENTER = 82;
   const FALLBACK_OFFICE_NAME = 'Delhi';
   const RELATIONSHIP_TYPE_NAME = 'Collection Camp Coordinator is';
-  const VOLUNTEER_RELATIONSHIP_TYPE_NAME = 'Induction Coordinator of';
+
 
   private static $individualId = NULL;
 
@@ -76,9 +75,6 @@ class CollectionCampService extends AutoSubscriber {
     }
 
     $stateId = $objectRef->state_province_id;
-
-    // Pass the state id and individual id.
-    self::setOfficeDetailForVolunteer($stateId, self::$individualId);
 
     $stateContactGroups = Group::get(FALSE)
       ->addWhere('Chapter_Contact_Group.Use_Case', '=', 'chapter-contacts')
@@ -653,79 +649,6 @@ class CollectionCampService extends AutoSubscriber {
 
     $options = $stateOptions;
 
-  }
-
-  /**
-   *
-   */
-  public static function setOfficeDetailForVolunteer($stateId, int $individualId) {
-    $officesFound = Contact::get(FALSE)
-      ->addSelect('id')
-      ->addWhere('contact_type', '=', 'Organization')
-      ->addWhere('contact_sub_type', 'CONTAINS', 'Goonj_Office')
-      ->addWhere('Goonj_Office_Details.Collection_Camp_Catchment', 'CONTAINS', $stateId)
-      ->execute();
-
-    $stateOffice = $officesFound->first();
-
-    // If no state office is found, assign the fallback state office.
-    if (!$stateOffice) {
-      $stateOffice = self::getFallbackOffice();
-    }
-
-    $stateOfficeId = $stateOffice['id'];
-
-    Individual::update(FALSE)
-      ->addValue('Volunteer_fields.Goonj_Office', $stateOfficeId)
-      ->addWhere('id', '=', $individualId)
-      ->execute();
-
-    $coordinators = Relationship::get(FALSE)
-      ->addWhere('contact_id_b', '=', $stateOfficeId)
-      ->addWhere('relationship_type_id:name', '=', self::VOLUNTEER_RELATIONSHIP_TYPE_NAME)
-      ->execute();
-
-    $coordinatorCount = $coordinators->count();
-
-    if ($coordinatorCount === 0) {
-      $coordinator = self::getActivityFallbackCoordinator();
-    }
-    elseif ($coordinatorCount > 1) {
-      $randomIndex = rand(0, $coordinatorCount - 1);
-      $coordinator = $coordinators->itemAt($randomIndex);
-    }
-    else {
-      $coordinator = $coordinators->first();
-    }
-
-    $coordinatorId = $coordinator['contact_id_a'];
-
-    Individual::update(FALSE)
-      ->addValue('Volunteer_fields.Coordinating_Urban_POC', $coordinatorId)
-      ->addWhere('id', '=', $individualId)
-      ->execute();
-
-    return TRUE;
-
-  }
-
-  /**
-   *
-   */
-  private static function getActivityFallbackCoordinator() {
-    $fallbackOffice = self::getFallbackOffice();
-
-    $fallbackCoordinators = Relationship::get(FALSE)
-      ->addWhere('contact_id_b', '=', $fallbackOffice['id'])
-      ->addWhere('relationship_type_id:name', '=', self::VOLUNTEER_RELATIONSHIP_TYPE_NAME)
-      ->execute();
-
-    $coordinatorCount = $fallbackCoordinators->count();
-
-    $randomIndex = rand(0, $coordinatorCount - 1);
-    $coordinator = $fallbackCoordinators->itemAt($randomIndex);
-
-    return $coordinator;
   }
 
 }
