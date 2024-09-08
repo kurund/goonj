@@ -277,10 +277,10 @@ class CollectionCampService extends AutoSubscriber {
 
     // Check for status change.
     if ($currentStatus !== $newStatus) {
-      if ($newStatus  === 'authorized') {
+      if ($newStatus === 'authorized') {
         self::sendAuthorizationEmail($contactId, $subType);
       }
-      elseif ($newStatus  === 'unauthorized') {
+      elseif ($newStatus === 'unauthorized') {
         self::sendUnAuthorizationEmail($contactId, $subType);
       }
     }
@@ -482,13 +482,13 @@ class CollectionCampService extends AutoSubscriber {
     $stateId = $stateField['value'];
     $collectionCampId = $stateField['entity_id'];
 
-	$collectionCamp = \Civi\Api4\EckEntity::get('Collection_Camp', TRUE)
-	->addSelect('Collection_Camp_Intent_Details.Will_your_collection_drive_be_open_for_general_public')
-	->addWhere('id', '=', $collectionCampId)
-	->execute();
+    $collectionCamp = EckEntity::get('Collection_Camp', TRUE)
+      ->addSelect('Collection_Camp_Intent_Details.Will_your_collection_drive_be_open_for_general_public')
+      ->addWhere('id', '=', $collectionCampId)
+      ->execute();
 
-	$collectionCampData = $collectionCamp->first();
-	$isPublicDriveOpen = $collectionCampData['Collection_Camp_Intent_Details.Will_your_collection_drive_be_open_for_general_public'];
+    $collectionCampData = $collectionCamp->first();
+    $isPublicDriveOpen = $collectionCampData['Collection_Camp_Intent_Details.Will_your_collection_drive_be_open_for_general_public'];
 
     if (!$stateId) {
       \CRM_Core_Error::debug_log_message('Cannot assign Goonj Office to collection camp: ' . $collectionCamp['id']);
