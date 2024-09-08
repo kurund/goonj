@@ -34,7 +34,7 @@ class GoonjUniqueUserValidation extends AutoSubscriber implements EventSubscribe
     $phone = $entityValues['Individual1'][0]['joins']['Phone'][0]['phone'] ?? '';
     $email = $entityValues['Individual1'][0]['joins']['Email'][0]['email'] ?? '';
 
-    $contactResult = Contact::get()
+    $contactResult = Contact::get(FALSE)
       ->addSelect('id', 'email_primary.email', 'phone_primary.phone')
       ->addWhere('email_primary.email', '=', $email)
       ->addWhere('phone_primary.phone', '=', $phone)
