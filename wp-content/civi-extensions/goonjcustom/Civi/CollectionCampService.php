@@ -9,9 +9,9 @@ use chillerlan\QRCode\QROptions;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\EckEntity;
-use Civi\Api4\Individual;
 use Civi\Api4\Group;
 use Civi\Api4\GroupContact;
+use Civi\Api4\Individual;
 use Civi\Api4\Relationship;
 use Civi\Api4\StateProvince;
 use Civi\Core\Service\AutoSubscriber;
@@ -77,7 +77,7 @@ class CollectionCampService extends AutoSubscriber {
 
     $stateId = $objectRef->state_province_id;
 
-    // Pass the state id and individual id
+    // Pass the state id and individual id.
     self::setOfficeDetailForVolunteer($stateId, self::$individualId);
 
     $stateContactGroups = Group::get(FALSE)
@@ -284,10 +284,10 @@ class CollectionCampService extends AutoSubscriber {
 
     // Check for status change.
     if ($currentStatus !== $newStatus) {
-      if ($newStatus  === 'authorized') {
+      if ($newStatus === 'authorized') {
         self::sendAuthorizationEmail($contactId, $subType);
       }
-      elseif ($newStatus  === 'unauthorized') {
+      elseif ($newStatus === 'unauthorized') {
         self::sendUnAuthorizationEmail($contactId, $subType);
       }
     }
@@ -489,13 +489,13 @@ class CollectionCampService extends AutoSubscriber {
     $stateId = $stateField['value'];
     $collectionCampId = $stateField['entity_id'];
 
-	$collectionCamp = \Civi\Api4\EckEntity::get('Collection_Camp', TRUE)
-	->addSelect('Collection_Camp_Intent_Details.Will_your_collection_drive_be_open_for_general_public')
-	->addWhere('id', '=', $collectionCampId)
-	->execute();
+    $collectionCamp = EckEntity::get('Collection_Camp', TRUE)
+      ->addSelect('Collection_Camp_Intent_Details.Will_your_collection_drive_be_open_for_general_public')
+      ->addWhere('id', '=', $collectionCampId)
+      ->execute();
 
-	$collectionCampData = $collectionCamp->first();
-	$isPublicDriveOpen = $collectionCampData['Collection_Camp_Intent_Details.Will_your_collection_drive_be_open_for_general_public'];
+    $collectionCampData = $collectionCamp->first();
+    $isPublicDriveOpen = $collectionCampData['Collection_Camp_Intent_Details.Will_your_collection_drive_be_open_for_general_public'];
 
     if (!$stateId) {
       \CRM_Core_Error::debug_log_message('Cannot assign Goonj Office to collection camp: ' . $collectionCamp['id']);
@@ -655,7 +655,7 @@ class CollectionCampService extends AutoSubscriber {
 
   }
 
-   /**
+  /**
    *
    */
   public static function setOfficeDetailForVolunteer($stateId, int $individualId) {
@@ -681,9 +681,9 @@ class CollectionCampService extends AutoSubscriber {
       ->execute();
 
     $coordinators = Relationship::get(FALSE)
-    ->addWhere('contact_id_b', '=', $stateOfficeId)
-    ->addWhere('relationship_type_id:name', '=', self::VOLUNTEER_RELATIONSHIP_TYPE_NAME)
-    ->execute();
+      ->addWhere('contact_id_b', '=', $stateOfficeId)
+      ->addWhere('relationship_type_id:name', '=', self::VOLUNTEER_RELATIONSHIP_TYPE_NAME)
+      ->execute();
 
     $coordinatorCount = $coordinators->count();
 
