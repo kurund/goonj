@@ -325,7 +325,7 @@ function goonj_handle_user_identification_form() {
 		$collectionCampResult = \Civi\Api4\EckEntity::get('Collection_Camp', FALSE)
 		->addSelect('*', 'custom.*')
 		->addWhere('Collection_Camp_Core_Details.Contact_Id', '=', $found_contacts['id'])
-		->addWhere('subtype', '=', 4) // Collection Camp subtype
+		->addWhere('subtype', '=', 1) // Collection Camp subtype
 		->addOrderBy('created_date', 'DESC')
 		->setLimit(1)
 		->execute();

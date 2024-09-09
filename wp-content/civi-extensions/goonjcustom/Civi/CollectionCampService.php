@@ -74,8 +74,9 @@ class CollectionCampService extends AutoSubscriber {
     $stateId = $objectRef->state_province_id;
 
     $stateContactGroups = Group::get(FALSE)
+      ->addSelect('id')
       ->addWhere('Chapter_Contact_Group.Use_Case', '=', 'chapter-contacts')
-      ->addWhere('Chapter_Contact_Group.Contact_Catchment', 'IN', [$stateId])
+      ->addWhere('Chapter_Contact_Group.Contact_Catchment', 'CONTAINS', $stateId)
       ->execute();
 
     $stateContactGroup = $stateContactGroups->first();
