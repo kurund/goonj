@@ -512,20 +512,12 @@ class CollectionCampService extends AutoSubscriber {
     }
 
     $stateOfficeId = $stateOffice['id'];
-    \Civi::log()->debug('stateOfficeId.1', [
-      'stateOfficeId' => $stateOfficeId,
-      'stateOffice' => $stateOffice, 
-      'isPublicDriveOpen' => $isPublicDriveOpen,
-      'collectionCampId' => $collectionCampId
-   ]);
 
     EckEntity::update('Collection_Camp', FALSE)
       ->addValue('Collection_Camp_Intent_Details.Goonj_Office', $stateOfficeId)
       ->addValue('Collection_Camp_Intent_Details.Camp_Type', $isPublicDriveOpen)
       ->addWhere('id', '=', $collectionCampId)
       ->execute();
-
-      \Civi::log()->debug('Logs working 1');
 
     $coordinators = Relationship::get(FALSE)
       ->addWhere('contact_id_b', '=', $stateOfficeId)
@@ -535,49 +527,23 @@ class CollectionCampService extends AutoSubscriber {
 
     $coordinatorCount = $coordinators->count();
 
-      \Civi::log()->debug('coordinators.1', [
-        'coordinators' => $coordinators,
-        'coordinatorCount' => $coordinatorCount, 
-        'isPublicDriveOpen' => $isPublicDriveOpen,
-        'collectionCampId' => $collectionCampId
-     ]);
-
     if ($coordinatorCount === 0) {
-      \Civi::log()->debug('Logs working 2');
       $coordinator = self::getFallbackCoordinator();
-      \Civi::log()->debug('coordinatorfallback', [
-        'coordinator' => $coordinator,
-     ]);
     }
     elseif ($coordinatorCount > 1) {
-      \Civi::log()->debug('Logs working 3');
       $randomIndex = rand(0, $coordinatorCount - 1);
-      \Civi::log()->debug('randomIndex', [
-        'randomIndex' => $randomIndex,
-     ]);
       $coordinator = $coordinators->itemAt($randomIndex);
-      \Civi::log()->debug('coordinatorrandomIndex', [
-        'coordinator' => $coordinator,
-     ]);
     }
     else {
       $coordinator = $coordinators->first();
-      \Civi::log()->debug('coordinator', [
-        'coordinators' => $coordinators,
-     ]);
     }
 
     $coordinatorId = $coordinator['contact_id_a'];
-    \Civi::log()->debug('coordinatorId', [
-      'coordinatorId' => $coordinatorId,
-   ]);
 
     EckEntity::update('Collection_Camp', FALSE)
       ->addValue('Collection_Camp_Intent_Details.Coordinating_Urban_POC', $coordinatorId)
       ->addWhere('id', '=', $collectionCampId)
       ->execute();
-      \Civi::log()->debug('Logs last working');
-
 
     return TRUE;
 
@@ -588,6 +554,7 @@ class CollectionCampService extends AutoSubscriber {
    */
   private static function findStateField(array $array) {
     $filteredItems = array_filter($array, fn($item) => $item['entity_table'] === 'civicrm_eck_collection_camp');
+
     if (empty($filteredItems)) {
       return FALSE;
     }
