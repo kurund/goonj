@@ -592,6 +592,7 @@ class CollectionCampService extends AutoSubscriber {
    *
    */
   private static function findStateField(array $array) {
+    $filteredItems = array_filter($array, fn($item) => $item['entity_table'] === 'civicrm_eck_collection_camp');
     if (empty($filteredItems)) {
       return FALSE;
     }
