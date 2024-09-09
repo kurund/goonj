@@ -581,6 +581,8 @@ class CollectionCampService extends AutoSubscriber {
       ->addValue('Collection_Camp_Intent_Details.Coordinating_Urban_POC', $coordinatorId)
       ->addWhere('id', '=', $collectionCampId)
       ->execute();
+      \Civi::log()->debug('Logs last working');
+
 
     return TRUE;
 
