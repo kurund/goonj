@@ -472,21 +472,36 @@ class CollectionCampService extends AutoSubscriber {
    *   The parameters that were sent into the calling function.
    */
   public static function setOfficeDetails($op, $groupID, $entityID, &$params) {
+    \Civi::log()->debug('Logs working1');
     if ($op !== 'create') {
       return;
     }
+    \Civi::log()->debug('setOfficeDetails.1', [
+      'op' => $op,
+      'groupID' => $groupID, 
+      'entityID' => $entityID,
+      'params' => $params
+   ]);
 
     if (!($stateField = self::findStateField($params))) {
       return;
     }
+    \Civi::log()->debug('Logs working2');
 
     $stateId = $stateField['value'];
     $collectionCampId = $stateField['entity_id'];
+
+    \Civi::log()->debug('stateIdandcollectionCamp1', [
+      'stateId' => $stateId,
+      'collectionCampId' => $collectionCampId,
+   ]);
+
 
     $collectionCamp = EckEntity::get('Collection_Camp', TRUE)
       ->addSelect('Collection_Camp_Intent_Details.Will_your_collection_drive_be_open_for_general_public')
       ->addWhere('id', '=', $collectionCampId)
       ->execute();
+      \Civi::log()->debug('Logs working3');
 
     $collectionCampData = $collectionCamp->first();
     $isPublicDriveOpen = $collectionCampData['Collection_Camp_Intent_Details.Will_your_collection_drive_be_open_for_general_public'];
@@ -503,6 +518,8 @@ class CollectionCampService extends AutoSubscriber {
       ->addWhere('contact_sub_type', 'CONTAINS', 'Goonj_Office')
       ->addWhere('Goonj_Office_Details.Collection_Camp_Catchment', 'CONTAINS', $stateId)
       ->execute();
+    \Civi::log()->debug('Logs working4');
+
 
     $stateOffice = $officesFound->first();
 
@@ -513,11 +530,17 @@ class CollectionCampService extends AutoSubscriber {
 
     $stateOfficeId = $stateOffice['id'];
 
+    \Civi::log()->debug('alldata', [
+      'collectionCampData' => $collectionCampData,
+      'stateOffice' => $stateOffice,
+   ]);
+
     EckEntity::update('Collection_Camp', FALSE)
       ->addValue('Collection_Camp_Intent_Details.Goonj_Office', $stateOfficeId)
       ->addValue('Collection_Camp_Intent_Details.Camp_Type', $isPublicDriveOpen)
       ->addWhere('id', '=', $collectionCampId)
       ->execute();
+      \Civi::log()->debug('Logs working5');
 
     $coordinators = Relationship::get(FALSE)
       ->addWhere('contact_id_b', '=', $stateOfficeId)
@@ -526,6 +549,11 @@ class CollectionCampService extends AutoSubscriber {
       ->execute();
 
     $coordinatorCount = $coordinators->count();
+
+    \Civi::log()->debug('coordinators', [
+      'coordinators' => $coordinators,
+      'coordinatorCount' => $coordinatorCount,
+   ]);
 
     if ($coordinatorCount === 0) {
       $coordinator = self::getFallbackCoordinator();
@@ -554,6 +582,9 @@ class CollectionCampService extends AutoSubscriber {
    */
   private static function findStateField(array $array) {
     $filteredItems = array_filter($array, fn($item) => $item['entity_table'] === 'civicrm_eck_collection_camp');
+    \Civi::log()->debug('filteredItems.1', [
+      'filteredItems' => $filteredItems,
+   ]);
 
     if (empty($filteredItems)) {
       return FALSE;
@@ -566,17 +597,28 @@ class CollectionCampService extends AutoSubscriber {
       ->execute()
       ->first();
 
+      \Civi::log()->debug('collectionCampStateFields.1', [
+        'collectionCampStateFields' => $collectionCampStateFields,
+     ]);
+
     if (!$collectionCampStateFields) {
       return FALSE;
     }
 
     $stateFieldId = $collectionCampStateFields['id'];
+    \Civi::log()->debug('stateFieldId.1', [
+      'stateFieldId' => $stateFieldId,
+   ]);
 
     $stateItemIndex = array_search(TRUE, array_map(fn($item) =>
         $item['entity_table'] === 'civicrm_eck_collection_camp' &&
         $item['custom_field_id'] == $stateFieldId,
         $filteredItems
     ));
+
+    \Civi::log()->debug('stateItemIndex.1', [
+      'stateItemIndex' => $stateItemIndex,
+   ]);
 
     return $stateItemIndex !== FALSE ? $filteredItems[$stateItemIndex] : FALSE;
   }
