@@ -332,7 +332,7 @@ class CollectionCampService extends AutoSubscriber {
   private static function logActivity($contactId, $collectionCampTitle) {
     $optionValues = \Civi\Api4\OptionValue::get(TRUE)
       ->addWhere('option_group_id', '=', 2)
-      ->addWhere('label', '=', 'Collection Camp')
+      ->addWhere('label', '=', 'Organize Collection Camp')
       ->execute();
     
     $collectionCampActivityId = $optionValues->first()['value'];
