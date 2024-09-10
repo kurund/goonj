@@ -68,8 +68,11 @@ class CollectionBaseService extends AutoSubscriber {
 
     if (!$teamGroupContact) {
       \Civi::log()->debug('no chapter team group found for user: ' . $userId);
-
-      return;
+      // @todo we should handle it in a better way.
+      // if there is no chapter assigned to the contact
+      // then ideally she should not see any collection camp which
+      // can be done but then it limits for the admin user as well.
+      return FALSE;
     }
 
     $groupId = $teamGroupContact['group_id'];
@@ -84,7 +87,8 @@ class CollectionBaseService extends AutoSubscriber {
 
     if (empty($statesControlled)) {
       // Handle the case when the group is not controlling any state.
-      return;
+      $clauses['id'][] = 'IN (null)';
+      return TRUE;
     }
 
     $statesControlled = array_unique($statesControlled);
@@ -100,6 +104,7 @@ class CollectionBaseService extends AutoSubscriber {
     );
 
     $clauses['id'][] = $clauseString;
+    return TRUE;
   }
 
   /**
