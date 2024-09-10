@@ -282,7 +282,6 @@ class CollectionCampService extends AutoSubscriber {
       }
       elseif ($newStatus === 'unauthorized') {
         self::sendUnAuthorizationEmail($contactId, $subType);
-        self::logActivity($contactId, $newStatus, $subType, $collectionCampTitle);
       }
     }
 }
