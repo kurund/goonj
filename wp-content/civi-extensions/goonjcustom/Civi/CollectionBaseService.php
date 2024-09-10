@@ -83,19 +83,21 @@ class CollectionBaseService extends AutoSubscriber {
       $statesControlled = array_unique($statesControlled);
       $statesList = implode(',', array_map('intval', $statesControlled));
 
-      $clauses['custom_261'][] = "IN ($statesList)";
+      $clauses['`Collection_Camp_Intent_Details_4`.`state_261`'][] = "IN ($statesList)";
     }
     else {
-      $clauses['custom_261'][] = "IN (NULL)";
+      $clauses['`Collection_Camp_Intent_Details_4`.`state_261`'][] = "IN (NULL)";
     }
 
-    \Civi::log()->debug($entity, [
-      [
-        'groupId' => $groupId,
-        'statesControlled' => $statesControlled,
-        'statesList' => $statesList,
-      ],
-    ]);
+    // \Civi::log()->debug($entity, [
+    //   [
+    //     'conditions'=>$conditions,
+    //     'groupId' => $groupId,
+    //     'statesControlled' => $statesControlled,
+    //     'statesList' => $statesList,
+    //     'clauses' => $clauses,
+    //   ],
+    // ]);
   }
 
 }
