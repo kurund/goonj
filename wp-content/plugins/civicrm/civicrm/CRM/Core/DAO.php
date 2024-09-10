@@ -3288,21 +3288,46 @@ SELECT contact_id
           $fieldClauses = (array) $fieldClauses;
         }
         $formattedClauses = [];
+
         foreach (CRM_Utils_SQL::prefixFieldNames($fieldClauses, array_keys($fields), $tableAlias) as $subClause) {
           // Arrays of arrays get joined with OR (similar to CRM_Core_Permission::check)
           if (is_array($subClause)) {
             $formattedClauses[] = "(`$tableAlias`.`$fieldName` " . implode(" OR `$tableAlias`.`$fieldName` ", $subClause) . ')';
           }
           else {
-            $formattedClauses[] = "(`$tableAlias`.`$fieldName` " . $subClause . ')';
+            $needsAlias = strpos($fieldName, '.') === false;
+
+            if ($needsAlias) {
+              $formattedClauses[] = "(`$tableAlias`.`$fieldName` " . $subClause . ')';
+            } else {
+              list($tableAlias, $fieldName) = explode('.', $fieldName);
+              $formattedClauses[] = "($tableAlias.$fieldName " . $subClause . ')';
+            }
           }
         }
+
         $finalClauses[$fieldName] = '(' . implode(' AND ', $formattedClauses) . ')';
         if (empty($fields[$fieldName]['required'])) {
-          $finalClauses[$fieldName] = "(`$tableAlias`.`$fieldName` IS NULL OR {$finalClauses[$fieldName]})";
+          $needsAlias = strpos($fieldName, '.') === false;
+          if ($needsAlias) {
+            if (strpos($tableAlias, '`') !== false) {
+              $tableAlias = trim($tableAlias, '`');
+            }
+            if (strpos($fieldName, '`') !== false) {
+              $fieldName = trim($fieldName, '`');
+            }
+
+            if ($finalClauses[$fieldName]) {
+              $finalClauses[$fieldName] = "(`$tableAlias`.`$fieldName` IS NULL OR {$finalClauses[$fieldName]})";
+            }
+          } else {
+            list($tableAlias, $fieldName) = explode('.', $fieldName);
+            $finalClauses[$fieldName] = "($tableAlias.$fieldName IS NULL OR {$finalClauses[$fieldName]})";
+          }
         }
       }
     }
+
     return $finalClauses;
   }
 

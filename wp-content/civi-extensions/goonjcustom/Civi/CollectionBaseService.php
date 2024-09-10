@@ -88,16 +88,6 @@ class CollectionBaseService extends AutoSubscriber {
     else {
       $clauses['`Collection_Camp_Intent_Details_4`.`state_261`'][] = "IN (NULL)";
     }
-
-    // \Civi::log()->debug($entity, [
-    //   [
-    //     'conditions'=>$conditions,
-    //     'groupId' => $groupId,
-    //     'statesControlled' => $statesControlled,
-    //     'statesList' => $statesList,
-    //     'clauses' => $clauses,
-    //   ],
-    // ]);
   }
 
 }
