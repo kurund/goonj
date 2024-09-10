@@ -3300,34 +3300,20 @@ SELECT contact_id
             if ($needsAlias) {
               $formattedClauses[] = "(`$tableAlias`.`$fieldName` " . $subClause . ')';
             } else {
-              list($tableAlias, $fieldName) = explode('.', $fieldName);
-              $formattedClauses[] = "($tableAlias.$fieldName " . $subClause . ')';
+              list($tA, $fN) = explode('.', $fieldName);
+              $formattedClauses[] = "($tA.$fN " . $subClause . ')';
             }
           }
         }
 
-        $finalClauses[$fieldName] = '(' . implode(' AND ', $formattedClauses) . ')';
-        if (empty($fields[$fieldName]['required'])) {
-          $needsAlias = strpos($fieldName, '.') === false;
-          if ($needsAlias) {
-            if (strpos($tableAlias, '`') !== false) {
-              $tableAlias = trim($tableAlias, '`');
-            }
-            if (strpos($fieldName, '`') !== false) {
-              $fieldName = trim($fieldName, '`');
-            }
+        $needsAlias = strpos($fieldName, '.') === false;
 
-            if ($finalClauses[$fieldName]) {
-              $finalClauses[$fieldName] = "(`$tableAlias`.`$fieldName` IS NULL OR {$finalClauses[$fieldName]})";
-            }
-          } else {
-            list($tableAlias, $fieldName) = explode('.', $fieldName);
-            $finalClauses[$fieldName] = "($tableAlias.$fieldName IS NULL OR {$finalClauses[$fieldName]})";
-          }
+        $finalClauses[$fieldName] = '(' . implode(' AND ', $formattedClauses) . ')';
+        if (empty($fields[$fieldName]['required']) && $needsAlias) {
+          $finalClauses[$fieldName] = "(`$tableAlias`.`$fieldName` IS NULL OR {$finalClauses[$fieldName]})";
         }
       }
     }
-
     return $finalClauses;
   }
 
