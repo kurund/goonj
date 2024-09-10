@@ -44,6 +44,7 @@ class CollectionCampService extends AutoSubscriber {
       '&hook_civicrm_pre' => [
         ['handleAuthorizationEmails'],
         ['generateCollectionCampQr'],
+        ['linkCollectionCampToContact'],
       ],
       '&hook_civicrm_custom' => [
         ['setOfficeDetails'],
@@ -265,6 +266,49 @@ class CollectionCampService extends AutoSubscriber {
     }
 
     $collectionCamps = EckEntity::get('Collection_Camp', FALSE)
+      ->addSelect('Collection_Camp_Core_Details.Status', 'Collection_Camp_Core_Details.Contact_Id')
+      ->addWhere('id', '=', $objectId)
+      ->execute();
+
+    $currentCollectionCamp = $collectionCamps->first();
+    $currentStatus = $currentCollectionCamp['Collection_Camp_Core_Details.Status'];
+    $contactId = $currentCollectionCamp['Collection_Camp_Core_Details.Contact_Id'];
+
+    // Check for status change.
+    if ($currentStatus !== $newStatus) {
+      if ($newStatus === 'authorized') {
+        self::sendAuthorizationEmail($contactId, $subType);
+      }
+      elseif ($newStatus === 'unauthorized') {
+        self::sendUnAuthorizationEmail($contactId, $subType);
+      }
+    }
+}
+
+  /**
+   * This hook is called after a db write on entities.
+   *
+   * @param string $op
+   *   The type of operation being performed.
+   * @param string $objectName
+   *   The name of the object.
+   * @param int $objectId
+   *   The unique identifier for the object.
+   * @param object $objectRef
+   *   The reference to the object.
+   */
+  public static function linkCollectionCampToContact(string $op, string $objectName, $objectId, &$objectRef) {
+    if ($objectName != 'Eck_Collection_Camp' || !$objectId) {
+      return;
+    }
+
+    $newStatus = $objectRef['Collection_Camp_Core_Details.Status'] ?? '';
+
+    if (!$newStatus) {
+      return;
+    }
+
+    $collectionCamps = EckEntity::get('Collection_Camp', FALSE)
       ->addSelect('Collection_Camp_Core_Details.Status', 'Collection_Camp_Core_Details.Contact_Id', 'title')
       ->addWhere('id', '=', $objectId)
       ->execute();
@@ -277,11 +321,7 @@ class CollectionCampService extends AutoSubscriber {
     // Check for status change.
     if ($currentStatus !== $newStatus) {
       if ($newStatus === 'authorized') {
-        self::sendAuthorizationEmail($contactId, $subType);
-        self::logActivity($contactId, $newStatus, $subType, $collectionCampTitle);
-      }
-      elseif ($newStatus === 'unauthorized') {
-        self::sendUnAuthorizationEmail($contactId, $subType);
+        self::logActivity($contactId, $collectionCampTitle);
       }
     }
 }
@@ -289,7 +329,7 @@ class CollectionCampService extends AutoSubscriber {
   /**
    * Log an activity in CiviCRM.
    */
-  private static function logActivity($contactId, $status, $subType, $collectionCampTitle) {
+  private static function logActivity($contactId, $collectionCampTitle) {
     try {
         // Define the activity details.
         $activityParams = [
