@@ -2,6 +2,8 @@
 
 namespace Civi;
 
+use Civi\Api4\CustomField;
+use Civi\Api4\CustomGroup;
 use Civi\Api4\Group;
 use Civi\Api4\GroupContact;
 use Civi\Core\Service\AutoSubscriber;
@@ -79,15 +81,53 @@ class CollectionBaseService extends AutoSubscriber {
     $group = $chapterGroups->first();
     $statesControlled = $group['Chapter_Contact_Group.States_controlled'];
 
-    if (!empty($statesControlled)) {
-      $statesControlled = array_unique($statesControlled);
-      $statesList = implode(',', array_map('intval', $statesControlled));
+    if (empty($statesControlled)) {
+      // Handle the case when the group is not controlling any state.
+      return;
+    }
 
-      $clauses['`Collection_Camp_Intent_Details_4`.`state_261`'][] = "IN ($statesList)";
-    }
-    else {
-      $clauses['`Collection_Camp_Intent_Details_4`.`state_261`'][] = "IN (NULL)";
-    }
+    $statesControlled = array_unique($statesControlled);
+    $statesList = implode(',', array_map('intval', $statesControlled));
+
+    $stateField = self::getStateFieldDbDetails();
+
+    $clauseString = sprintf(
+      'IN (SELECT entity_id FROM `%1$s` WHERE `%2$s` IN (%3$s))',
+      $stateField['tableName'],
+      $stateField['columnName'],
+     $statesList,
+    );
+
+    $clauses['id'][] = $clauseString;
+  }
+
+  /**
+   *
+   */
+  private static function getStateFieldDbDetails() {
+    $customGroups = CustomGroup::get(FALSE)
+      ->addSelect('table_name')
+      ->addWhere('name', '=', 'Collection_Camp_Intent_Details')
+      ->setLimit(25)
+      ->execute();
+
+    $customGroup = $customGroups->first();
+    $tableName = $customGroup['table_name'];
+
+    $customFields = CustomField::get(FALSE)
+      ->addSelect('column_name')
+      ->addWhere('custom_group_id:name', '=', 'Collection_Camp_Intent_Details')
+      ->addWhere('name', '=', 'state')
+      ->execute();
+
+    $customField = $customFields->first();
+    $columnName = $customField['column_name'];
+
+    return [
+      'tableName' => $tableName,
+      'columnName' => $columnName,
+    ];
+
   }
 
 }

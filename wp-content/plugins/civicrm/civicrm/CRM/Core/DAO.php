@@ -3294,20 +3294,11 @@ SELECT contact_id
             $formattedClauses[] = "(`$tableAlias`.`$fieldName` " . implode(" OR `$tableAlias`.`$fieldName` ", $subClause) . ')';
           }
           else {
-            $needsAlias = strpos($fieldName, '.') === false;
-            if ($needsAlias) {
-              $formattedClauses[] = "(`$tableAlias`.`$fieldName` " . $subClause . ')';
-            } else {
-              list($customTableAlias, $customFieldName) = explode('.', $fieldName);
-              $formattedClauses[] = "($customTableAlias.$customFieldName " . $subClause . ')';
-            }
+            $formattedClauses[] = "(`$tableAlias`.`$fieldName` " . $subClause . ')';
           }
         }
-
-        $needsAlias = strpos($fieldName, '.') === false;
-
         $finalClauses[$fieldName] = '(' . implode(' AND ', $formattedClauses) . ')';
-        if (empty($fields[$fieldName]['required']) && $needsAlias) {
+        if (empty($fields[$fieldName]['required'])) {
           $finalClauses[$fieldName] = "(`$tableAlias`.`$fieldName` IS NULL OR {$finalClauses[$fieldName]})";
         }
       }
