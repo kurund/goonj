@@ -265,24 +265,51 @@ class CollectionCampService extends AutoSubscriber {
     }
 
     $collectionCamps = EckEntity::get('Collection_Camp', FALSE)
-      ->addSelect('Collection_Camp_Core_Details.Status', 'Collection_Camp_Core_Details.Contact_Id')
+      ->addSelect('Collection_Camp_Core_Details.Status', 'Collection_Camp_Core_Details.Contact_Id', 'title')
       ->addWhere('id', '=', $objectId)
       ->execute();
 
     $currentCollectionCamp = $collectionCamps->first();
     $currentStatus = $currentCollectionCamp['Collection_Camp_Core_Details.Status'];
     $contactId = $currentCollectionCamp['Collection_Camp_Core_Details.Contact_Id'];
+    $collectionCampTitle = $currentCollectionCamp['title'];
 
     // Check for status change.
     if ($currentStatus !== $newStatus) {
       if ($newStatus === 'authorized') {
         self::sendAuthorizationEmail($contactId, $subType);
+        self::logActivity($contactId, $newStatus, $subType, $collectionCampTitle);
       }
       elseif ($newStatus === 'unauthorized') {
         self::sendUnAuthorizationEmail($contactId, $subType);
+        self::logActivity($contactId, $newStatus, $subType, $collectionCampTitle);
       }
     }
+}
+
+  /**
+   * Log an activity in CiviCRM.
+   */
+  private static function logActivity($contactId, $status, $subType, $collectionCampTitle) {
+    try {
+        // Define the activity details.
+        $activityParams = [
+            'subject' => $collectionCampTitle,
+            'activity_type_id' => 67,
+            'status_id' => 2,
+            'activity_date_time' => date('YmdHis'),
+            'source_contact_id' => $contactId,
+            'target_contact_id' => $contactId,
+        ];
+
+        // Call the CiviCRM API to create the activity.
+        $result = civicrm_api3('Activity', 'create', $activityParams);
+
+    } catch (\CiviCRM_API3_Exception $ex) {
+        error_log("Exception caught while logging activity: " . $ex->getMessage());
+    }
   }
+
 
   /**
    * Send Authorization Email to contact.
