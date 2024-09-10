@@ -14,6 +14,7 @@ use Civi\Core\Service\AutoSubscriber;
 class CollectionBaseService extends AutoSubscriber {
 
   const ENTITY_NAME = 'Collection_Camp';
+  const INTENT_CUSTOM_GROUP_NAME = 'Collection_Camp_Intent_Details';
 
   /**
    *
@@ -107,8 +108,7 @@ class CollectionBaseService extends AutoSubscriber {
   private static function getStateFieldDbDetails() {
     $customGroups = CustomGroup::get(FALSE)
       ->addSelect('table_name')
-      ->addWhere('name', '=', 'Collection_Camp_Intent_Details')
-      ->setLimit(25)
+      ->addWhere('name', '=', self::INTENT_CUSTOM_GROUP_NAME)
       ->execute();
 
     $customGroup = $customGroups->first();
@@ -116,7 +116,7 @@ class CollectionBaseService extends AutoSubscriber {
 
     $customFields = CustomField::get(FALSE)
       ->addSelect('column_name')
-      ->addWhere('custom_group_id:name', '=', 'Collection_Camp_Intent_Details')
+      ->addWhere('custom_group_id:name', '=', self::INTENT_CUSTOM_GROUP_NAME)
       ->addWhere('name', '=', 'state')
       ->execute();
 
