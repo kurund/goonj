@@ -333,7 +333,6 @@ class CollectionCampService extends AutoSubscriber {
     $optionValues = \Civi\Api4\OptionValue::get(TRUE)
       ->addWhere('option_group_id', '=', 2)
       ->addWhere('label', '=', 'Collection Camp')
-      ->setLimit(25)
       ->execute();
     
     $collectionCampActivityId = $optionValues->first()['value'];
