@@ -331,20 +331,17 @@ class CollectionCampService extends AutoSubscriber {
    */
   private static function logActivity($contactId, $collectionCampTitle) {
     try {
-        // Define the activity details.
-        $activityParams = [
-            'subject' => $collectionCampTitle,
-            'activity_type_id' => 67,
-            'status_id' => 2,
-            'activity_date_time' => date('YmdHis'),
-            'source_contact_id' => $contactId,
-            'target_contact_id' => $contactId,
-        ];
+        $results = \Civi\Api4\Activity::create(FALSE)
+          ->addValue('subject', $collectionCampTitle)
+          ->addValue('activity_type_id', 67)
+          ->addValue('status_id', 2)
+          ->addValue('activity_date_time', date('YmdHis'))
+          ->addValue('source_contact_id', $contactId)
+          ->addValue('target_contact_id', $contactId)
+          ->execute();
+          error_log("results: " . print_r($results, TRUE));
 
-        // Call the CiviCRM API to create the activity.
-        $result = civicrm_api3('Activity', 'create', $activityParams);
-
-    } catch (\CiviCRM_API3_Exception $ex) {
+    } catch (\CiviCRM_API4_Exception $ex) {
         error_log("Exception caught while logging activity: " . $ex->getMessage());
     }
   }
