@@ -353,7 +353,6 @@ class CollectionCampService extends AutoSubscriber {
     }
   }
 
-
   /**
    * Send Authorization Email to contact.
    */
