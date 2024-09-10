@@ -330,10 +330,18 @@ class CollectionCampService extends AutoSubscriber {
    * Log an activity in CiviCRM.
    */
   private static function logActivity($contactId, $collectionCampTitle) {
+    $optionValues = \Civi\Api4\OptionValue::get(TRUE)
+      ->addWhere('option_group_id', '=', 2)
+      ->addWhere('label', '=', 'Collection Camp')
+      ->setLimit(25)
+      ->execute();
+    
+    $collectionCampActivityId = $optionValues->first()['value'];
+
     try {
         $results = \Civi\Api4\Activity::create(FALSE)
           ->addValue('subject', $collectionCampTitle)
-          ->addValue('activity_type_id', 67)
+          ->addValue('activity_type_id', $collectionCampActivityId)
           ->addValue('status_id', 2)
           ->addValue('activity_date_time', date('YmdHis'))
           ->addValue('source_contact_id', $contactId)
