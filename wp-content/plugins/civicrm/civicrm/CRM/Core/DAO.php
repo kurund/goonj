@@ -3288,7 +3288,6 @@ SELECT contact_id
           $fieldClauses = (array) $fieldClauses;
         }
         $formattedClauses = [];
-
         foreach (CRM_Utils_SQL::prefixFieldNames($fieldClauses, array_keys($fields), $tableAlias) as $subClause) {
           // Arrays of arrays get joined with OR (similar to CRM_Core_Permission::check)
           if (is_array($subClause)) {
@@ -3296,12 +3295,11 @@ SELECT contact_id
           }
           else {
             $needsAlias = strpos($fieldName, '.') === false;
-
             if ($needsAlias) {
               $formattedClauses[] = "(`$tableAlias`.`$fieldName` " . $subClause . ')';
             } else {
-              list($tA, $fN) = explode('.', $fieldName);
-              $formattedClauses[] = "($tA.$fN " . $subClause . ')';
+              list($customTableAlias, $customFieldName) = explode('.', $fieldName);
+              $formattedClauses[] = "($customTableAlias.$customFieldName " . $subClause . ')';
             }
           }
         }
