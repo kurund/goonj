@@ -283,7 +283,7 @@ class CollectionCampService extends AutoSubscriber {
         self::sendUnAuthorizationEmail($contactId, $subType);
       }
     }
-}
+  }
 
   /**
    * This hook is called after a db write on entities.
@@ -325,32 +325,33 @@ class CollectionCampService extends AutoSubscriber {
         self::createCollectionCampOrganizeActivity($contactId, $collectionCampTitle, $collectionCampId);
       }
     }
-}
+  }
 
   /**
    * Log an activity in CiviCRM.
    */
   private static function createCollectionCampOrganizeActivity($contactId, $collectionCampTitle, $collectionCampId) {
-    $optionValues = \Civi\Api4\OptionValue::get(TRUE)
+    $optionValues = OptionValue::get(TRUE)
       ->addWhere('option_group_id:name', '=', 'activity_type')
       ->addWhere('label', '=', 'Organize Collection Camp')
       ->execute();
-    
+
     $collectionCampActivityId = $optionValues->first()['value'];
 
     try {
-        $results = \Civi\Api4\Activity::create(FALSE)
-          ->addValue('subject', $collectionCampTitle)
-          ->addValue('activity_type_id', $collectionCampActivityId)
-          ->addValue('status_id', 2)
-          ->addValue('activity_date_time', date('YmdHis'))
-          ->addValue('source_contact_id', $contactId)
-          ->addValue('target_contact_id', $contactId)
-          ->addValue('Collection_Camp_Data.Collection_Camp_ID', $collectionCampId)
-          ->execute();
+      $results = Activity::create(FALSE)
+        ->addValue('subject', $collectionCampTitle)
+        ->addValue('activity_type_id', $collectionCampActivityId)
+        ->addValue('status_id', 2)
+        ->addValue('activity_date_time', date('YmdHis'))
+        ->addValue('source_contact_id', $contactId)
+        ->addValue('target_contact_id', $contactId)
+        ->addValue('Collection_Camp_Data.Collection_Camp_ID', $collectionCampId)
+        ->execute();
 
-    } catch (\CiviCRM_API4_Exception $ex) {
-        error_log("Exception caught while logging activity: " . $ex->getMessage());
+    }
+    catch (\CiviCRM_API4_Exception $ex) {
+      error_log("Exception caught while logging activity: " . $ex->getMessage());
     }
   }
 
