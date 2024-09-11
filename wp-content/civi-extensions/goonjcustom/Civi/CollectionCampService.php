@@ -346,7 +346,6 @@ class CollectionCampService extends AutoSubscriber {
           ->addValue('source_contact_id', $contactId)
           ->addValue('target_contact_id', $contactId)
           ->execute();
-          error_log("results: " . print_r($results, TRUE));
 
     } catch (\CiviCRM_API4_Exception $ex) {
         error_log("Exception caught while logging activity: " . $ex->getMessage());
