@@ -321,7 +321,7 @@ class CollectionCampService extends AutoSubscriber {
     // Check for status change.
     if ($currentStatus !== $newStatus) {
       if ($newStatus === 'authorized') {
-        self::logActivity($contactId, $collectionCampTitle);
+        self::createCollectionCampOrganizeActivity($contactId, $collectionCampTitle);
       }
     }
 }
@@ -329,7 +329,7 @@ class CollectionCampService extends AutoSubscriber {
   /**
    * Log an activity in CiviCRM.
    */
-  private static function logActivity($contactId, $collectionCampTitle) {
+  private static function createCollectionCampOrganizeActivity($contactId, $collectionCampTitle) {
     $optionValues = \Civi\Api4\OptionValue::get(TRUE)
       ->addWhere('option_group_id:name', '=', 'activity_type')
       ->addWhere('label', '=', 'Organize Collection Camp')
