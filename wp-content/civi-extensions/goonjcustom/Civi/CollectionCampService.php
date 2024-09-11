@@ -317,11 +317,12 @@ class CollectionCampService extends AutoSubscriber {
     $currentStatus = $currentCollectionCamp['Collection_Camp_Core_Details.Status'];
     $contactId = $currentCollectionCamp['Collection_Camp_Core_Details.Contact_Id'];
     $collectionCampTitle = $currentCollectionCamp['title'];
+    $collectionCampId = $currentCollectionCamp['id'];
 
     // Check for status change.
     if ($currentStatus !== $newStatus) {
       if ($newStatus === 'authorized') {
-        self::createCollectionCampOrganizeActivity($contactId, $collectionCampTitle);
+        self::createCollectionCampOrganizeActivity($contactId, $collectionCampTitle, $collectionCampId);
       }
     }
 }
@@ -329,7 +330,7 @@ class CollectionCampService extends AutoSubscriber {
   /**
    * Log an activity in CiviCRM.
    */
-  private static function createCollectionCampOrganizeActivity($contactId, $collectionCampTitle) {
+  private static function createCollectionCampOrganizeActivity($contactId, $collectionCampTitle, $collectionCampId) {
     $optionValues = \Civi\Api4\OptionValue::get(TRUE)
       ->addWhere('option_group_id:name', '=', 'activity_type')
       ->addWhere('label', '=', 'Organize Collection Camp')
@@ -345,6 +346,7 @@ class CollectionCampService extends AutoSubscriber {
           ->addValue('activity_date_time', date('YmdHis'))
           ->addValue('source_contact_id', $contactId)
           ->addValue('target_contact_id', $contactId)
+          ->addValue('Collection_Camp_Data.Collection_Camp_ID', $collectionCampId)
           ->execute();
 
     } catch (\CiviCRM_API4_Exception $ex) {
