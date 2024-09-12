@@ -576,10 +576,17 @@ class CollectionCampService extends AutoSubscriber {
     $collectionCampData = $collectionCamp->first();
     $contactId = $collectionCampData['Collection_Camp_Core_Details.Contact_Id'];
 
+    $optionValues = \Civi\Api4\OptionValue::get(TRUE)
+      ->addWhere('option_group_id:name', '=', 'activity_type')
+      ->addWhere('label', '=', 'Induction')
+      ->execute();
+
+    $activityTypeId = $optionValues->first()['value'];
+
     $activities = Activity::get(FALSE)
       ->addSelect('id')
       ->addWhere('target_contact_id', '=', $contactId)
-      ->addWhere('activity_type_id', '=', 57)
+      ->addWhere('activity_type_id', '=', $activityTypeId)
       ->execute();
 
     $activityId = $activities->first()['id'];
