@@ -395,7 +395,6 @@ function goonj_is_volunteer_inducted( $volunteer ) {
 
 	$noShowStatusId = $noShowStatusOptionValue->first()['value'];
 
-
 	$activityResult = \Civi\Api4\Activity::get(FALSE)
 	->addSelect('id')
 	->addWhere('target_contact_id', '=', $volunteer['id'])
