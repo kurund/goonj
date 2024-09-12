@@ -592,7 +592,7 @@ class CollectionCampService extends AutoSubscriber {
     $inductionId = $induction['id'];
 
     EckEntity::update('Collection_Camp', FALSE)
-      ->addValue('Collection_Camp_Intent_Details.Activity_Id', $inductionId)
+      ->addValue('Collection_Camp_Intent_Details.Initiator_Induction_Id', $inductionId)
       ->addWhere('id', '=', $collectionCampId)
       ->execute();
   }
