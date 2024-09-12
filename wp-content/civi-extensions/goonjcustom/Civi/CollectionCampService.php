@@ -558,7 +558,7 @@ class CollectionCampService extends AutoSubscriber {
    *   The parameters that were sent into the calling function.
    */
   public static function displayActivityDataForCollectionCamp($op, $groupID, $entityID, &$params) {
-    if ($op !== 'create') {
+    if ($op !== 'create' || $entityId !== 'Eck_Collection_Camp') {
       return;
     }
 
