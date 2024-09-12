@@ -379,28 +379,12 @@ function goonj_is_volunteer_inducted( $volunteer ) {
 
 	$activityTypeId = $optionValue->first()['value'];
 
-	$completeStatusOptionValue = \Civi\Api4\OptionValue::get(TRUE)
-	->addWhere('option_group_id:name', '=', 'activity_status')
-	->addWhere('label', '=', 'completed')
-	->setLimit(25)
-	->execute();
-
-	$completeStatusId = $completeStatusOptionValue->first()['value'];
-
-	$unknownStatusOptionValue = \Civi\Api4\OptionValue::get(TRUE)
-	->addWhere('option_group_id:name', '=', 'activity_status')
-	->addWhere('label', '=', 'Unknown')
-	->setLimit(25)
-	->execute();
-
-	$unknownStatusId = $unknownStatusOptionValue->first()['value'];
-
 	$activityResult = \Civi\Api4\Activity::get(FALSE)
 	->addSelect('id')
 	->addWhere('target_contact_id', '=', $volunteer['id'])
 	->addWhere('activity_type_id', '=', $activityTypeId)
 	->addWhere('status_id', 'CONTAINS', '')
-	->addClause('OR', ['status_id', '=', $completeStatusId], ['status_id', '=', $unknownStatusId])
+	->addClause('OR', ['status_id:label', '=',  'Completed'], ['status_id:label', '=', 'Unknown'])
 	->setLimit(1)
 	->execute();
 
