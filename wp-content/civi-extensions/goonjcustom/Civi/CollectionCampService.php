@@ -579,9 +579,9 @@ class CollectionCampService extends AutoSubscriber {
     $optionValues = OptionValue::get(TRUE)
       ->addWhere('option_group_id:name', '=', 'activity_type')
       ->addWhere('label', '=', 'Induction')
-      ->execute();
+      ->execute()->single();
 
-    $activityTypeId = $optionValues->first()['value'];
+    $activityTypeId = $optionValue['value'];
 
     $induction = Activity::get(FALSE)
       ->addSelect('id')
