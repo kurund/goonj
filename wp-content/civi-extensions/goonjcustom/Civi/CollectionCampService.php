@@ -12,6 +12,7 @@ use Civi\Api4\CustomField;
 use Civi\Api4\EckEntity;
 use Civi\Api4\Group;
 use Civi\Api4\GroupContact;
+use Civi\Api4\OptionValue;
 use Civi\Api4\Relationship;
 use Civi\Api4\StateProvince;
 use Civi\Core\Service\AutoSubscriber;
@@ -576,7 +577,7 @@ class CollectionCampService extends AutoSubscriber {
     $collectionCampData = $collectionCamp->first();
     $contactId = $collectionCampData['Collection_Camp_Core_Details.Contact_Id'];
 
-    $optionValues = \Civi\Api4\OptionValue::get(TRUE)
+    $optionValues = OptionValue::get(TRUE)
       ->addWhere('option_group_id:name', '=', 'activity_type')
       ->addWhere('label', '=', 'Induction')
       ->execute();
@@ -589,7 +590,7 @@ class CollectionCampService extends AutoSubscriber {
       ->addWhere('activity_type_id', '=', $activityTypeId)
       ->execute()->single();
 
-      $inductionId = $induction['id'];
+    $inductionId = $induction['id'];
 
     EckEntity::update('Collection_Camp', FALSE)
       ->addValue('Collection_Camp_Intent_Details.Activity_Id', $inductionId)
