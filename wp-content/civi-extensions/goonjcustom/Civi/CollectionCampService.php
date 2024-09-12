@@ -559,7 +559,7 @@ class CollectionCampService extends AutoSubscriber {
    *   The parameters that were sent into the calling function.
    */
   public static function linkInductionWithCollectionCamp($op, $groupID, $entityID, &$params) {
-    if ($op !== 'create' || $entityId !== 'Eck_Collection_Camp') {
+    if ($op !== 'create') {
       return;
     }
 
@@ -572,10 +572,9 @@ class CollectionCampService extends AutoSubscriber {
     $collectionCamp = EckEntity::get('Collection_Camp', FALSE)
       ->addSelect('Collection_Camp_Core_Details.Contact_Id', 'custom.*')
       ->addWhere('id', '=', $collectionCampId)
-      ->execute();
+      ->execute()->single();
 
-    $collectionCampData = $collectionCamp->first();
-    $contactId = $collectionCampData['Collection_Camp_Core_Details.Contact_Id'];
+    $contactId = $collectionCamp['Collection_Camp_Core_Details.Contact_Id'];
 
     $optionValues = OptionValue::get(TRUE)
       ->addWhere('option_group_id:name', '=', 'activity_type')
