@@ -40,6 +40,7 @@ class CollectionCampService extends AutoSubscriber {
       '&hook_civicrm_pre' => [
         ['generateCollectionCampQr'],
         ['linkCollectionCampToContact'],
+        ['sendNotificationToUrbanOpsTeam'],
       ],
       '&hook_civicrm_custom' => [
         ['setOfficeDetails'],
@@ -692,6 +693,93 @@ class CollectionCampService extends AutoSubscriber {
 
     $options = $stateOptions;
 
+  }
+
+
+  /**
+   * This hook is called after the database write on a custom table.
+   *
+   * @param string $op
+   *   The type of operation being performed.
+   * @param string $objectName
+   *   The custom group ID.
+   * @param int $objectId
+   *   The entityID of the row in the custom table.
+   * @param object $objectRef
+   *   The parameters that were sent into the calling function.
+   */
+  public static function sendNotificationToUrbanOpsTeam($op, $groupID, $entityID, &$params) {
+    if ($op !== 'create') {
+      return;
+    }
+
+    if (!($stateField = self::findStateField($params))) {
+      return;
+    }
+
+    $stateId = $stateField['value'];
+
+    if (!$stateId) {
+      \CRM_Core_Error::debug_log_message('Cannot assign Goonj Office to collection camp: ' . $collectionCamp['id']);
+      \CRM_Core_Error::debug_log_message('No state provided on the intent for collection camp: ' . $collectionCamp['id']);
+      return FALSE;
+    }
+
+    $officesFound = Contact::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('contact_type', '=', 'Organization')
+      ->addWhere('contact_sub_type', 'CONTAINS', 'Goonj_Office')
+      ->addWhere('Goonj_Office_Details.Collection_Camp_Catchment', 'CONTAINS', $stateId)
+      ->execute();
+
+    $stateOffice = $officesFound->first();
+
+    // If no state office is found, assign the fallback state office.
+    if (!$stateOffice) {
+      $stateOffice = self::getFallbackOffice();
+    }
+
+    $stateOfficeId = $stateOffice['id'];
+
+    $coordinators = Relationship::get(FALSE)
+      ->addWhere('contact_id_b', '=', $stateOfficeId)
+      ->addWhere('relationship_type_id:name', '=', self::RELATIONSHIP_TYPE_NAME)
+      ->addWhere('is_current', '=', TRUE)
+      ->execute()->single();
+
+    // $coordinators->first();
+    $coordinatorId = $coordinator['contact_id_a'];
+
+    self::sendAdminNotificatationForCollectionCamp($coordinatorId);
+
+    return TRUE;
+
+  }
+
+  /**
+   * Send Notification Email to Urban Ops Team for collection camp registered.
+   */
+  public static function sendAdminNotificatationForCollectionCamp($contactId) {
+    try {
+      $messageTemplates = MessageTemplate::get(TRUE)
+        ->addSelect('id', 'msg_title')
+        ->addWhere('msg_title', '=', 'Notify Urban Ops Team after collection camp form submission')
+        ->execute()->single();
+      $templateId = $messageTemplates['id'];
+      // Set up email parameters.
+      $emailParams = [
+        'contact_id' => $contactId,
+        'template_id' => $templateId,
+      ];
+
+      // Send email using CiviCRM API.
+      $result = civicrm_api3('Email', 'send', $emailParams);
+    }
+    catch (\CiviCRM_API3_Exception $ex) {
+      // Log the exception for debugging.
+      \Civi::log()->error("Exception caught while sending urban ops notification email: " . $ex->getMessage());
+      error_log("Exception caught while sending urban ops notification email: " . $ex->getMessage());
+    }
   }
 
 }
