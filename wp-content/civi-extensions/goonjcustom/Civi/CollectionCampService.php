@@ -331,19 +331,12 @@ class CollectionCampService extends AutoSubscriber {
    * Log an activity in CiviCRM.
    */
   private static function createCollectionCampOrganizeActivity($contactId, $collectionCampTitle, $collectionCampId) {
-    $optionValues = OptionValue::get(TRUE)
-      ->addWhere('option_group_id:name', '=', 'activity_type')
-      ->addWhere('label', '=', 'Organize Collection Camp')
-      ->execute();
-
-    $collectionCampActivityId = $optionValues->first()['value'];
-
     try {
       $results = Activity::create(FALSE)
         ->addValue('subject', $collectionCampTitle)
-        ->addValue('activity_type_id', $collectionCampActivityId)
-        ->addValue('status_id', 2)
-        ->addValue('activity_date_time', date('YmdHis'))
+        ->addValue('activity_type_id:name', 'Organize Collection Camp')
+        ->addValue('status_id:name', 'Authorized')
+        ->addValue('activity_date_time', date('Y-m-d H:i:s'))
         ->addValue('source_contact_id', $contactId)
         ->addValue('target_contact_id', $contactId)
         ->addValue('Collection_Camp_Data.Collection_Camp_ID', $collectionCampId)
