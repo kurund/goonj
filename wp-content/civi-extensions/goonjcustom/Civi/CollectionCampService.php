@@ -583,16 +583,16 @@ class CollectionCampService extends AutoSubscriber {
 
     $activityTypeId = $optionValues->first()['value'];
 
-    $activities = Activity::get(FALSE)
+    $induction = Activity::get(FALSE)
       ->addSelect('id')
       ->addWhere('target_contact_id', '=', $contactId)
       ->addWhere('activity_type_id', '=', $activityTypeId)
-      ->execute();
+      ->execute()->single();
 
-    $activityId = $activities->first()['id'];
+      $inductionId = $induction['id'];
 
     EckEntity::update('Collection_Camp', FALSE)
-      ->addValue('Collection_Camp_Intent_Details.Activity_Id', $activityId)
+      ->addValue('Collection_Camp_Intent_Details.Activity_Id', $inductionId)
       ->addWhere('id', '=', $collectionCampId)
       ->execute();
   }
