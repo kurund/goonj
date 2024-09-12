@@ -44,6 +44,7 @@ class CollectionCampService extends AutoSubscriber {
       '&hook_civicrm_pre' => [
         ['handleAuthorizationEmails'],
         ['generateCollectionCampQr'],
+        ['linkCollectionCampToContact'],
       ],
       '&hook_civicrm_custom' => [
         ['setOfficeDetails'],
@@ -281,6 +282,69 @@ class CollectionCampService extends AutoSubscriber {
       elseif ($newStatus === 'unauthorized') {
         self::sendUnAuthorizationEmail($contactId, $subType);
       }
+    }
+  }
+
+  /**
+   * This hook is called after a db write on entities.
+   *
+   * @param string $op
+   *   The type of operation being performed.
+   * @param string $objectName
+   *   The name of the object.
+   * @param int $objectId
+   *   The unique identifier for the object.
+   * @param object $objectRef
+   *   The reference to the object.
+   */
+  public static function linkCollectionCampToContact(string $op, string $objectName, $objectId, &$objectRef) {
+    if ($objectName != 'Eck_Collection_Camp' || !$objectId) {
+      return;
+    }
+
+    $newStatus = $objectRef['Collection_Camp_Core_Details.Status'] ?? '';
+
+    if (!$newStatus) {
+      return;
+    }
+
+    $collectionCamps = EckEntity::get('Collection_Camp', FALSE)
+      ->addSelect('Collection_Camp_Core_Details.Status', 'Collection_Camp_Core_Details.Contact_Id', 'title')
+      ->addWhere('id', '=', $objectId)
+      ->execute();
+
+    $currentCollectionCamp = $collectionCamps->first();
+    $currentStatus = $currentCollectionCamp['Collection_Camp_Core_Details.Status'];
+    $contactId = $currentCollectionCamp['Collection_Camp_Core_Details.Contact_Id'];
+    $collectionCampTitle = $currentCollectionCamp['title'];
+    $collectionCampId = $currentCollectionCamp['id'];
+
+    // Check for status change.
+    if ($currentStatus !== $newStatus) {
+      if ($newStatus === 'authorized') {
+        self::createCollectionCampOrganizeActivity($contactId, $collectionCampTitle, $collectionCampId);
+      }
+    }
+  }
+
+  /**
+   * Log an activity in CiviCRM.
+   */
+  private static function createCollectionCampOrganizeActivity($contactId, $collectionCampTitle, $collectionCampId) {
+    try {
+      $results = Activity::create(FALSE)
+        ->addValue('subject', $collectionCampTitle)
+        ->addValue('activity_type_id:name', 'Organize Collection Camp')
+        ->addValue('status_id:name', 'Authorized')
+        ->addValue('activity_date_time', date('Y-m-d H:i:s'))
+        ->addValue('source_contact_id', $contactId)
+        ->addValue('target_contact_id', $contactId)
+        ->addValue('Collection_Camp_Data.Collection_Camp_ID', $collectionCampId)
+        ->execute();
+
+    }
+    catch (\CiviCRM_API4_Exception $ex) {
+      error_log("Exception caught while logging activity: " . $ex->getMessage());
     }
   }
 
