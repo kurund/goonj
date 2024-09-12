@@ -12,11 +12,11 @@ use Civi\Api4\CustomField;
 use Civi\Api4\EckEntity;
 use Civi\Api4\Group;
 use Civi\Api4\GroupContact;
+use Civi\Api4\MessageTemplate;
 use Civi\Api4\OptionValue;
 use Civi\Api4\Relationship;
 use Civi\Api4\StateProvince;
 use Civi\Core\Service\AutoSubscriber;
-use Civi\Api4\MessageTemplate;
 
 /**
  *
@@ -236,8 +236,6 @@ class CollectionCampService extends AutoSubscriber {
     }
     return $collectionCampData['Collection_Camp_Intent_Details.State'] ?? NULL;
   }
-
-
 
   /**
    * This hook is called after a db write on entities.
@@ -694,7 +692,6 @@ class CollectionCampService extends AutoSubscriber {
     $options = $stateOptions;
 
   }
-
 
   /**
    * This hook is called after the database write on a custom table.
