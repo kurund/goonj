@@ -40,11 +40,11 @@ class CollectionCampService extends AutoSubscriber {
       '&hook_civicrm_pre' => [
         ['generateCollectionCampQr'],
         ['linkCollectionCampToContact'],
-        ['sendNotificationToUrbanOpsTeam'],
       ],
       '&hook_civicrm_custom' => [
         ['setOfficeDetails'],
         ['linkInductionWithCollectionCamp'],
+        ['sendNotificationToUrbanOpsTeam'],
       ],
       '&hook_civicrm_fieldOptions' => 'setIndianStateOptions',
     ];
@@ -747,8 +747,7 @@ class CollectionCampService extends AutoSubscriber {
       ->addWhere('is_current', '=', TRUE)
       ->execute()->single();
 
-    // $coordinators->first();
-    $coordinatorId = $coordinator['contact_id_a'];
+    $coordinatorId = $coordinators['contact_id_a'];
 
     self::sendAdminNotificatationForCollectionCamp($coordinatorId);
 
