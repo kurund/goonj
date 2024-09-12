@@ -376,7 +376,8 @@ function goonj_is_volunteer_inducted( $volunteer ) {
 	->addSelect('id')
 	->addWhere('target_contact_id', '=', $volunteer['id'])
 	->addWhere('activity_type_id', '=', 57) // hardcode ID of activity type "Induction"
-	->addWhere('status_id', '=', 2) // hardcode ID of activity status "Completed"
+	->addWhere('status_id', 'CONTAINS', '')
+	->addClause('OR', ['status_id', '=', 2], ['status_id', '=', 8])
 	->setLimit(1)
 	->execute();
 
