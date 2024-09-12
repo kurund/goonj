@@ -576,7 +576,7 @@ class CollectionCampService extends AutoSubscriber {
 
     $contactId = $collectionCamp['Collection_Camp_Core_Details.Contact_Id'];
 
-    $optionValues = OptionValue::get(TRUE)
+    $optionValue = OptionValue::get(TRUE)
       ->addWhere('option_group_id:name', '=', 'activity_type')
       ->addWhere('label', '=', 'Induction')
       ->execute()->single();
