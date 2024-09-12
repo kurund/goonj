@@ -372,19 +372,36 @@ function goonj_handle_user_identification_form() {
 }
 
 function goonj_is_volunteer_inducted( $volunteer ) {
-	$optionValues = \Civi\Api4\OptionValue::get(TRUE)
+	$optionValue = \Civi\Api4\OptionValue::get(TRUE)
 	->addWhere('option_group_id:name', '=', 'activity_type')
 	->addWhere('label', '=', 'Induction')
 	->execute();
 
-	$activityTypeId = $optionValues->first()['value'];
+	$activityTypeId = $optionValue->first()['value'];
+
+	$completeStatusOptionValue = \Civi\Api4\OptionValue::get(TRUE)
+	->addWhere('option_group_id:name', '=', 'activity_status')
+	->addWhere('label', '=', 'completed')
+	->setLimit(25)
+	->execute();
+
+	$completeStatusId = $completeStatusOptionValue->first()['value'];
+
+	$noShowStatusOptionValue = \Civi\Api4\OptionValue::get(TRUE)
+	->addWhere('option_group_id:name', '=', 'activity_status')
+	->addWhere('label', '=', 'no-show')
+	->setLimit(25)
+	->execute();
+
+	$noShowStatusId = $noShowStatusOptionValue->first()['value'];
+
 
 	$activityResult = \Civi\Api4\Activity::get(FALSE)
 	->addSelect('id')
 	->addWhere('target_contact_id', '=', $volunteer['id'])
 	->addWhere('activity_type_id', '=', $activityTypeId)
 	->addWhere('status_id', 'CONTAINS', '')
-	->addClause('OR', ['status_id', '=', 2], ['status_id', '=', 8])
+	->addClause('OR', ['status_id', '=', $completeStatusId], ['status_id', '=', $noShowStatusId])
 	->setLimit(1)
 	->execute();
 
