@@ -563,7 +563,7 @@ class CollectionCampService extends AutoSubscriber {
       return;
     }
 
-    if (!($contactId = self::findContactId($params))) {
+    if (!($contactId = self::findCollectionCampInitiatorContact($params))) {
       return;
     }
 
@@ -632,7 +632,7 @@ class CollectionCampService extends AutoSubscriber {
   /**
    *
    */
-  private static function findContactId(array $array) {
+  private static function findCollectionCampInitiatorContact(array $array) {
     $filteredItems = array_filter($array, fn($item) => $item['entity_table'] === 'civicrm_eck_collection_camp');
 
     if (empty($filteredItems)) {
