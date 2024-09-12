@@ -46,7 +46,7 @@ class CollectionCampService extends AutoSubscriber {
       ],
       '&hook_civicrm_custom' => [
         ['setOfficeDetails'],
-        ['displayActivityDataForCollectionCamp'],
+        ['linkInductionWithCollectionCamp'],
       ],
       '&hook_civicrm_fieldOptions' => 'setIndianStateOptions',
     ];
@@ -557,7 +557,7 @@ class CollectionCampService extends AutoSubscriber {
    * @param object $objectRef
    *   The parameters that were sent into the calling function.
    */
-  public static function displayActivityDataForCollectionCamp($op, $groupID, $entityID, &$params) {
+  public static function linkInductionWithCollectionCamp($op, $groupID, $entityID, &$params) {
     if ($op !== 'create' || $entityId !== 'Eck_Collection_Camp') {
       return;
     }
