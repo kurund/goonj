@@ -372,7 +372,7 @@ function goonj_handle_user_identification_form() {
 }
 
 function goonj_is_volunteer_inducted( $volunteer ) {
-	$optionValue = \Civi\Api4\OptionValue::get(TRUE)
+	$optionValue = \Civi\Api4\OptionValue::get(FALSE)
 	->addWhere('option_group_id:name', '=', 'activity_type')
 	->addWhere('label', '=', 'Induction')
 	->execute()->single();
