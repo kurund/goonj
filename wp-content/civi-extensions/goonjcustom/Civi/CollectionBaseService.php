@@ -7,6 +7,7 @@ use Civi\Api4\EckEntity;
 use Civi\Api4\Group;
 use Civi\Api4\GroupContact;
 use Civi\Api4\MessageTemplate;
+use Civi\Api4\OptionValue;
 use Civi\Core\Service\AutoSubscriber;
 
 /**
@@ -214,11 +215,11 @@ class CollectionBaseService extends AutoSubscriber {
       ->execute();
 
     foreach ($collectionCampSubtypes as $subtype) {
-      $subtypeValue = $subtype[$value];
+      $subtypeValue = $subtype['value'];
       $subtypeName = $subtype['name'];
 
-      $mapper[$subtypeValue]['authorized'] = $subtypeName . 'authorized';
-      $mapper[$subtypeValue]['unauthorized'] = $subtypeName . 'unauthorized';
+      $mapper[$subtypeValue]['authorized'] = $subtypeName . ' ' . 'authorized';
+      $mapper[$subtypeValue]['unauthorized'] = $subtypeName . ' ' . 'unauthorized';
     }
 
     $msgTitleStartsWith = $mapper[$collectionCampSubtype][$status] . '%';
