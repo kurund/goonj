@@ -218,8 +218,8 @@ class CollectionBaseService extends AutoSubscriber {
       $subtypeValue = $subtype['value'];
       $subtypeName = $subtype['name'];
 
-      $mapper[$subtypeValue]['authorized'] = $subtypeName . ' ' . 'authorized';
-      $mapper[$subtypeValue]['unauthorized'] = $subtypeName . ' ' . 'unauthorized';
+      $mapper[$subtypeValue]['authorized'] = $subtypeName . ' authorized';
+      $mapper[$subtypeValue]['unauthorized'] = $subtypeName . ' unauthorized';
     }
 
     $msgTitleStartsWith = $mapper[$collectionCampSubtype][$status] . '%';
