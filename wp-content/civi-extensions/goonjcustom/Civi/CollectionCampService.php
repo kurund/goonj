@@ -21,11 +21,6 @@ use Civi\Core\Service\AutoSubscriber;
  *
  */
 class CollectionCampService extends AutoSubscriber {
-
-  const AUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP = 78;
-  const AUTHORIZED_TEMPLATE_ID_DROPPING_CENTER = 83;
-  const UNAUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP = 77;
-  const UNAUTHORIZED_TEMPLATE_ID_DROPPING_CENTER = 82;
   const FALLBACK_OFFICE_NAME = 'Delhi';
   const RELATIONSHIP_TYPE_NAME = 'Collection Camp Coordinator of';
 
@@ -42,7 +37,6 @@ class CollectionCampService extends AutoSubscriber {
         ['assignChapterGroupToIndividual'],
       ],
       '&hook_civicrm_pre' => [
-        ['handleAuthorizationEmails'],
         ['generateCollectionCampQr'],
         ['linkCollectionCampToContact'],
       ],
@@ -253,50 +247,6 @@ class CollectionCampService extends AutoSubscriber {
    * @param object $objectRef
    *   The reference to the object.
    */
-  public static function handleAuthorizationEmails(string $op, string $objectName, $objectId, &$objectRef) {
-    if ($objectName != 'Eck_Collection_Camp' || !$objectId) {
-      return;
-    }
-
-    $newStatus = $objectRef['Collection_Camp_Core_Details.Status'] ?? '';
-    $subType = $objectRef['subtype'] ?? '';
-
-    if (!$newStatus) {
-      return;
-    }
-
-    $collectionCamps = EckEntity::get('Collection_Camp', FALSE)
-      ->addSelect('Collection_Camp_Core_Details.Status', 'Collection_Camp_Core_Details.Contact_Id')
-      ->addWhere('id', '=', $objectId)
-      ->execute();
-
-    $currentCollectionCamp = $collectionCamps->first();
-    $currentStatus = $currentCollectionCamp['Collection_Camp_Core_Details.Status'];
-    $contactId = $currentCollectionCamp['Collection_Camp_Core_Details.Contact_Id'];
-
-    // Check for status change.
-    if ($currentStatus !== $newStatus) {
-      if ($newStatus === 'authorized') {
-        self::sendAuthorizationEmail($contactId, $subType);
-      }
-      elseif ($newStatus === 'unauthorized') {
-        self::sendUnAuthorizationEmail($contactId, $subType);
-      }
-    }
-  }
-
-  /**
-   * This hook is called after a db write on entities.
-   *
-   * @param string $op
-   *   The type of operation being performed.
-   * @param string $objectName
-   *   The name of the object.
-   * @param int $objectId
-   *   The unique identifier for the object.
-   * @param object $objectRef
-   *   The reference to the object.
-   */
   public static function linkCollectionCampToContact(string $op, string $objectName, $objectId, &$objectRef) {
     if ($objectName != 'Eck_Collection_Camp' || !$objectId) {
       return;
@@ -345,58 +295,6 @@ class CollectionCampService extends AutoSubscriber {
     }
     catch (\CiviCRM_API4_Exception $ex) {
       error_log("Exception caught while logging activity: " . $ex->getMessage());
-    }
-  }
-
-  /**
-   * Send Authorization Email to contact.
-   */
-  private static function sendAuthorizationEmail($contactId, $subType) {
-    try {
-      // Determine the template based on dynamic subtype.
-      $templateId = $subType == 4 ? self::AUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP : ($subType == 5 ? self::AUTHORIZED_TEMPLATE_ID_DROPPING_CENTER : NULL);
-
-      if (!$templateId) {
-        return;
-      }
-
-      $emailParams = [
-        'contact_id' => $contactId,
-      // Template ID for the authorization email.
-        'template_id' => $templateId,
-      ];
-
-      $result = civicrm_api3('Email', 'send', $emailParams);
-
-    }
-    catch (\CiviCRM_API3_Exception $ex) {
-      error_log("Exception caught while sending authorization email: " . $ex->getMessage());
-    }
-  }
-
-  /**
-   * Send UnAuthorization Email to contact.
-   */
-  private static function sendUnAuthorizationEmail($contactId, $subType) {
-    try {
-      // Determine the template based on dynamic subtype.
-      $templateId = $subType == 4 ? self::UNAUTHORIZED_TEMPLATE_ID_COLLECTION_CAMP : ($subType == 5 ? self::UNAUTHORIZED_TEMPLATE_ID_DROPPING_CENTER : NULL);
-
-      if (!$templateId) {
-        return;
-      }
-
-      $emailParams = [
-        'contact_id' => $contactId,
-      // Template ID for the unauthorization email.
-        'template_id' => $templateId,
-      ];
-
-      $result = civicrm_api3('Email', 'send', $emailParams);
-
-    }
-    catch (\CiviCRM_API3_Exception $ex) {
-      error_log("Exception caught while sending unauthorization email: " . $ex->getMessage());
     }
   }
 

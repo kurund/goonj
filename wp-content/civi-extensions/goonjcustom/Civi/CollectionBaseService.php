@@ -3,8 +3,11 @@
 namespace Civi;
 
 use Civi\Api4\CustomField;
+use Civi\Api4\EckEntity;
 use Civi\Api4\Group;
 use Civi\Api4\GroupContact;
+use Civi\Api4\MessageTemplate;
+use Civi\Api4\OptionValue;
 use Civi\Core\Service\AutoSubscriber;
 
 /**
@@ -24,6 +27,7 @@ class CollectionBaseService extends AutoSubscriber {
     return [
       '&hook_civicrm_tabset' => 'collectionBaseTabset',
       '&hook_civicrm_selectWhereClause' => 'aclCollectionCamp',
+      '&hook_civicrm_pre' => 'handleAuthorizationEmails',
     ];
   }
 
@@ -134,6 +138,101 @@ class CollectionBaseService extends AutoSubscriber {
 
     return self::$stateCustomFieldDbDetails;
 
+  }
+
+  /**
+   * This hook is called after a db write on entities.
+   *
+   * @param string $op
+   *   The type of operation being performed.
+   * @param string $objectName
+   *   The name of the object.
+   * @param int $objectId
+   *   The unique identifier for the object.
+   * @param object $objectRef
+   *   The reference to the object.
+   */
+  public static function handleAuthorizationEmails(string $op, string $objectName, $objectId, &$objectRef) {
+    if ($objectName != 'Eck_Collection_Camp' || !$objectId) {
+      return;
+    }
+
+    $newStatus = $objectRef['Collection_Camp_Core_Details.Status'] ?? '';
+    $subType = $objectRef['subtype'] ?? '';
+
+    if (!$newStatus) {
+      return;
+    }
+
+    $currentCollectionCamp = EckEntity::get('Collection_Camp', FALSE)
+      ->addSelect('Collection_Camp_Core_Details.Status', 'Collection_Camp_Core_Details.Contact_Id')
+      ->addWhere('id', '=', $objectId)
+      ->execute()->single();
+
+    $currentStatus = $currentCollectionCamp['Collection_Camp_Core_Details.Status'];
+    $initiatorId = $currentCollectionCamp['Collection_Camp_Core_Details.Contact_Id'];
+
+    // Check for status change.
+    if ($currentStatus !== $newStatus) {
+      self::sendAuthorizationEmail($initiatorId, $objectRef, $newStatus);
+    }
+  }
+
+  /**
+   * Send Authorization Email to contact.
+   */
+  private static function sendAuthorizationEmail($initiatorId, $collectionCampPre, $status) {
+    try {
+      $subtype = $collectionCampPre['subtype'];
+
+      $templateId = self::getMessageTemplateId($subtype, $status);
+
+      $emailParams = [
+        'contact_id' => $initiatorId,
+        'template_id' => $templateId,
+      ];
+
+      $result = civicrm_api3('Email', 'send', $emailParams);
+
+    }
+    catch (\Exception $ex) {
+      \Civi::log()->debug('Cannot send authorization email to initiator.', [
+        'initiatorId' => $initiatorId,
+        'status' => $status,
+        'entityId' => $objectRef['id'],
+        'error' => $ex->getMessage(),
+      ]);
+    }
+  }
+
+  /**
+   *
+   */
+  public static function getMessageTemplateId($collectionCampSubtype, $status) {
+    $collectionCampSubtypes = OptionValue::get(FALSE)
+      ->addWhere('option_group_id:name', '=', 'eck_sub_types')
+      ->addWhere('grouping', '=', 'Collection_Camp')
+      ->execute();
+
+    foreach ($collectionCampSubtypes as $subtype) {
+      $subtypeValue = $subtype['value'];
+      $subtypeName = $subtype['name'];
+
+      $mapper[$subtypeValue]['authorized'] = $subtypeName . ' authorized';
+      $mapper[$subtypeValue]['unauthorized'] = $subtypeName . ' unauthorized';
+    }
+
+    $msgTitleStartsWith = $mapper[$collectionCampSubtype][$status] . '%';
+
+    $messageTemplates = MessageTemplate::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('msg_title', 'LIKE', $msgTitleStartsWith)
+      ->addWhere('is_active', '=', TRUE)
+      ->execute();
+
+    $messageTemplate = $messageTemplates->first();
+
+    return $messageTemplate['id'];
   }
 
 }
