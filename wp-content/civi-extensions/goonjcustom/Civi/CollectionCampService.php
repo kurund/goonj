@@ -6,11 +6,13 @@ require_once __DIR__ . '/../../../../wp-content/civi-extensions/goonjcustom/vend
 
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
+use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\EckEntity;
 use Civi\Api4\Group;
 use Civi\Api4\GroupContact;
+use Civi\Api4\OptionValue;
 use Civi\Api4\Relationship;
 use Civi\Api4\StateProvince;
 use Civi\Core\Service\AutoSubscriber;
@@ -42,8 +44,12 @@ class CollectionCampService extends AutoSubscriber {
       '&hook_civicrm_pre' => [
         ['handleAuthorizationEmails'],
         ['generateCollectionCampQr'],
+        ['linkCollectionCampToContact'],
       ],
-      '&hook_civicrm_custom' => 'setOfficeDetails',
+      '&hook_civicrm_custom' => [
+        ['setOfficeDetails'],
+        ['linkInductionWithCollectionCamp'],
+      ],
       '&hook_civicrm_fieldOptions' => 'setIndianStateOptions',
     ];
   }
@@ -276,6 +282,69 @@ class CollectionCampService extends AutoSubscriber {
       elseif ($newStatus === 'unauthorized') {
         self::sendUnAuthorizationEmail($contactId, $subType);
       }
+    }
+  }
+
+  /**
+   * This hook is called after a db write on entities.
+   *
+   * @param string $op
+   *   The type of operation being performed.
+   * @param string $objectName
+   *   The name of the object.
+   * @param int $objectId
+   *   The unique identifier for the object.
+   * @param object $objectRef
+   *   The reference to the object.
+   */
+  public static function linkCollectionCampToContact(string $op, string $objectName, $objectId, &$objectRef) {
+    if ($objectName != 'Eck_Collection_Camp' || !$objectId) {
+      return;
+    }
+
+    $newStatus = $objectRef['Collection_Camp_Core_Details.Status'] ?? '';
+
+    if (!$newStatus) {
+      return;
+    }
+
+    $collectionCamps = EckEntity::get('Collection_Camp', FALSE)
+      ->addSelect('Collection_Camp_Core_Details.Status', 'Collection_Camp_Core_Details.Contact_Id', 'title')
+      ->addWhere('id', '=', $objectId)
+      ->execute();
+
+    $currentCollectionCamp = $collectionCamps->first();
+    $currentStatus = $currentCollectionCamp['Collection_Camp_Core_Details.Status'];
+    $contactId = $currentCollectionCamp['Collection_Camp_Core_Details.Contact_Id'];
+    $collectionCampTitle = $currentCollectionCamp['title'];
+    $collectionCampId = $currentCollectionCamp['id'];
+
+    // Check for status change.
+    if ($currentStatus !== $newStatus) {
+      if ($newStatus === 'authorized') {
+        self::createCollectionCampOrganizeActivity($contactId, $collectionCampTitle, $collectionCampId);
+      }
+    }
+  }
+
+  /**
+   * Log an activity in CiviCRM.
+   */
+  private static function createCollectionCampOrganizeActivity($contactId, $collectionCampTitle, $collectionCampId) {
+    try {
+      $results = Activity::create(FALSE)
+        ->addValue('subject', $collectionCampTitle)
+        ->addValue('activity_type_id:name', 'Organize Collection Camp')
+        ->addValue('status_id:name', 'Authorized')
+        ->addValue('activity_date_time', date('Y-m-d H:i:s'))
+        ->addValue('source_contact_id', $contactId)
+        ->addValue('target_contact_id', $contactId)
+        ->addValue('Collection_Camp_Data.Collection_Camp_ID', $collectionCampId)
+        ->execute();
+
+    }
+    catch (\CiviCRM_API4_Exception $ex) {
+      error_log("Exception caught while logging activity: " . $ex->getMessage());
     }
   }
 
@@ -542,6 +611,57 @@ class CollectionCampService extends AutoSubscriber {
   }
 
   /**
+   * This hook is called after the database write on a custom table.
+   *
+   * @param string $op
+   *   The type of operation being performed.
+   * @param string $objectName
+   *   The custom group ID.
+   * @param int $objectId
+   *   The entityID of the row in the custom table.
+   * @param object $objectRef
+   *   The parameters that were sent into the calling function.
+   */
+  public static function linkInductionWithCollectionCamp($op, $groupID, $entityID, &$params) {
+    if ($op !== 'create') {
+      return;
+    }
+
+    if (!($contactId = self::findCollectionCampInitiatorContact($params))) {
+      return;
+    }
+
+    $collectionCampId = $contactId['entity_id'];
+
+    $collectionCamp = EckEntity::get('Collection_Camp', FALSE)
+      ->addSelect('Collection_Camp_Core_Details.Contact_Id', 'custom.*')
+      ->addWhere('id', '=', $collectionCampId)
+      ->execute()->single();
+
+    $contactId = $collectionCamp['Collection_Camp_Core_Details.Contact_Id'];
+
+    $optionValue = OptionValue::get(TRUE)
+      ->addWhere('option_group_id:name', '=', 'activity_type')
+      ->addWhere('label', '=', 'Induction')
+      ->execute()->single();
+
+    $activityTypeId = $optionValue['value'];
+
+    $induction = Activity::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('target_contact_id', '=', $contactId)
+      ->addWhere('activity_type_id', '=', $activityTypeId)
+      ->execute()->single();
+
+    $inductionId = $induction['id'];
+
+    EckEntity::update('Collection_Camp', FALSE)
+      ->addValue('Collection_Camp_Intent_Details.Initiator_Induction_Id', $inductionId)
+      ->addWhere('id', '=', $collectionCampId)
+      ->execute();
+  }
+
+  /**
    *
    */
   private static function findStateField(array $array) {
@@ -571,6 +691,38 @@ class CollectionCampService extends AutoSubscriber {
     ));
 
     return $stateItemIndex !== FALSE ? $filteredItems[$stateItemIndex] : FALSE;
+  }
+
+  /**
+   *
+   */
+  private static function findCollectionCampInitiatorContact(array $array) {
+    $filteredItems = array_filter($array, fn($item) => $item['entity_table'] === 'civicrm_eck_collection_camp');
+
+    if (empty($filteredItems)) {
+      return FALSE;
+    }
+
+    $collectionCampContactId = CustomField::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('name', '=', 'Contact_Id')
+      ->addWhere('custom_group_id:name', '=', 'Collection_Camp_Core_Details')
+      ->execute()
+      ->first();
+
+    if (!$collectionCampContactId) {
+      return FALSE;
+    }
+
+    $contactFieldId = $collectionCampContactId['id'];
+
+    $contactItemIndex = array_search(TRUE, array_map(fn($item) =>
+        $item['entity_table'] === 'civicrm_eck_collection_camp' &&
+        $item['custom_field_id'] == $contactFieldId,
+        $filteredItems
+    ));
+
+    return $contactItemIndex !== FALSE ? $filteredItems[$contactItemIndex] : FALSE;
   }
 
   /**
