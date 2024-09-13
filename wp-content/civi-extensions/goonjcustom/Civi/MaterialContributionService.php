@@ -28,6 +28,10 @@ class MaterialContributionService extends AutoSubscriber {
    * Attach material contribution receipt to the email.
    */
   public static function attachContributionReceiptToEmail(&$params, $context = NULL) {
+    if (!isset($params['entity_id'])) {
+      return;
+    }
+
     $reminderId = (int) $params['entity_id'];
 
     if ($context !== 'singleEmail' || $reminderId !== self::CONTRIBUTION_RECEIPT_REMINDER_ID) {
