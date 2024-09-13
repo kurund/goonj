@@ -37,6 +37,11 @@ class InductionService extends AutoSubscriber {
       return FALSE;
     }
 
+    \Civi::log()->info('Individual created: ', [
+      'id' => $objectId,
+      'subtypes' => $objectRef->contact_sub_type,
+    ]);
+
     $subTypes = $objectRef->contact_sub_type;
 
     if (empty($subTypes)) {
@@ -54,6 +59,10 @@ class InductionService extends AutoSubscriber {
 
     self::$volunteerId = $objectId;
 
+    \Civi::log()->info('Volunteer set: ', [
+      'id' => self::$volunteerId,
+    ]);
+
   }
 
   /**
@@ -63,6 +72,13 @@ class InductionService extends AutoSubscriber {
     if ($op !== 'create' || $objectName !== 'Address') {
       return FALSE;
     }
+
+    \Civi::log()->info('Address created: ', [
+      'id' => $objectId,
+      'volunteer' => self::$volunteerId,
+      'contactId' => $objectRef->contact_id,
+      'isPrimary' => $objectRef->is_primary,
+    ]);
 
     if (self::$volunteerId !== $objectRef->contact_id || !$objectRef->is_primary) {
       return FALSE;
@@ -107,6 +123,14 @@ class InductionService extends AutoSubscriber {
     $targetContactId = ($currentUserId === self::$volunteerId) ? $currentUserId : [self::$volunteerId];
 
     $placeholderActivityDate = self::getPlaceholderActivityDate();
+
+    \Civi::log()->info('Before induction activity create: ', [
+      'id' => $objectId,
+      'source' => $sourceContactId,
+      'target' => $targetContactId,
+      'coordinator' => $coordinatorId,
+      'officeId' => $officeId,
+    ]);
 
     Activity::create(FALSE)
       ->addValue('activity_type_id:name', self::INDUCTION_ACTIVITY_TYPE_NAME)
