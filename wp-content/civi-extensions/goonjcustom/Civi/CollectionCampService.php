@@ -549,6 +549,8 @@ class CollectionCampService extends AutoSubscriber {
       ->addSelect('id')
       ->addWhere('target_contact_id', '=', $contactId)
       ->addWhere('activity_type_id', '=', $activityTypeId)
+      ->addOrderBy('created_date', 'DESC')
+      ->setLimit(1)
       ->execute()->single();
 
     $inductionId = $induction['id'];
