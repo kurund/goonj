@@ -335,9 +335,9 @@
         // Check if End Date is before Start Date
         if (endDate < startDate) {
           errorMessage += `Collections cannot end (${endDateValue}) before start (${startDateValue}).\n`;
-          isValid = false;     
+          isValid = false;   
         }
-      }
+    }
 
     // Birth date validation
     var birthDateField = $element.find("af-field[name='birth_date'] input[type='text']");
