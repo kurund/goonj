@@ -5,6 +5,7 @@
  */
 
 use Civi\Api4\EckEntity;
+use Civi\Api4\MessageTemplate;
 use Civi\Api4\OptionValue;
 
 /**
@@ -93,11 +94,20 @@ function goonjcustomevent_check_and_send_emails_for_camp_end_date() {
  * Function to send email to camp attendee.
  */
 function emailToCampAttendBy($contactId, $collectionCampEndDate) {
+  $messageTemplates = MessageTemplate::get(TRUE)
+    ->addSelect('id')
+    ->addWhere('msg_title', '=', 'Event Completion Notification')
+    ->addWhere('is_active', '=', TRUE)
+    ->execute();
+
+  $messageTemplateId = $messageTemplates->first()['id'];
+  error_log('messageTemplateId ' . print_r($messageTemplateId, TRUE));
+
   // Prepare email parameters.
   $emailParams = [
     'contact_id'  => $contactId,
   // Replace with your actual template ID.
-    'template_id' => 72,
+    'template_id' => $messageTemplateId,
   ];
   error_log('emailParams ' . print_r($emailParams, TRUE));
 
