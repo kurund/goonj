@@ -5,6 +5,7 @@
  */
 
 use Civi\Api4\EckEntity;
+use Civi\Api4\OptionValue;
 
 /**
  * Civirules.Cron API specification.
@@ -44,10 +45,16 @@ function civicrm_api3_goonjcustomevent_cron($params) {
  * Function to check camp end date and send emails.
  */
 function goonjcustomevent_check_and_send_emails_for_camp_end_date() {
+  $optionValues = OptionValue::get(FALSE)
+    ->addWhere('option_group_id:label', '=', 'ECK Subtypes')
+    ->addWhere('label', '=', 'Collection Camp')
+    ->execute();
+
+  $collectionCampSubtype = $optionValues->first()['value'];
   try {
     $collectionCamps = EckEntity::get('Collection_Camp', TRUE)
       ->addSelect('Logistics_Coordination.Camp_to_be_attended_by', 'Collection_Camp_Intent_Details.End_Date')
-      ->addWhere('subtype', '=', 4)
+      ->addWhere('subtype', '=', $collectionCampSubtype)
       ->execute();
 
     // Get today's date in the same format as the End_Date field.
