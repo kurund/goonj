@@ -16,6 +16,7 @@ class InductionService extends AutoSubscriber {
   const RELATIONSHIP_TYPE_NAME = 'Induction Coordinator of';
 
   private static $volunteerId = NULL;
+  private static $inductionId = NULL;
 
   /**
    *
@@ -25,6 +26,10 @@ class InductionService extends AutoSubscriber {
       '&hook_civicrm_post' => [
             ['volunteerCreated'],
             ['createInductionForVolunteer'],
+            ['inductionCreated'],
+      ],
+      '&hook_civicrm_custom' => [
+        ['sendInductionEmailToVolunteer'],
       ],
     ];
   }
@@ -141,6 +146,82 @@ class InductionService extends AutoSubscriber {
     $date->setTime(11, 0);
 
     return $date->format('Y-m-d H:i:s');
+  }
+
+  public static function inductionCreated(string $op, string $objectName, int $objectId, &$objectRef) {
+    if ($op !== 'create' || $objectName !== 'ActivityContact') {
+      return FALSE;
+    }
+
+    if ($objectRef->contact_id !== self::$volunteerId){
+      return;
+    }
+    self::$inductionId = $objectRef->activity_id;
+    // $induction = \Civi\Api4\Activity::get(FALSE)
+    //   ->addSelect('Induction_Fields.Goonj_Office', 'Induction_Fields.Assign')
+    //   ->addWhere('id', '=', self::$inductionId)
+    //   ->setLimit(1)
+    //   ->execute()->single();
+  //   \Civi::log()->info('op',['op'=>$op,
+  //   'objectName'=>$objectName,
+  //   'objectId'=>$objectId,
+  //   'objectref'=>$objectRef,
+  // 'induction'=>$induction]);
+  }
+
+  
+    /**
+   * This hook is called after the database write on a custom table.
+   *
+   * @param string $op
+   *   The type of operation being performed.
+   * @param string $objectName
+   *   The custom group ID.
+   * @param int $objectId
+   *   The entityID of the row in the custom table.
+   * @param object $objectRef
+   *   The parameters that were sent into the calling function.
+   */
+  public static function sendInductionEmailToVolunteer($op, $groupID, $entityID, &$params) {
+    if ($op !== 'create') {
+      return;
+    }
+
+    if (!($inductionsFields = self::findInductionOfficeFields($params))) {
+      return;
+    }
+  }
+
+    /**
+   *
+   */
+  private static function findInductionOfficeFields(array $array) {
+    \Civi::log()->info('check',['check'=>$array]);
+
+    $filteredItems = array_filter($array, fn($item) => $item['entity_table'] === 'civicrm_activity');
+
+    if (empty($filteredItems)) {
+      return FALSE;
+    }
+
+    $inductionOfficeFields = CustomField::get(FALSE)
+      ->addWhere('custom_group_id:name', '=', 'Induction_Fields')
+      ->addWhere('name', 'IN', ['Goonj_Office', 'Assign'])
+      ->execute();
+    \Civi::log()->info('inductionOfficeFields',['inductionOfficeFields'=>$inductionOfficeFields]);
+    if (!$inductionOfficeFields) {
+      return FALSE;
+    }
+
+    // $stateFieldId = $collectionCampStateFields['id'];
+
+    $stateItemIndex = array_search(TRUE, array_map(fn($item) =>
+        $item['entity_table'] === 'civicrm_eck_collection_camp' &&
+        $item['custom_field_id'] == $stateFieldId,
+        $filteredItems
+    ));
+
+    // return $stateItemIndex !== FALSE ? $filteredItems[$stateItemIndex] : FALSE;
   }
 
 }
