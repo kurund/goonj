@@ -4,6 +4,8 @@ namespace Civi;
 
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
+use Civi\Api4\CustomField;
+use Civi\Api4\MessageTemplate;
 use Civi\Api4\Relationship;
 use Civi\Core\Service\AutoSubscriber;
 
@@ -26,7 +28,9 @@ class InductionService extends AutoSubscriber {
       '&hook_civicrm_post' => [
             ['volunteerCreated'],
             ['createInductionForVolunteer'],
-            ['inductionCreated'],
+      ],
+      '&hook_civicrm_postCommit' => [
+        ['inductionCreated'],
       ],
       '&hook_civicrm_custom' => [
         ['sendInductionEmailToVolunteer'],
@@ -152,24 +156,70 @@ class InductionService extends AutoSubscriber {
    *
    */
   public static function inductionCreated(string $op, string $objectName, int $objectId, &$objectRef) {
+    // \Civi::log()->info('op',['op'=>$op,
+    // 'objectName'=>$objectName,
+    // 'objectId'=>$objectId,
+    // 'objectref'=>$objectRef]);
+    // return;
     if ($op !== 'create' || $objectName !== 'ActivityContact') {
       return FALSE;
     }
 
+    // \Civi::log()->info('data', ['$objectRef->contact_id'=>$objectRef->contact_id, 'volunteerId'=>self::$volunteerId, 'activity id' => $objectRef->activity_id]);
     if ($objectRef->contact_id !== self::$volunteerId) {
       return;
     }
-    self::$inductionId = $objectRef->activity_id;
-    // $induction = \Civi\Api4\Activity::get(FALSE)
-    //   ->addSelect('Induction_Fields.Goonj_Office', 'Induction_Fields.Assign')
-    //   ->addWhere('id', '=', self::$inductionId)
-    //   ->setLimit(1)
-    //   ->execute()->single();
-    //   \Civi::log()->info('op',['op'=>$op,
-    //   'objectName'=>$objectName,
-    //   'objectId'=>$objectId,
-    //   'objectref'=>$objectRef,
-    // 'induction'=>$induction]);
+
+    $contactId = $objectRef->contact_id;
+    $inductionId = $objectRef->activity_id;
+    $induction = Activity::get(FALSE)
+    ->addSelect('Induction_Fields.Assign', 'Induction_Fields.Goonj_Office')
+    ->addWhere('id', '=', $inductionId)
+    ->setLimit(1)
+    ->execute()->single();
+
+    $assigneeId = $induction['Induction_Fields.Assign'];
+    \Civi::log()->info('induction', ['induction'=>$induction, 'assigneeId'=>$assigneeId]);  
+    $assignee = Contact::get(TRUE)
+    ->addSelect('email.email')
+    ->addJoin('Email AS email', 'LEFT')
+    ->addWhere('id', '=', $assigneeId)
+    ->addWhere('email.is_primary', '=', TRUE)
+    ->setLimit(1)
+    ->execute()->single();
+
+    $assigneeEmail = $assignee['email.email'];
+    
+
+    $templateId = MessageTemplate::get(FALSE)
+      ->addWhere('msg_title', '=', 'Volunteer Registration')
+      ->setLimit(1)
+      ->execute()->single()['id'];
+
+    $contactId = self::$volunteerId;
+    $contactEmail = Contact::get(TRUE)
+    ->addSelect('email.email')
+    ->addJoin('Email AS email', 'LEFT')
+    ->addWhere('id', '=', $contactId)
+    ->addWhere('email.is_primary', '=', TRUE)
+    ->setLimit(1)
+    ->execute()->single();
+    try {
+      $emailParams = [
+        'contact_id' => $contactId,
+        'template_id' => $templateId,
+        'cc' => $assigneeEmail,
+      ];
+      \Civi::log()->info('emailParams', ['result' => $emailParams, 'contactEmail'=>$contactEmail]);
+      $result = civicrm_api3('Email', 'send', $emailParams);
+      \Civi::log()->info('result1', ['result1' => $result]);
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      $errorMessage = "Error sending email: " . $e->getMessage();
+      CRM_Core_Error::debug_log_message($errorMessage);
+      error_log($errorMessage);
+    }
+
   }
 
   /**
@@ -185,6 +235,11 @@ class InductionService extends AutoSubscriber {
    *   The parameters that were sent into the calling function.
    */
   public static function sendInductionEmailToVolunteer($op, $groupID, $entityID, &$params) {
+    // \Civi::log()->info('send',['send'=>$op,
+    // 'groupID'=>$groupID,
+    // 'entityID'=>$entityID,
+    // 'params'=>$params]);
+    return;
     if ($op !== 'create') {
       return;
     }
@@ -193,7 +248,45 @@ class InductionService extends AutoSubscriber {
       return;
     }
 
-    \Civi::log()->info('inductionsFields', [$inductionsFields]);
+    $assignee = Contact::get(TRUE)
+      ->addSelect('email.email')
+      ->addJoin('Email AS email', 'LEFT')
+      ->addWhere('id', '=', $inductionsFields['Assign']['value'])
+      ->addWhere('email.is_primary', '=', TRUE)
+      ->setLimit(1)
+      ->execute()->single();
+
+    $assigneeEmail = $assignee['email.email'];
+
+    $templateId = MessageTemplate::get(FALSE)
+      ->addWhere('msg_title', '=', 'Volunteer Registration')
+      ->setLimit(1)
+      ->execute()->single()['id'];
+
+    $contactId = self::$volunteerId;
+    $contactEmail = Contact::get(TRUE)
+    ->addSelect('email.email')
+    ->addJoin('Email AS email', 'LEFT')
+    ->addWhere('id', '=', $contactId)
+    ->addWhere('email.is_primary', '=', TRUE)
+    ->setLimit(1)
+    ->execute()->single();
+    try {
+      $emailParams = [
+        'contact_id' => $contactId,
+        'template_id' => $templateId,
+        'cc' => $assigneeEmail,
+      ];
+      \Civi::log()->info('emailParams', ['result' => $emailParams, 'contactEmail'=>$contactEmail]);
+      $result = civicrm_api3('Email', 'send', $emailParams);
+      \Civi::log()->info('result1', ['result1' => $result]);
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      $errorMessage = "Error sending email: " . $e->getMessage();
+      CRM_Core_Error::debug_log_message($errorMessage);
+      error_log($errorMessage);
+    }
+
   }
 
   /**
@@ -212,11 +305,11 @@ class InductionService extends AutoSubscriber {
       ->addWhere('name', 'IN', ['Goonj_Office', 'Assign'])
       ->execute();
 
-    if ($inductionOfficeFields->count === 0) {
+    if ($inductionOfficeFields->count() === 0) {
       return FALSE;
     }
 
-    $inductionOfficeFields = [];
+    $inductionOfficeFieldValues = [];
 
     foreach ($inductionOfficeFields as $field) {
       $fieldIndex = array_search(TRUE, array_map(fn($item) =>
@@ -225,10 +318,10 @@ class InductionService extends AutoSubscriber {
       $filteredItems
       ));
 
-      $inductionOfficeFields[$field['name']] = $fieldIndex !== FALSE ? $filteredItems[$fieldIndex] : FALSE; .
+      $inductionOfficeFieldValues[$field['name']] = $fieldIndex !== FALSE ? $filteredItems[$fieldIndex] : FALSE;
     }
 
-    return $inductionOfficeFields;
+    return $inductionOfficeFieldValues;
   }
 
 }
