@@ -102,12 +102,6 @@ function emailToCampAttendBy($contactId, $collectionCampEndDate) {
   // Send the email using CiviCRM API.
   try {
     $result = civicrm_api3('Email', 'send', $emailParams);
-    if (isset($result['is_error']) && $result['is_error']) {
-      error_log('Email failed to send: ' . $result['error_message']);
-    }
-    else {
-      error_log("Email sent successfully to contact ID: $contactId");
-    }
   }
   catch (Exception $e) {
     error_log('Exception while sending email: ' . $e->getMessage());
