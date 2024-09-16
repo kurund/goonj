@@ -434,5 +434,14 @@ form input {
   }
   .wp-block-gb-goonj-blocks .wp-block-gb-action-button {
     padding: 16px 12px !important;
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .wp-block-gb-table {
+    width: 100%;
+    max-width: 75%;
   }
 }
