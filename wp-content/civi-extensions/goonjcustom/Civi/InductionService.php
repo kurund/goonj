@@ -148,12 +148,15 @@ class InductionService extends AutoSubscriber {
     return $date->format('Y-m-d H:i:s');
   }
 
+  /**
+   *
+   */
   public static function inductionCreated(string $op, string $objectName, int $objectId, &$objectRef) {
     if ($op !== 'create' || $objectName !== 'ActivityContact') {
       return FALSE;
     }
 
-    if ($objectRef->contact_id !== self::$volunteerId){
+    if ($objectRef->contact_id !== self::$volunteerId) {
       return;
     }
     self::$inductionId = $objectRef->activity_id;
@@ -162,15 +165,14 @@ class InductionService extends AutoSubscriber {
     //   ->addWhere('id', '=', self::$inductionId)
     //   ->setLimit(1)
     //   ->execute()->single();
-  //   \Civi::log()->info('op',['op'=>$op,
-  //   'objectName'=>$objectName,
-  //   'objectId'=>$objectId,
-  //   'objectref'=>$objectRef,
-  // 'induction'=>$induction]);
+    //   \Civi::log()->info('op',['op'=>$op,
+    //   'objectName'=>$objectName,
+    //   'objectId'=>$objectId,
+    //   'objectref'=>$objectRef,
+    // 'induction'=>$induction]);
   }
 
-  
-    /**
+  /**
    * This hook is called after the database write on a custom table.
    *
    * @param string $op
@@ -190,14 +192,14 @@ class InductionService extends AutoSubscriber {
     if (!($inductionsFields = self::findInductionOfficeFields($params))) {
       return;
     }
+
+    \Civi::log()->info('inductionsFields', [$inductionsFields]);
   }
 
-    /**
+  /**
    *
    */
   private static function findInductionOfficeFields(array $array) {
-    \Civi::log()->info('check',['check'=>$array]);
-
     $filteredItems = array_filter($array, fn($item) => $item['entity_table'] === 'civicrm_activity');
 
     if (empty($filteredItems)) {
@@ -205,23 +207,28 @@ class InductionService extends AutoSubscriber {
     }
 
     $inductionOfficeFields = CustomField::get(FALSE)
+      ->addSelect('name')
       ->addWhere('custom_group_id:name', '=', 'Induction_Fields')
       ->addWhere('name', 'IN', ['Goonj_Office', 'Assign'])
       ->execute();
-    \Civi::log()->info('inductionOfficeFields',['inductionOfficeFields'=>$inductionOfficeFields]);
-    if (!$inductionOfficeFields) {
+
+    if ($inductionOfficeFields->count === 0) {
       return FALSE;
     }
 
-    // $stateFieldId = $collectionCampStateFields['id'];
+    $inductionOfficeFields = [];
 
-    $stateItemIndex = array_search(TRUE, array_map(fn($item) =>
-        $item['entity_table'] === 'civicrm_eck_collection_camp' &&
-        $item['custom_field_id'] == $stateFieldId,
-        $filteredItems
-    ));
+    foreach ($inductionOfficeFields as $field) {
+      $fieldIndex = array_search(TRUE, array_map(fn($item) =>
+      $item['entity_table'] === 'civicrm_activity' &&
+      $item['custom_field_id'] == $field['id'],
+      $filteredItems
+      ));
 
-    // return $stateItemIndex !== FALSE ? $filteredItems[$stateItemIndex] : FALSE;
+      $inductionOfficeFields[$field['name']] = $fieldIndex !== FALSE ? $filteredItems[$fieldIndex] : FALSE; .
+    }
+
+    return $inductionOfficeFields;
   }
 
 }
