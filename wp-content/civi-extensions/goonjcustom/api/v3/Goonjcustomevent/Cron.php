@@ -52,15 +52,19 @@ function goonjcustomevent_check_and_send_emails_for_camp_end_date() {
     ->execute()->single();
 
   $collectionCampSubtype = $optionValues['value'];
+
+  // Get today's date in the same format as the End_Date field.
+  $today = new DateTime();
+  $today->setTime(23, 59, 59); // Set time to end of the day
+  $endOfDay = $today->format('Y-m-d H:i:s');
+  $todayFormatted = $today->format('Y-m-d');
+
   try {
     $collectionCamps = EckEntity::get('Collection_Camp', TRUE)
       ->addSelect('Logistics_Coordination.Camp_to_be_attended_by', 'Collection_Camp_Intent_Details.End_Date')
       ->addWhere('subtype', '=', $collectionCampSubtype)
+      ->addWhere('Collection_Camp_Intent_Details.End_Date', '<=', $endOfDay)
       ->execute();
-
-    // Get today's date in the same format as the End_Date field.
-    $today = new DateTime();
-    $todayFormatted = $today->format('Y-m-d');
 
     foreach ($collectionCamps as $camp) {
       if (empty($camp['Logistics_Coordination.Camp_to_be_attended_by'])) {
