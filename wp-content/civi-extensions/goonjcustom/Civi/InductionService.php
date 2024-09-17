@@ -18,6 +18,7 @@ class InductionService extends AutoSubscriber {
   const RELATIONSHIP_TYPE_NAME = 'Induction Coordinator of';
 
   private static $volunteerId = NULL;
+  private static $volunteerInductionAssigneeEmail = NULL;
 
   /**
    *
@@ -27,9 +28,10 @@ class InductionService extends AutoSubscriber {
       '&hook_civicrm_post' => [
             ['volunteerCreated'],
             ['createInductionForVolunteer'],
+            ['sendInductionEmailToVolunteer'],
       ],
       '&hook_civicrm_custom' => [
-        ['sendInductionEmailToVolunteer'],
+        ['volunteerInductionAssignee'],
       ],
     ];
   }
@@ -160,7 +162,7 @@ class InductionService extends AutoSubscriber {
    * @param object $objectRef
    *   The parameters that were sent into the calling function.
    */
-  public static function sendInductionEmailToVolunteer($op, $groupID, $entityID, &$params) {
+  public static function volunteerInductionAssignee($op, $groupID, $entityID, &$params) {
     if ($op !== 'create') {
       return;
     }
@@ -177,21 +179,7 @@ class InductionService extends AutoSubscriber {
       ->setLimit(1)
       ->execute()->single();
 
-    $assigneeEmail = $assignee['email.email'];
-
-    $templateId = MessageTemplate::get(FALSE)
-      ->addWhere('msg_title', '=', 'Volunteer Registration')
-      ->setLimit(1)
-      ->execute()->single()['id'];
-
-    $emailParams = [
-      'contact_id' => self::$volunteerId,
-      'template_id' => $templateId,
-      'cc' => $assigneeEmail,
-    ];
-    \Civi::log()->info('emailParams', ['result' => $emailParams]);
-    $result = civicrm_api3('Email', 'send', $emailParams);
-    \Civi::log()->info('result1', ['result1' => $result]);
+    self::$volunteerInductionAssigneeEmail = $assignee['email.email'];
 
   }
 
@@ -228,6 +216,33 @@ class InductionService extends AutoSubscriber {
     }
 
     return $inductionOfficeFieldValues;
+  }
+
+  /**
+   *
+   */
+  public static function sendInductionEmailToVolunteer(string $op, string $objectName, int $objectId, &$objectRef) {
+    if ($op !== 'create' || $objectName !== 'Email' || !$objectId) {
+      return;
+    }
+
+    if ($objectRef->contact_id !== self::$volunteerId) {
+      return;
+    }
+
+    $template = MessageTemplate::get(FALSE)
+      ->addWhere('msg_title', '=', 'Volunteer Registration')
+      ->setLimit(1)
+      ->execute()->single();
+
+    $emailParams = [
+      'contact_id' => self::$volunteerId,
+      'template_id' => $template['id'],
+      'cc' => self::$volunteerInductionAssigneeEmail,
+    ];
+
+    $result = civicrm_api3('Email', 'send', $emailParams);
+
   }
 
 }
