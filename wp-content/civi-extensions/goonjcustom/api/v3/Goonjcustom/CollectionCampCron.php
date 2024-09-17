@@ -39,6 +39,7 @@ function _civicrm_api3_goonjcustom_collection_camp_cron_spec(&$spec) {
  * @throws \CRM_Core_Exception
  */
 function civicrm_api3_goonjcustom_collection_camp_cron($params) {
+  $returnValues = [];
   $optionValues = OptionValue::get(FALSE)
     ->addWhere('option_group_id:name', '=', 'eck_sub_types')
     ->addWhere('name', '=', 'Collection_Camp')
