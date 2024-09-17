@@ -77,6 +77,13 @@ function goonjcustomevent_check_and_send_emails_for_camp_end_date() {
       $collectionCampId = $camp['id'];
       $endDateFormatted = $endDate->format('Y-m-d');
 
+      $collectionCamp = \Civi\Api4\EckEntity::get('Collection_Camp', TRUE)
+      ->addSelect('Collection_Camp_Intent_Details.Goonj_Office')
+      ->addWhere('id', '=', $collectionCampId)
+      ->execute()->single();
+
+      $collectionCampGoonjOffice =  $collectionCamp['Collection_Camp_Intent_Details.Goonj_Office'];
+
       $emails = Email::get(TRUE)
         ->addWhere('contact_id', '=', $recipientId)
         ->execute()->single();
@@ -96,7 +103,7 @@ function goonjcustomevent_check_and_send_emails_for_camp_end_date() {
           'from' => 'urban.ops@goonj.org',
           'toEmail' => $emailId,
           'replyTo' => 'urban.ops@goonj.org',
-          'html' => goonjcustomevent_collection_camp_email_html($contactName, $collectionCampId, $recipientId),
+          'html' => goonjcustomevent_collection_camp_email_html($contactName, $collectionCampId, $recipientId, $collectionCampGoonjOffice),
           // 'messageTemplateID' => 76, // Uncomment if using a message template
         ];
         try {
@@ -116,11 +123,11 @@ function goonjcustomevent_check_and_send_emails_for_camp_end_date() {
 /**
  *
  */
-function goonjcustomevent_collection_camp_email_html($contactName, $collectionCampId, $recipientId) {
+function goonjcustomevent_collection_camp_email_html($contactName, $collectionCampId, $recipientId, $collectionCampGoonjOffice) {
   $homeUrl = get_home_url();
 
   // Construct the full URLs for the forms.
-  $campVehicleDispatchFormUrl = $homeUrl . '/camp-vehicle-dispatch-form/#?Camp_Vehicle_Dispatch.Collection_Camp_Intent_Id=' . $collectionCampId . '&Camp_Vehicle_Dispatch.Filled_by=' . $recipientId;
+  $campVehicleDispatchFormUrl = $homeUrl . '/camp-vehicle-dispatch-form/#?Camp_Vehicle_Dispatch.Collection_Camp_Intent_Id=' . $collectionCampId . '&Camp_Vehicle_Dispatch.Filled_by=' . $recipientId . '&Camp_Vehicle_Dispatch.To_which_PU_Center_material_is_being_sent=' . $collectionCampGoonjOffice;
   $campOutcomeFormUrl = $homeUrl . '/camp-outcome-form/';
 
   $html = "
