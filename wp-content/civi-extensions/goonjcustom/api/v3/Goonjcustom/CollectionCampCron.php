@@ -42,6 +42,7 @@ function civicrm_api3_goonjcustom_collection_camp_cron($params) {
   $optionValues = OptionValue::get(FALSE)
     ->addWhere('option_group_id:name', '=', 'eck_sub_types')
     ->addWhere('name', '=', 'Collection_Camp')
+    ->setLimit(1)
     ->execute()->single();
 
   $collectionCampSubtype = $optionValues['value'];
@@ -68,17 +69,17 @@ function civicrm_api3_goonjcustom_collection_camp_cron($params) {
       ->execute()->single();
     $collectionCampGoonjOffice = $collectionCamp['Collection_Camp_Intent_Details.Goonj_Office'];
 
-    $emails = Email::get(TRUE)
+    $email = Email::get(TRUE)
       ->addWhere('contact_id', '=', $recipientId)
       ->execute()->single();
 
-    $emailId = $emails['email'];
+    $emailId = $email['email'];
 
-    $contacts = Contact::get(TRUE)
+    $contact = Contact::get(TRUE)
       ->addWhere('id', '=', $recipientId)
       ->execute()->single();
 
-    $contactName = $contacts['display_name'];
+    $contactName = $contact['display_name'];
 
     // Only send the email if the end date is exactly today.
     if ($endDateFormatted <= $todayFormatted) {
