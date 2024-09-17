@@ -63,7 +63,7 @@ function goonjcustomevent_check_and_send_emails_for_camp_end_date() {
 
   try {
     $collectionCamps = EckEntity::get('Collection_Camp', TRUE)
-      ->addSelect('Logistics_Coordination.Camp_to_be_attended_by', 'Collection_Camp_Intent_Details.End_Date')
+      ->addSelect('Logistics_Coordination.Camp_to_be_attended_by', 'Collection_Camp_Intent_Details.End_Date', 'id')
       ->addWhere('subtype', '=', $collectionCampSubtype)
       ->addWhere('Collection_Camp_Intent_Details.End_Date', '<=', $endOfDay)
       ->execute();
@@ -74,6 +74,7 @@ function goonjcustomevent_check_and_send_emails_for_camp_end_date() {
       }
       $recipientId = $camp['Logistics_Coordination.Camp_to_be_attended_by'];
       $endDate = new DateTime($camp['Collection_Camp_Intent_Details.End_Date']);
+      $collectionCampId = $camp['id'];
       $endDateFormatted = $endDate->format('Y-m-d');
 
       $emails = Email::get(TRUE)
@@ -95,7 +96,7 @@ function goonjcustomevent_check_and_send_emails_for_camp_end_date() {
           'from' => 'urban.ops@goonj.org',
           'toEmail' => $emailId,
           'replyTo' => 'urban.ops@goonj.org',
-          'html' => goonjcustomevent_collection_camp_email_html($contactName),
+          'html' => goonjcustomevent_collection_camp_email_html($contactName, $collectionCampId, $recipientId),
           // 'messageTemplateID' => 76, // Uncomment if using a message template
         ];
         try {
@@ -115,15 +116,22 @@ function goonjcustomevent_check_and_send_emails_for_camp_end_date() {
 /**
  *
  */
-function goonjcustomevent_collection_camp_email_html($contactName) {
+function goonjcustomevent_collection_camp_email_html($contactName, $collectionCampId, $recipientId) {
+  $homeUrl = get_home_url();
+
+  // Construct the full URLs for the forms.
+  $campVehicleDispatchFormUrl = $homeUrl . '/camp-vehicle-dispatch-form/#?Camp_Vehicle_Dispatch.Collection_Camp_Intent_Id=' . $collectionCampId . '&Camp_Vehicle_Dispatch.Filled_by=' . $recipientId;
+  $campOutcomeFormUrl = $homeUrl . '/camp-outcome-form/';
+
   $html = "
   <p>Dear $contactName,</p>
-  <p>You are selected as the Goonj User who is going to attend the Camp</p>
-  <p>Today the end date of the event is completed so here are the links for the Camp Vehicle Dispatch Form and Camp Outcome Form</p>
+  <p>You have been selected as the Goonj user to attend the camp.</p>
+  <p>Today the event has ended. Please find below the links for the Camp Vehicle Dispatch Form and the Camp Outcome Form:</p>
   <ul>
-    $volunteerDetailsHtml
+    <li><a href=\"$campVehicleDispatchFormUrl\">Camp Vehicle Dispatch Form</a></li>
+    <li><a href=\"$campOutcomeFormUrl\">Camp Outcome Form</a></li>
   </ul>
-  <p>Warm regards, </p>";
+  <p>Warm regards,</p>";
 
   return $html;
 }
