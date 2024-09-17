@@ -49,9 +49,9 @@ function goonjcustomevent_check_and_send_emails_for_camp_end_date() {
   $optionValues = OptionValue::get(FALSE)
     ->addWhere('option_group_id:name', '=', 'eck_sub_types')
     ->addWhere('name', '=', 'Collection_Camp')
-    ->execute();
+    ->execute()->single();
 
-  $collectionCampSubtype = $optionValues->first()['value'];
+  $collectionCampSubtype = $optionValues['value'];
   try {
     $collectionCamps = EckEntity::get('Collection_Camp', TRUE)
       ->addSelect('Logistics_Coordination.Camp_to_be_attended_by', 'Collection_Camp_Intent_Details.End_Date')
