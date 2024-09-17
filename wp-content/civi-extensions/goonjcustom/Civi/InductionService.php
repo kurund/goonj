@@ -231,7 +231,7 @@ class InductionService extends AutoSubscriber {
     }
 
     $template = MessageTemplate::get(FALSE)
-      ->addWhere('msg_title', '=', 'Volunteer Registration')
+      ->addWhere('msg_title', 'LIKE', 'New_Volunteer_Registration%')
       ->setLimit(1)
       ->execute()->single();
 
