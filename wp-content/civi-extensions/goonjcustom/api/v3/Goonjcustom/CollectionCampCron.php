@@ -43,6 +43,7 @@ function civicrm_api3_goonjcustom_collection_camp_cron($params) {
   $optionValues = OptionValue::get(FALSE)
     ->addWhere('option_group_id:name', '=', 'eck_sub_types')
     ->addWhere('name', '=', 'Collection_Camp')
+    ->addWhere('grouping', '=', 'Collection_Camp')
     ->setLimit(1)
     ->execute()->single();
 
