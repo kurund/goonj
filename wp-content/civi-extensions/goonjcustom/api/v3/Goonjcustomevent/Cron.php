@@ -48,7 +48,7 @@ function civicrm_api3_goonjcustomevent_cron($params) {
 function goonjcustomevent_check_and_send_emails_for_camp_end_date() {
   $optionValues = OptionValue::get(FALSE)
     ->addWhere('option_group_id:name', '=', 'eck_sub_types')
-    ->addWhere('label', '=', 'Collection Camp')
+    ->addWhere('name', '=', 'Collection_Camp')
     ->execute();
 
   $collectionCampSubtype = $optionValues->first()['value'];
