@@ -4,8 +4,9 @@
  * @file
  */
 
+use Civi\Api4\Contact;
 use Civi\Api4\EckEntity;
-use Civi\Api4\MessageTemplate;
+use Civi\Api4\Email;
 use Civi\Api4\OptionValue;
 
 /**
@@ -55,7 +56,8 @@ function goonjcustomevent_check_and_send_emails_for_camp_end_date() {
 
   // Get today's date in the same format as the End_Date field.
   $today = new DateTime();
-  $today->setTime(23, 59, 59); // Set time to end of the day
+  // Set time to end of the day.
+  $today->setTime(23, 59, 59);
   $endOfDay = $today->format('Y-m-d H:i:s');
   $todayFormatted = $today->format('Y-m-d');
 
@@ -74,9 +76,34 @@ function goonjcustomevent_check_and_send_emails_for_camp_end_date() {
       $endDate = new DateTime($camp['Collection_Camp_Intent_Details.End_Date']);
       $endDateFormatted = $endDate->format('Y-m-d');
 
+      $emails = Email::get(TRUE)
+        ->addWhere('contact_id', '=', $recipientId)
+        ->execute()->single();
+
+      $emailId = $emails['email'];
+
+      $contacts = Contact::get(TRUE)
+        ->addWhere('id', '=', $recipientId)
+        ->execute()->single();
+
+      $contactName = $contacts['display_name'];
+
       // Only send the email if the end date is exactly today.
       if ($endDateFormatted === $todayFormatted) {
-        emailToCampAttendBy($recipientId, $endDateFormatted);
+        $mailParams = [
+          'subject' => 'Event Completion Notification',
+          'from' => 'urban.ops@goonj.org',
+          'toEmail' => $emailId,
+          'replyTo' => 'urban.ops@goonj.org',
+          'html' => goonjcustomevent_collection_camp_email_html($contactName),
+          // 'messageTemplateID' => 76, // Uncomment if using a message template
+        ];
+        try {
+          $result = CRM_Utils_Mail::send($mailParams);
+        }
+        catch (CiviCRM_API3_Exception $e) {
+          error_log('Goonj Cron Job: API error - ' . $e->getMessage());
+        }
       }
     }
   }
@@ -86,28 +113,17 @@ function goonjcustomevent_check_and_send_emails_for_camp_end_date() {
 }
 
 /**
- * Function to send email to camp attendee.
+ *
  */
-function emailToCampAttendBy($contactId, $collectionCampEndDate) {
-  $messageTemplates = MessageTemplate::get(TRUE)
-    ->addSelect('id')
-    ->addWhere('msg_title', '=', 'Event Completion Notification')
-    ->addWhere('is_active', '=', TRUE)
-    ->execute()->single();
+function goonjcustomevent_collection_camp_email_html($contactName) {
+  $html = "
+  <p>Dear $contactName,</p>
+  <p>You are selected as the Goonj User who is going to attend the Camp</p>
+  <p>Today the end date of the event is completed so here are the links for the Camp Vehicle Dispatch Form and Camp Outcome Form</p>
+  <ul>
+    $volunteerDetailsHtml
+  </ul>
+  <p>Warm regards, </p>";
 
-  $messageTemplateId = $messageTemplates['id'];
-
-  // Prepare email parameters.
-  $emailParams = [
-    'contact_id'  => $contactId,
-    'template_id' => $messageTemplateId,
-  ];
-
-  // Send the email using CiviCRM API.
-  try {
-    $result = civicrm_api3('Email', 'send', $emailParams);
-  }
-  catch (Exception $e) {
-    error_log('Exception while sending email: ' . $e->getMessage());
-  }
+  return $html;
 }
