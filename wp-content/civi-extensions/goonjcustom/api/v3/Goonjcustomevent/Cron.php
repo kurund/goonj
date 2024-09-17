@@ -89,9 +89,9 @@ function emailToCampAttendBy($contactId, $collectionCampEndDate) {
     ->addSelect('id')
     ->addWhere('msg_title', '=', 'Event Completion Notification')
     ->addWhere('is_active', '=', TRUE)
-    ->execute();
+    ->execute()->single();
 
-  $messageTemplateId = $messageTemplates->first()['id'];
+  $messageTemplateId = $messageTemplates['id'];
 
   // Prepare email parameters.
   $emailParams = [
