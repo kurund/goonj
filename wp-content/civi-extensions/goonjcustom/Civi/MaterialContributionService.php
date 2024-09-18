@@ -10,9 +10,9 @@ use Civi\Core\Service\AutoSubscriber;
  */
 class MaterialContributionService extends AutoSubscriber {
   // See: CiviCRM > Administer > Communications > Schedule Reminders.
-  public const CONTRIBUTION_RECEIPT_REMINDER_ID = 6;
+  const CONTRIBUTION_RECEIPT_REMINDER_ID = 6;
 
-  public const ACTIVITY_SOURCE_RECORD_TYPE_ID = 2;
+  const ACTIVITY_SOURCE_RECORD_TYPE_ID = 2;
 
   /**
    *
@@ -33,6 +33,7 @@ class MaterialContributionService extends AutoSubscriber {
       return;
     }
 
+    // Hack: Retrieve the most recent "Material Contribution" activity for this contact.
     $activities = Activity::get(TRUE)
       ->addSelect('*', 'contact.display_name', 'Material_Contribution.Delivered_By', 'Material_Contribution.Delivered_By_Contact')
       ->addJoin('ActivityContact AS activity_contact', 'LEFT')
@@ -91,7 +92,6 @@ class MaterialContributionService extends AutoSubscriber {
       return;
     }
 
-    // Generate and attach PDF receipt.
     $html = self::generateContributionReceiptHtml($contribution, $email, $phone, $locationAreaOfCamp);
     $fileName = 'material_contribution_' . $contribution['id'] . '.pdf';
     $params['attachments'][] = \CRM_Utils_Mail::appendPDF($fileName, $html);
