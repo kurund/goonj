@@ -116,7 +116,7 @@ class MaterialContributionService extends AutoSubscriber {
     $html = '<html><body>';
     
     $html .= '<table width="100%" cellpadding="0" cellspacing="0" style="border: none;">';
-    $html .= '<td style="text-align: center; vertical-align: top;"><img style="width: 80px; height: 60px;" src="data:image/png;base64,' . $logoData . '" alt="Goonj-logo"></td>';
+    $html .= '<td><img style="width: 80px;text-align: center; vertical-align: top; height: 60px;" src="data:image/png;base64,' . $logoData . '" alt="Goonj-logo"></td>';
     $html .= '<tr>';
     $html .= '<td style="text-align: left; vertical-align: top;">Material Receipt#' . $activity['id'] . '</td>';
     $html .= '<td style="text-align: right; vertical-align: top;">Goonj, C-544, Pocket C, Sarita Vihar, Delhi, India</td>';
@@ -185,21 +185,32 @@ class MaterialContributionService extends AutoSubscriber {
     $html .= '<div style="clear:both;"></div>';
 
     // Add social media icons
+    $html .= '<div style="display: flex; flex-direction: column; align-items: center; width:100%; margin-top:20px; background-color:#f2f2f2; padding:20px; border-top:2px solid #666;">';
+
+    // Container for address and contact information
+    $html .= '<div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 10px;">';
+    $html .= '<div style="margin-bottom: 4px;">Goonj, C-544, 1st Floor, C-Pocket, Sarita Vihar, NewDelhi-110076</div>';
+    $html .= '<div style="margin-bottom: 4px;">011-26972351/41401216</div>';    
+    
+    // Container for website and email
+    $html .= '<div style="display: flex; flex-direction: column; align-items: center;">';
+    $html .= '<div style="margin-bottom: 4px;">www.goonj.org</div>';
+    $html .= '<div>mail@goonj.org</div>';
+    $html .= '</div>';
+    
+    $html .= '</div>';
+    
+    // Add social media icons
     $html .= '<div style="text-align:center; width:100%; margin-top:20px;">';
     $html .= '<a href="https://www.facebook.com/your-page" target="_blank"><img src="data:image/webp;base64,' . base64_encode(file_get_contents(plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/facebook.webp')) . '" alt="Facebook" style="width:24px; height:24px; margin-right:10px;"></a>';
     $html .= '<a href="https://twitter.com/your-profile" target="_blank"><img src="data:image/webp;base64,' . base64_encode(file_get_contents(plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/twitter.webp')) . '" alt="Twitter" style="width:24px; height:24px; margin-right:10px;"></a>';
     $html .= '<a href="https://www.youtube.com/channel/your-channel" target="_blank"><img src="data:image/webp;base64,' . base64_encode(file_get_contents(plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/youtube.webp')) . '" alt="YouTube" style="width:24px; height:24px; margin-right:10px;"></a>';
     $html .= '<a href="https://www.instagram.com/your-profile" target="_blank"><img src="data:image/webp;base64,' . base64_encode(file_get_contents(plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/Instagram.webp')) . '" alt="Instagram" style="width:24px; height:24px; margin-right:10px;"></a>';
-    $html .= '</div>';
-
-    $html .= '<div style="text-align:center; width:100%; margin-top:20px; background-color:#f2f2f2; padding:20px; border-top:2px solid #666;">';
-    $html .= 'Goonj, C-544, 1st Floor, C-Pocket, Sarita Vihar, New Delhi-110076<br>';
-    $html .= 'Email: mail@goonj.org | Phone: 011-26972351/41401216 | Website: www.goonj.org<br>';
-    $html .= '</div>';
-    $html .= '</div>';
+    $html .= '</div>'; 
 
     // End the HTML document.
     $html .= '</body></html>';
+    $html .= '</div>';
 
     return $html;
 }
