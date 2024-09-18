@@ -36,7 +36,7 @@ class MaterialContributionService extends AutoSubscriber {
 
     // Hack: Retrieve the most recent "Material Contribution" activity for this contact.
     $activities = Activity::get(TRUE)
-      ->addSelect('*', 'contact.display_name')
+      ->addSelect('*', 'contact.display_name', 'Material_Contribution.Delivered_By', 'Material_Contribution.Delivered_By_Contact')
       ->addJoin('ActivityContact AS activity_contact', 'LEFT')
       ->addJoin('Contact AS contact', 'LEFT')
       ->addWhere('source_contact_id', '=', $params['contactId'])
@@ -47,6 +47,8 @@ class MaterialContributionService extends AutoSubscriber {
       ->execute();
 
     $contribution = $activities->first();
+    error_log("contributionTarun: " . print_r($contribution, TRUE));// Access the first result directly.
+
 
     $contactData = civicrm_api4('Contact', 'get', [
       'select' => [
@@ -102,21 +104,27 @@ class MaterialContributionService extends AutoSubscriber {
    *   The generated HTML.
    */
   private static function generateContributionReceiptHtml($activity, $email, $phone, $address) {
-
+    error_log("activity: " . print_r($activity, TRUE));
     // Format the activity date.
     $activityDate = date("F j, Y", strtotime($activity['activity_date_time']));
 
     $logoPath = plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/images/goonj-logo.png';
     $qrCodePath = plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/images/qr-code.png';
+    $callIconPath = plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/call.png';
+    $domainIconPath = plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/domain.png';
 
     $logoData = base64_encode(file_get_contents($logoPath));
     $qrCodeData = base64_encode(file_get_contents($qrCodePath));
+    $callIconData = base64_encode(file_get_contents($callIconPath));
+    $domainIconData = base64_encode(file_get_contents($domainIconPath));
 
     // Start building the HTML.
     $html = '<html><body>';
     
     $html .= '<table width="100%" cellpadding="0" cellspacing="0" style="border: none;">';
-    $html .= '<td><img style="width: 80px;text-align: center; vertical-align: top; height: 60px;" src="data:image/png;base64,' . $logoData . '" alt="Goonj-logo"></td>';
+    $html .= '<td style="text-align: center;">';
+    $html .= '<img style="width: 80px; height: 60px;" src="data:image/png;base64,' . $logoData . '" alt="Goonj-logo">';
+    $html .= '</td>';
     $html .= '<tr>';
     $html .= '<td style="text-align: left; vertical-align: top;">Material Receipt#' . $activity['id'] . '</td>';
     $html .= '<td style="text-align: right; vertical-align: top;">Goonj, C-544, Pocket C, Sarita Vihar, Delhi, India</td>';
@@ -159,9 +167,10 @@ class MaterialContributionService extends AutoSubscriber {
     $html .= '<td style="padding: 10px;">' . $phone . '</td>';
     $html .= '</tr>';
     
-    $html .= '<tr style="background-color: #D4D5D4;">';
-    $html .= '<td style="font-weight: bold; padding: 10px;">Delivered by (Name & contact no.)</td>';
-    $html .= '<td style="padding: 10px;">Self (TODO)</td>';
+    $html .= '<tr>';
+    $html .= '<td style="font-weight: bold; padding: 10px;background-color: #D4D5D4;">Delivered by (Name & contact no.)</td>';
+    $html .= '<td style="padding: 10px;">' . $activity['Material_Contribution.Delivered_By'] . ' & ' . $activity['Material_Contribution.Delivered_By_Contact'] . '</td>';
+
     $html .= '</tr>';
     
     $html .= '</table>';
@@ -183,18 +192,26 @@ class MaterialContributionService extends AutoSubscriber {
     $html .= '<img style="width: 60px; height: 60px;" src="data:image/png;base64,' . $qrCodeData . '" alt="QR Code">';
     $html .= '</div>';
     $html .= '<div style="clear:both;"></div>';
-
-    // Add social media icons
+    
+    // Add address, contact, website, and email with icons.
     $html .= '<div style="display: flex; flex-direction: column; align-items: center; width:100%; margin-top:20px; background-color:#f2f2f2; padding:20px;">';
-
-    // Container for address and contact information
+    
+    // Address and contact information
     $html .= '<div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 10px;">';
     $html .= '<div style="margin-bottom: 4px;">Goonj, C-544, 1st Floor, C-Pocket, Sarita Vihar, NewDelhi-110076</div>';
-    $html .= '<div style="margin-bottom: 4px;">011-26972351/41401216</div>';    
+    $html .= '<div style="display: flex; align-items: center; margin-bottom: 4px;">';
+    $html .= '<img src="data:image/png;base64,' . $callIconData . '" alt="Phone" style="width:16px; height:16px; margin-right: 5px;">';
+    $html .= '<div>011-26972351/41401216</div>';
+    $html .= '</div>';  
     
-    // Container for website and email
-    $html .= '<div style="display: flex; flex-direction: column; align-items: center;">';
-    $html .= '<div style="margin-bottom: 4px;">www.goonj.org</div>';
+    // Website and email information
+    $html .= '<div style="display: flex; align-items: center; margin-bottom: 4px;">';
+    $html .= '<img src="data:image/png;base64,' . $domainIconData . '" alt="Website" style="width:16px; height:16px; margin-right: 5px;">';
+    $html .= '<div>www.goonj.org</div>';
+    $html .= '</div>';
+    
+    $html .= '<div style="display: flex; align-items: center;">';
+    $html .= '<img src="data:image/png;base64,' . $domainIconData . '" alt="Email" style="width:16px; height:16px; margin-right: 5px;">';
     $html .= '<div>mail@goonj.org</div>';
     $html .= '</div>';
     
@@ -202,10 +219,10 @@ class MaterialContributionService extends AutoSubscriber {
     
     // Add social media icons
     $html .= '<div style="text-align:center; width:100%; margin-top:20px;">';
-    $html .= '<a href="https://www.facebook.com/your-page" target="_blank"><img src="data:image/webp;base64,' . base64_encode(file_get_contents(plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/facebook.webp')) . '" alt="Facebook" style="width:24px; height:24px; margin-right:10px;"></a>';
-    $html .= '<a href="https://www.instagram.com/your-profile" target="_blank"><img src="data:image/webp;base64,' . base64_encode(file_get_contents(plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/Instagram.webp')) . '" alt="Instagram" style="width:24px; height:24px; margin-right:10px;"></a>';
-    $html .= '<a href="https://twitter.com/your-profile" target="_blank"><img src="data:image/webp;base64,' . base64_encode(file_get_contents(plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/twitter.webp')) . '" alt="Twitter" style="width:24px; height:24px; margin-right:10px;"></a>';
-    $html .= '<a href="https://www.youtube.com/channel/your-channel" target="_blank"><img src="data:image/webp;base64,' . base64_encode(file_get_contents(plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/youtube.webp')) . '" alt="YouTube" style="width:24px; height:24px; margin-right:10px;"></a>';
+    $html .= '<a href="https://www.facebook.com/goonj.org" target="_blank"><img src="data:image/webp;base64,' . base64_encode(file_get_contents(plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/facebook.webp')) . '" alt="Facebook" style="width:24px; height:24px; margin-right:10px;"></a>';
+    $html .= '<a href="https://www.instagram.com/goonj/" target="_blank"><img src="data:image/webp;base64,' . base64_encode(file_get_contents(plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/Instagram.webp')) . '" alt="Instagram" style="width:24px; height:24px; margin-right:10px;"></a>';
+    $html .= '<a href="https://x.com/goonj" target="_blank"><img src="data:image/webp;base64,' . base64_encode(file_get_contents(plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/twitter.webp')) . '" alt="Twitter" style="width:24px; height:24px; margin-right:10px;"></a>';
+    $html .= '<a href="https://www.youtube.com/channel/UCCq8iYlmjT7rrgPI1VHzIHg" target="_blank"><img src="data:image/webp;base64,' . base64_encode(file_get_contents(plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/youtube.webp')) . '" alt="YouTube" style="width:24px; height:24px; margin-right:10px;"></a>';
     $html .= '</div>'; 
 
     // End the HTML document.
