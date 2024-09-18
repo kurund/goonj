@@ -116,9 +116,9 @@ class MaterialContributionService extends AutoSubscriber {
     $html = '<html><body>';
     
     $html .= '<table width="100%" cellpadding="0" cellspacing="0" style="border: none;">';
+    $html .= '<td style="text-align: center; vertical-align: top;"><img style="width: 80px; height: 60px;" src="data:image/png;base64,' . $logoData . '" alt="Goonj-logo"></td>';
     $html .= '<tr>';
     $html .= '<td style="text-align: left; vertical-align: top;">Material Receipt#' . $activity['id'] . '</td>';
-    $html .= '<td style="text-align: center; vertical-align: top;"><img style="width: 80px; height: 60px;" src="data:image/png;base64,' . $logoData . '" alt="Goonj-logo"></td>';
     $html .= '<td style="text-align: right; vertical-align: top;">Goonj, C-544, Pocket C, Sarita Vihar, Delhi, India</td>';
     $html .= '</tr>';
     $html .= '</table>';
@@ -166,18 +166,32 @@ class MaterialContributionService extends AutoSubscriber {
     
     $html .= '</table>';
 
+    $html .= '<div style="text-align: right; margin: 2px 0">';
+    $html .= 'Team Goonj<br>';
+    $html .= '</div>';
 
-    // Add the footer from the provided HTML.
+    // Add the footer with social media icons.
     $html .= '<div style="width:100%; font-family:Arial, sans-serif; font-size:12px; margin-top:50px;">';
     $html .= '<div style="float:left; width:60%;">';
-    $html .= 'Join us, by encouraging your friends, relatives, colleagues and neighbours to join the journey as all of us have a lot to give.<br>';
-    $html .= 'With Material Money Matter! Your monetary contribution is needed too. for sorting, packing, transportation to implementation (Financial contributions are tax exempted u/s 80G of IT Act)<br>';
+    $html .= '<ul style="padding-left: 15px; margin: 0;">';
+    $html .= '<li>Join us, by encouraging your friends, relatives, colleagues, and neighbours to join the journey as all of us have a lot to give.</li>';
+    $html .= '<li><strong>With Material Money Matter!</strong> Your monetary contribution is needed too for sorting, packing, transportation to implementation. <br>(Financial contributions are tax-exempted u/s 80G of IT Act)</li>';
+    $html .= '</ul>';
     $html .= '</div>';
-    $html .= '<div style="float:right; width:40%; text-align:right;">';
-    $html .= 'To pay, scan the code on your Paytm App.<br>';
+    $html .= '<div style="float:right; width:40%; text-align:right; font-style: italic;">';
+    $html .= 'To pay, scan the code on <br> your Paytm App.<br>';
     $html .= '<img style="width: 60px; height: 60px;" src="data:image/png;base64,' . $qrCodeData . '" alt="QR Code">';
     $html .= '</div>';
     $html .= '<div style="clear:both;"></div>';
+
+    // Add social media icons
+    $html .= '<div style="text-align:center; width:100%; margin-top:20px;">';
+    $html .= '<a href="https://www.facebook.com/your-page" target="_blank"><img src="data:image/webp;base64,' . base64_encode(file_get_contents(plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/facebook.webp')) . '" alt="Facebook" style="width:24px; height:24px; margin-right:10px;"></a>';
+    $html .= '<a href="https://twitter.com/your-profile" target="_blank"><img src="data:image/webp;base64,' . base64_encode(file_get_contents(plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/twitter.webp')) . '" alt="Twitter" style="width:24px; height:24px; margin-right:10px;"></a>';
+    $html .= '<a href="https://www.youtube.com/channel/your-channel" target="_blank"><img src="data:image/webp;base64,' . base64_encode(file_get_contents(plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/youtube.webp')) . '" alt="YouTube" style="width:24px; height:24px; margin-right:10px;"></a>';
+    $html .= '<a href="https://www.instagram.com/your-profile" target="_blank"><img src="data:image/webp;base64,' . base64_encode(file_get_contents(plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/Instagram.webp')) . '" alt="Instagram" style="width:24px; height:24px; margin-right:10px;"></a>';
+    $html .= '</div>';
+
     $html .= '<div style="text-align:center; width:100%; margin-top:20px; background-color:#f2f2f2; padding:20px; border-top:2px solid #666;">';
     $html .= 'Goonj, C-544, 1st Floor, C-Pocket, Sarita Vihar, New Delhi-110076<br>';
     $html .= 'Email: mail@goonj.org | Phone: 011-26972351/41401216 | Website: www.goonj.org<br>';
@@ -188,4 +202,5 @@ class MaterialContributionService extends AutoSubscriber {
     $html .= '</body></html>';
 
     return $html;
-}}
+}
+}
