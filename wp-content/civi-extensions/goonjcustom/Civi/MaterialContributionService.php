@@ -106,15 +106,20 @@ class MaterialContributionService extends AutoSubscriber {
     // Format the activity date.
     $activityDate = date("F j, Y", strtotime($activity['activity_date_time']));
 
+    $logoPath = plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/images/goonj-logo.png';
+    $qrCodePath = plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/images/qr-code.png';
+
+    $logoData = base64_encode(file_get_contents($logoPath));
+    $qrCodeData = base64_encode(file_get_contents($qrCodePath));
+
     // Start building the HTML.
     $html = '<html><body>';
-    $imagePath = plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/images/goonj-logo.png';
-    $imageData = base64_encode(file_get_contents($imagePath));
+    
     // Header: Material Receipt#<activity_id> (left) | Goonj address (right)
     $html .= '<table width="100%" cellpadding="0" cellspacing="0" style="border: none;">';
     $html .= '<tr>';
     $html .= '<td style="text-align: left; vertical-align: top;">Material Receipt#' . $activity['id'] . '</td>';
-    $html .= '<img class="w-150" src="data:image/png;base64,' . $imageData . '" alt="Goonj-logo">';
+    $html .= '<td style="text-align: center; vertical-align: top;"><img style="width: 80px; height: 60px;" src="data:image/png;base64,' . $logoData . '" alt="Goonj-logo"></td>';
     $html .= '<td style="text-align: right; vertical-align: top;">Goonj, C-544, Pocket C, Sarita Vihar, Delhi, India</td>';
     $html .= '</tr>';
     $html .= '</table>';
@@ -170,6 +175,12 @@ class MaterialContributionService extends AutoSubscriber {
     $html .= '<td>Self (TODO)</td>';
     $html .= '</tr>';
 
+    $html .= '<tr>';
+    $html .= '<td colspan="2" style="text-align: center;">';
+    $html .= '<img style="width: 60px; height: 60px;" src="data:image/png;base64,' . $qrCodeData . '" alt="QR Code">';
+    $html .= '</td>';
+    $html .= '</tr>';
+
     // End of the table.
     $html .= '</table>';
 
@@ -177,6 +188,6 @@ class MaterialContributionService extends AutoSubscriber {
     $html .= '</body></html>';
 
     return $html;
-  }
+}
 
 }
