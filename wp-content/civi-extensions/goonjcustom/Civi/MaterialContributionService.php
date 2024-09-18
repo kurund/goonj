@@ -115,7 +115,6 @@ class MaterialContributionService extends AutoSubscriber {
     // Start building the HTML.
     $html = '<html><body>';
     
-    // Header: Material Receipt#<activity_id> (left) | Goonj address (right)
     $html .= '<table width="100%" cellpadding="0" cellspacing="0" style="border: none;">';
     $html .= '<tr>';
     $html .= '<td style="text-align: left; vertical-align: top;">Material Receipt#' . $activity['id'] . '</td>';
@@ -123,71 +122,70 @@ class MaterialContributionService extends AutoSubscriber {
     $html .= '<td style="text-align: right; vertical-align: top;">Goonj, C-544, Pocket C, Sarita Vihar, Delhi, India</td>';
     $html .= '</tr>';
     $html .= '</table>';
-
-    // Line breaks.
     $html .= '<br><br><br>';
-
-    // Appreciation message.
     $html .= '<div style="font-weight: bold; font-style: italic;">';
     $html .= '"We appreciate your contribution of pre used/new material. Goonj makes sure that the material reaches people with dignity and care."';
     $html .= '</div>';
-
-    // Line breaks.
     $html .= '<br><br><br>';
-
-    // Start of the table.
-    $html .= '<table border="1" cellpadding="5" cellspacing="0" style="width: 100%; border-collapse: collapse;">';
-
-    // Table rows.
+    
+    // Main table with improved styling.
+    $html .= '<table border="1" cellpadding="10" cellspacing="0" style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px;">';
     $html .= '<tr>';
-    $html .= '<td>Description of Material</td>';
-    $html .= '<td>' . $activity['subject'] . '</td>';
+    $html .= '<td style="font-weight: bold; padding: 10px; background-color: #D4D5D4;">Description of Material</td>';
+    $html .= '<td style="padding: 10px;">' . $activity['subject'] . '</td>';
     $html .= '</tr>';
-
+    
     $html .= '<tr>';
-    $html .= '<td>Received On</td>';
-    $html .= '<td>' . $activityDate . '</td>';
+    $html .= '<td style="font-weight: bold; padding: 10px; background-color: #D4D5D4;">Received On</td>';
+    $html .= '<td style="padding: 10px;">' . $activityDate . '</td>';
     $html .= '</tr>';
-
+    
     $html .= '<tr>';
-    $html .= '<td>From</td>';
-    $html .= '<td>' . $activity['contact.display_name'] . '</td>';
+    $html .= '<td style="font-weight: bold; padding: 10px; background-color: #D4D5D4;">From</td>';
+    $html .= '<td style="padding: 10px;">' . $activity['contact.display_name'] . '</td>';
     $html .= '</tr>';
-
+    
     $html .= '<tr>';
-    $html .= '<td>Address</td>';
-    $html .= '<td>' . $address . '</td>';
+    $html .= '<td style="font-weight: bold; padding: 10px; background-color: #D4D5D4;">Address</td>';
+    $html .= '<td style="padding: 10px;">' . $address . '</td>';
     $html .= '</tr>';
-
     $html .= '<tr>';
-    $html .= '<td>Email</td>';
-    $html .= '<td>' . $email . '</td>';
+    $html .= '<td style="font-weight: bold; padding: 10px; background-color: #D4D5D4;">Email</td>';
+    $html .= '<td style="padding: 10px;">' . $email . '</td>';
     $html .= '</tr>';
-
+    
     $html .= '<tr>';
-    $html .= '<td>Phone</td>';
-    $html .= '<td>' . $phone . '</td>';
+    $html .= '<td style="font-weight: bold; padding: 10px; background-color: #D4D5D4;">Phone</td>';
+    $html .= '<td style="padding: 10px;">' . $phone . '</td>';
     $html .= '</tr>';
-
-    $html .= '<tr>';
-    $html .= '<td>Delivered by (Name & contact no.)</td>';
-    // Hardcoded delivery details.
-    $html .= '<td>Self (TODO)</td>';
+    
+    $html .= '<tr style="background-color: #D4D5D4;">';
+    $html .= '<td style="font-weight: bold; padding: 10px;">Delivered by (Name & contact no.)</td>';
+    $html .= '<td style="padding: 10px;">Self (TODO)</td>';
     $html .= '</tr>';
-
-    $html .= '<tr>';
-    $html .= '<td colspan="2" style="text-align: center;">';
-    $html .= '<img style="width: 60px; height: 60px;" src="data:image/png;base64,' . $qrCodeData . '" alt="QR Code">';
-    $html .= '</td>';
-    $html .= '</tr>';
-
-    // End of the table.
+    
     $html .= '</table>';
+
+
+    // Add the footer from the provided HTML.
+    $html .= '<div style="width:100%; font-family:Arial, sans-serif; font-size:12px; margin-top:50px;">';
+    $html .= '<div style="float:left; width:60%;">';
+    $html .= 'Join us, by encouraging your friends, relatives, colleagues and neighbours to join the journey as all of us have a lot to give.<br>';
+    $html .= 'With Material Money Matter! Your monetary contribution is needed too. for sorting, packing, transportation to implementation (Financial contributions are tax exempted u/s 80G of IT Act)<br>';
+    $html .= '</div>';
+    $html .= '<div style="float:right; width:40%; text-align:right;">';
+    $html .= 'To pay, scan the code on your Paytm App.<br>';
+    $html .= '<img style="width: 60px; height: 60px;" src="data:image/png;base64,' . $qrCodeData . '" alt="QR Code">';
+    $html .= '</div>';
+    $html .= '<div style="clear:both;"></div>';
+    $html .= '<div style="text-align:center; width:100%; margin-top:20px; background-color:#f2f2f2; padding:20px; border-top:2px solid #666;">';
+    $html .= 'Goonj, C-544, 1st Floor, C-Pocket, Sarita Vihar, New Delhi-110076<br>';
+    $html .= 'Email: mail@goonj.org | Phone: 011-26972351/41401216 | Website: www.goonj.org<br>';
+    $html .= '</div>';
+    $html .= '</div>';
 
     // End the HTML document.
     $html .= '</body></html>';
 
     return $html;
-}
-
-}
+}}
