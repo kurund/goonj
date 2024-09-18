@@ -104,131 +104,113 @@ class MaterialContributionService extends AutoSubscriber {
    *   The generated HTML.
    */
   private static function generateContributionReceiptHtml($activity, $email, $phone, $address) {
-    error_log("activity: " . print_r($activity, TRUE));
-    // Format the activity date.
     $activityDate = date("F j, Y", strtotime($activity['activity_date_time']));
 
-    $logoPath = plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/images/goonj-logo.png';
-    $qrCodePath = plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/images/qr-code.png';
-    $callIconPath = plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/call.png';
-    $domainIconPath = plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/domain.png';
+    // Define the base directory for theme assets
+    $baseDir = plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/';
 
-    $logoData = base64_encode(file_get_contents($logoPath));
-    $qrCodeData = base64_encode(file_get_contents($qrCodePath));
-    $callIconData = base64_encode(file_get_contents($callIconPath));
-    $domainIconData = base64_encode(file_get_contents($domainIconPath));
+    // Collect file paths
+    $paths = [
+        'logo' => $baseDir . 'images/goonj-logo.png',
+        'qrCode' => $baseDir . 'images/qr-code.png',
+        'callIcon' => $baseDir . 'Icon/call.png',
+        'domainIcon' => $baseDir . 'Icon/domain.png',
+        'emailIcon' => $baseDir . 'Icon/email.png',
+        'facebookIcon' => $baseDir . 'Icon/facebook.webp',
+        'instagramIcon' => $baseDir . 'Icon/instagram.webp',
+        'twitterIcon' => $baseDir . 'Icon/twitter.webp',
+        'youtubeIcon' => $baseDir . 'Icon/youtube.webp'
+    ];
 
-    // Start building the HTML.
-    $html = '<html><body>';
-    
-    $html .= '<table width="100%" cellpadding="0" cellspacing="0" style="border: none;">';
-    $html .= '<td style="text-align: center;">';
-    $html .= '<img style="width: 80px; height: 60px;" src="data:image/png;base64,' . $logoData . '" alt="Goonj-logo">';
-    $html .= '</td>';
-    $html .= '<tr>';
-    $html .= '<td style="text-align: left; vertical-align: top;">Material Receipt#' . $activity['id'] . '</td>';
-    $html .= '<td style="text-align: right; vertical-align: top;">Goonj, C-544, Pocket C, Sarita Vihar, Delhi, India</td>';
-    $html .= '</tr>';
-    $html .= '</table>';
-    $html .= '<br><br><br>';
-    $html .= '<div style="font-weight: bold; font-style: italic;">';
-    $html .= '"We appreciate your contribution of pre used/new material. Goonj makes sure that the material reaches people with dignity and care."';
-    $html .= '</div>';
-    $html .= '<br><br><br>';
-    
-    // Main table with improved styling.
-    $html .= '<table border="1" cellpadding="10" cellspacing="0" style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px;">';
-    $html .= '<tr>';
-    $html .= '<td style="font-weight: bold; padding: 10px; background-color: #D4D5D4;">Description of Material</td>';
-    $html .= '<td style="padding: 10px;">' . $activity['subject'] . '</td>';
-    $html .= '</tr>';
-    
-    $html .= '<tr>';
-    $html .= '<td style="font-weight: bold; padding: 10px; background-color: #D4D5D4;">Received On</td>';
-    $html .= '<td style="padding: 10px;">' . $activityDate . '</td>';
-    $html .= '</tr>';
-    
-    $html .= '<tr>';
-    $html .= '<td style="font-weight: bold; padding: 10px; background-color: #D4D5D4;">From</td>';
-    $html .= '<td style="padding: 10px;">' . $activity['contact.display_name'] . '</td>';
-    $html .= '</tr>';
-    
-    $html .= '<tr>';
-    $html .= '<td style="font-weight: bold; padding: 10px; background-color: #D4D5D4;">Address</td>';
-    $html .= '<td style="padding: 10px;">' . $address . '</td>';
-    $html .= '</tr>';
-    $html .= '<tr>';
-    $html .= '<td style="font-weight: bold; padding: 10px; background-color: #D4D5D4;">Email</td>';
-    $html .= '<td style="padding: 10px;">' . $email . '</td>';
-    $html .= '</tr>';
-    
-    $html .= '<tr>';
-    $html .= '<td style="font-weight: bold; padding: 10px; background-color: #D4D5D4;">Phone</td>';
-    $html .= '<td style="padding: 10px;">' . $phone . '</td>';
-    $html .= '</tr>';
-    
-    $html .= '<tr>';
-    $html .= '<td style="font-weight: bold; padding: 10px;background-color: #D4D5D4;">Delivered by (Name & contact no.)</td>';
-    $html .= '<td style="padding: 10px;">' . $activity['Material_Contribution.Delivered_By'] . ' & ' . $activity['Material_Contribution.Delivered_By_Contact'] . '</td>';
+    $imageData = array_map(fn($path) => base64_encode(file_get_contents($path)), $paths);
 
-    $html .= '</tr>';
+    $html = <<<HTML
+<html>
+<body style="font-family: Arial, sans-serif;">
+    <div style="text-align: center; margin-bottom: 10px;">
+        <img src="data:image/png;base64,{$imageData['logo']}" alt="Goonj Logo" style="width: 80px; height: 60px;">
+    </div>
     
-    $html .= '</table>';
+    <!-- Justified content: Material Receipt and Address -->
+    <div style="display: flex; justify-content: space-between; font-size: 14px;">
+    <div style="text-align: left;">
+        Material Receipt# {$activity['id']}
+    </div>
+    <div style="text-align: right;">
+        Goonj, C-544, Pocket C, Sarita Vihar, Delhi, India
+    </div>
+</div>
 
-    $html .= '<div style="text-align: right; margin: 2px 0">';
-    $html .= 'Team Goonj<br>';
-    $html .= '</div>';
 
-    // Add the footer with social media icons.
-    $html .= '<div style="width:100%; font-family:Arial, sans-serif; font-size:12px; margin-top:50px;">';
-    $html .= '<div style="float:left; width:60%;">';
-    $html .= '<ul style="padding-left: 15px; margin: 0;">';
-    $html .= '<li>Join us, by encouraging your friends, relatives, colleagues, and neighbours to join the journey as all of us have a lot to give.</li>';
-    $html .= '<li><strong>With Material Money Matter!</strong> Your monetary contribution is needed too for sorting, packing, transportation to implementation. <br>(Financial contributions are tax-exempted u/s 80G of IT Act)</li>';
-    $html .= '</ul>';
-    $html .= '</div>';
-    $html .= '<div style="float:right; width:40%; text-align:right; font-style: italic;">';
-    $html .= 'To pay, scan the code on <br> your Paytm App.<br>';
-    $html .= '<img style="width: 60px; height: 60px;" src="data:image/png;base64,' . $qrCodeData . '" alt="QR Code">';
-    $html .= '</div>';
-    $html .= '<div style="clear:both;"></div>';
-    
-    // Add address, contact, website, and email with icons.
-    $html .= '<div style="display: flex; flex-direction: column; align-items: center; width:100%; margin-top:20px; background-color:#f2f2f2; padding:20px;">';
-    
-    // Address and contact information
-    $html .= '<div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 10px;">';
-    $html .= '<div style="margin-bottom: 4px;">Goonj, C-544, 1st Floor, C-Pocket, Sarita Vihar, NewDelhi-110076</div>';
-    $html .= '<div style="display: flex; align-items: center; margin-bottom: 4px;">';
-    $html .= '<img src="data:image/png;base64,' . $callIconData . '" alt="Phone" style="width:16px; height:16px; margin-right: 5px;">';
-    $html .= '<div>011-26972351/41401216</div>';
-    $html .= '</div>';  
-    
-    // Website and email information
-    $html .= '<div style="display: flex; align-items: center; margin-bottom: 4px;">';
-    $html .= '<img src="data:image/png;base64,' . $domainIconData . '" alt="Website" style="width:16px; height:16px; margin-right: 5px;">';
-    $html .= '<div>www.goonj.org</div>';
-    $html .= '</div>';
-    
-    $html .= '<div style="display: flex; align-items: center;">';
-    $html .= '<img src="data:image/png;base64,' . $domainIconData . '" alt="Email" style="width:16px; height:16px; margin-right: 5px;">';
-    $html .= '<div>mail@goonj.org</div>';
-    $html .= '</div>';
-    
-    $html .= '</div>';
-    
-    // Add social media icons
-    $html .= '<div style="text-align:center; width:100%; margin-top:20px;">';
-    $html .= '<a href="https://www.facebook.com/goonj.org" target="_blank"><img src="data:image/webp;base64,' . base64_encode(file_get_contents(plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/facebook.webp')) . '" alt="Facebook" style="width:24px; height:24px; margin-right:10px;"></a>';
-    $html .= '<a href="https://www.instagram.com/goonj/" target="_blank"><img src="data:image/webp;base64,' . base64_encode(file_get_contents(plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/Instagram.webp')) . '" alt="Instagram" style="width:24px; height:24px; margin-right:10px;"></a>';
-    $html .= '<a href="https://x.com/goonj" target="_blank"><img src="data:image/webp;base64,' . base64_encode(file_get_contents(plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/twitter.webp')) . '" alt="Twitter" style="width:24px; height:24px; margin-right:10px;"></a>';
-    $html .= '<a href="https://www.youtube.com/channel/UCCq8iYlmjT7rrgPI1VHzIHg" target="_blank"><img src="data:image/webp;base64,' . base64_encode(file_get_contents(plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/youtube.webp')) . '" alt="YouTube" style="width:24px; height:24px; margin-right:10px;"></a>';
-    $html .= '</div>'; 
+    <br><br>
+    <div style="text-align: center; font-weight: bold; font-style: italic; margin-bottom: 20px;">
+        "We appreciate your contribution of pre-used/new material. Goonj makes sure that the material reaches people with dignity and care."
+    </div>
+    <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+        <!-- Table rows for each item -->
+        <tr><td>Description of Material</td><td>{$activity['subject']}</td></tr>
+        <tr><td>Received On</td><td>{$activityDate}</td></tr>
+        <tr><td>From</td><td>{$activity['contact.display_name']}</td></tr>
+        <tr><td>Address</td><td>{$address}</td></tr>
+        <tr><td>Email</td><td>{$email}</td></tr>
+        <tr><td>Phone</td><td>{$phone}</td></tr>
+        <tr><td>Delivered by (Name & contact no.)</td><td>{$activity['Material_Contribution.Delivered_By']} & {$activity['Material_Contribution.Delivered_By_Contact']}</td></tr>
+    </table>
+    <div style="text-align: right; margin-top: 20px;">
+        Team Goonj
+    </div>
+    <div style="width: 100%; margin-top: 28px;">
+        <div style="float: left; width: 60%; font-size: 14px;">
+            <ul>
+                <li>Join us, by encouraging your friends, relatives, colleagues, and neighbours to join the journey as all of us have a lot to give.</li>
+                <li><strong>With Material Money Matter!</strong> Your monetary contribution is needed too for sorting, packing, transportation to implementation.<br>(Financial contributions are tax-exempted u/s 80G of IT Act)</li>
+            </ul>
+        </div>
+        <div style="float: right; width: 40%; text-align: right; font-size: 14px; font-style: italic;">
+            To pay, scan the code on<br> your Paytm App.<br>
+            <img src="data:image/png;base64,{$imageData['qrCode']}" alt="QR Code" style="width: 80px; height: 70px;">
+        </div>
+    </div>
+    <div style="clear: both; margin-top: 20px;"></div>
 
-    // End the HTML document.
-    $html .= '</body></html>';
-    $html .= '</div>';
+    <div style="display: flex; width: 100%; margin-top: 15px; background-color: #f2f2f2; padding: 20px;">
+    <!-- Address and Phone -->
+    <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 20px;">
+        <div style="font-size: 16px; color: #333;">
+            Goonj, C-544, 1st Floor, C-Pocket, Sarita Vihar, New Delhi-110076
+        </div>
+        <div style="display: flex; align-items: center;">
+            <img src="data:image/png;base64,{$imageData['callIcon']}" alt="Phone" style="width:16px; height:16px; margin-right: 5px;">
+            <div style="font-size: 14px; color: #666;">011-26972351/41401216</div>
+        </div>
+    </div>
+
+    <!-- Website and Email -->
+    <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 20px;">
+        <div style="display: flex; align-items: center;">
+            <img src="data:image/png;base64,{$imageData['domainIcon']}" alt="Website" style="width:16px; height:16px; margin-right: 5px;">
+            <div style="font-size: 14px; color: #666;">www.goonj.org</div>
+        </div>
+        <div style="display: flex; align-items: center;">
+            <img src="data:image/png;base64,{$imageData['emailIcon']}" alt="Email" style="width:16px; height:16px; margin-right: 5px;">
+            <div style="font-size: 14px; color: #666;">mail@goonj.org</div>
+        </div>
+    </div>
+
+    <!-- Social Media Icons -->
+    <div style="text-align: center; width: 100%; margin-top: 20px;">
+        <a href="https://www.facebook.com/goonj.org" target="_blank"><img src="data:image/webp;base64,{$imageData['facebookIcon']}" alt="Facebook" style="width: 24px; height: 24px; margin-right: 10px;"></a>
+        <a href="https://www.instagram.com/goonj/" target="_blank"><img src="data:image/webp;base64,{$imageData['instagramIcon']}" alt="Instagram" style="width: 24px; height: 24px; margin-right: 10px;"></a>
+        <a href="https://x.com/goonj" target="_blank"><img src="data:image/webp;base64,{$imageData['twitterIcon']}" alt="Twitter" style="width: 24px; height: 24px; margin-right: 10px;"></a>
+        <a href="https://www.youtube.com/channel/UCCq8iYlmjT7rrgPI1VHzIHg" target="_blank"><img src="data:image/webp;base64,{$imageData['youtubeIcon']}" alt="YouTube" style="width: 24px; height: 24px; margin-right: 10px;"></a>
+    </div>
+</div>
+
+</body>
+</html>
+HTML;
 
     return $html;
 }
+
 }
