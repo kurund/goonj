@@ -150,31 +150,31 @@ class MaterialContributionService extends AutoSubscriber {
     <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; text-align: center; border-collapse: collapse;">
     <!-- Table rows for each item -->
     <tr>
-        <td style="background-color: #f2f2f2;">Description of Material</td>
+        <td style="background-color: #f2f2f2; text-align: left; font-weight: bold;">Description of Material</td>
         <td>{$activity['subject']}</td>
     </tr>
     <tr>
-        <td style="background-color: #f2f2f2;">Received On</td>
+        <td style="background-color: #f2f2f2; text-align: left; font-weight: bold;">Received On</td>
         <td>{$activityDate}</td>
     </tr>
     <tr>
-        <td style="background-color: #f2f2f2;">From</td>
+        <td style="background-color: #f2f2f2; text-align: left; font-weight: bold;">From</td>
         <td>{$activity['contact.display_name']}</td>
     </tr>
     <tr>
-        <td style="background-color: #f2f2f2;">Address</td>
+        <td style="background-color: #f2f2f2; text-align: left; font-weight: bold;">Address</td>
         <td>{$locationAreaOfCamp}</td>
     </tr>
     <tr>
-        <td style="background-color: #f2f2f2;">Email</td>
+        <td style="background-color: #f2f2f2; text-align: left; font-weight: bold;">Email</td>
         <td>{$email}</td>
     </tr>
     <tr>
-        <td style="background-color: #f2f2f2;">Phone</td>
+        <td style="background-color: #f2f2f2; text-align: left; font-weight: bold;">Phone</td>
         <td>{$phone}</td>
     </tr>
     <tr>
-        <td style="background-color: #f2f2f2;">Delivered by (Name & contact no.)</td>
+        <td style="background-color: #f2f2f2; text-align: left; font-weight: bold;">Delivered by (Name & contact no.)</td>
         <td>{$activity['Material_Contribution.Delivered_By']} & {$activity['Material_Contribution.Delivered_By_Contact']}</td>
     </tr>
 </table>
