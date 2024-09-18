@@ -185,7 +185,7 @@ class MaterialContributionService extends AutoSubscriber {
     $html .= '<div style="clear:both;"></div>';
 
     // Add social media icons
-    $html .= '<div style="display: flex; flex-direction: column; align-items: center; width:100%; margin-top:20px; background-color:#f2f2f2; padding:20px; border-top:2px solid #666;">';
+    $html .= '<div style="display: flex; flex-direction: column; align-items: center; width:100%; margin-top:20px; background-color:#f2f2f2; padding:20px;">';
 
     // Container for address and contact information
     $html .= '<div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 10px;">';
