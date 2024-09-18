@@ -147,37 +147,45 @@ class MaterialContributionService extends AutoSubscriber {
     <div style="font-weight: bold; font-style: italic; margin-top: 22px; margin-bottom: 22px;">
         "We appreciate your contribution of pre-used/new material. Goonj makes sure that the material reaches people with dignity and care."
     </div>
-    <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; text-align: center; border-collapse: collapse;">
+    <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+    <style>
+        .table-header {
+            background-color: #f2f2f2;
+            text-align: left;
+            font-weight: bold;
+        }
+    </style>
     <!-- Table rows for each item -->
     <tr>
-        <td style="background-color: #f2f2f2; text-align: left; font-weight: bold;">Description of Material</td>
-        <td>{$activity['subject']}</td>
+        <td class="table-header">Description of Material</td>
+        <td style="text-align: center;">{$activity['subject']}</td>
     </tr>
     <tr>
-        <td style="background-color: #f2f2f2; text-align: left; font-weight: bold;">Received On</td>
-        <td>{$activityDate}</td>
+        <td class="table-header">Received On</td>
+        <td style="text-align: center;">{$activityDate}</td>
     </tr>
     <tr>
-        <td style="background-color: #f2f2f2; text-align: left; font-weight: bold;">From</td>
-        <td>{$activity['contact.display_name']}</td>
+        <td class="table-header">From</td>
+        <td style="text-align: center;">{$activity['contact.display_name']}</td>
     </tr>
     <tr>
-        <td style="background-color: #f2f2f2; text-align: left; font-weight: bold;">Address</td>
-        <td>{$locationAreaOfCamp}</td>
+        <td class="table-header">Address</td>
+        <td style="text-align: center;">{$locationAreaOfCamp}</td>
     </tr>
     <tr>
-        <td style="background-color: #f2f2f2; text-align: left; font-weight: bold;">Email</td>
-        <td>{$email}</td>
+        <td class="table-header">Email</td>
+        <td style="text-align: center;">{$email}</td>
     </tr>
     <tr>
-        <td style="background-color: #f2f2f2; text-align: left; font-weight: bold;">Phone</td>
-        <td>{$phone}</td>
+        <td class="table-header">Phone</td>
+        <td style="text-align: center;">{$phone}</td>
     </tr>
     <tr>
-        <td style="background-color: #f2f2f2; text-align: left; font-weight: bold;">Delivered by (Name & contact no.)</td>
-        <td>{$activity['Material_Contribution.Delivered_By']} & {$activity['Material_Contribution.Delivered_By_Contact']}</td>
+        <td class="table-header">Delivered by (Name & contact no.)</td>
+        <td style="text-align: center;">{$activity['Material_Contribution.Delivered_By']} & {$activity['Material_Contribution.Delivered_By_Contact']}</td>
     </tr>
 </table>
+
 
     <div style="text-align: right; margin-top: 20px;">
         Team Goonj
@@ -202,8 +210,8 @@ class MaterialContributionService extends AutoSubscriber {
     <div style="font-size: 14px; margin-bottom: 20px;">
     <div style="position: relative; height: 24px;">
         <div style="font-size: 14px; color: #666; float: left; display: flex; align-items: center;">
-        Goonj, C-544, 1st Floor, C-Pocket,<br>
-        Sarita Vihar, New Delhi-110076
+        Goonj, C-544, 1st Floor, C-Pocket, Sarita Vihar, New<br>
+        Delhi-110076
     </div>
     <div style="font-size: 14px; color: #666; float: right; display: flex; align-items: center;">
             <img src="data:image/png;base64,{$imageData['callIcon']}" alt="Phone" style="width:16px; height:16px; margin-right: 5px;">
