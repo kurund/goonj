@@ -203,9 +203,9 @@ class MaterialContributionService extends AutoSubscriber {
     // Add social media icons
     $html .= '<div style="text-align:center; width:100%; margin-top:20px;">';
     $html .= '<a href="https://www.facebook.com/your-page" target="_blank"><img src="data:image/webp;base64,' . base64_encode(file_get_contents(plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/facebook.webp')) . '" alt="Facebook" style="width:24px; height:24px; margin-right:10px;"></a>';
+    $html .= '<a href="https://www.instagram.com/your-profile" target="_blank"><img src="data:image/webp;base64,' . base64_encode(file_get_contents(plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/Instagram.webp')) . '" alt="Instagram" style="width:24px; height:24px; margin-right:10px;"></a>';
     $html .= '<a href="https://twitter.com/your-profile" target="_blank"><img src="data:image/webp;base64,' . base64_encode(file_get_contents(plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/twitter.webp')) . '" alt="Twitter" style="width:24px; height:24px; margin-right:10px;"></a>';
     $html .= '<a href="https://www.youtube.com/channel/your-channel" target="_blank"><img src="data:image/webp;base64,' . base64_encode(file_get_contents(plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/youtube.webp')) . '" alt="YouTube" style="width:24px; height:24px; margin-right:10px;"></a>';
-    $html .= '<a href="https://www.instagram.com/your-profile" target="_blank"><img src="data:image/webp;base64,' . base64_encode(file_get_contents(plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/Icon/Instagram.webp')) . '" alt="Instagram" style="width:24px; height:24px; margin-right:10px;"></a>';
     $html .= '</div>'; 
 
     // End the HTML document.
