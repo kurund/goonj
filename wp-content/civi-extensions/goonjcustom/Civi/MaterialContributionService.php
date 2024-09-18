@@ -31,53 +31,53 @@ class MaterialContributionService extends AutoSubscriber {
     $reminderId = (int) $params['entity_id'];
 
     if ($context !== 'singleEmail' || $reminderId !== self::CONTRIBUTION_RECEIPT_REMINDER_ID) {
-        return;
+      return;
     }
 
     $activities = Activity::get(TRUE)
-        ->addSelect('*', 'contact.display_name', 'Material_Contribution.Delivered_By', 'Material_Contribution.Delivered_By_Contact')
-        ->addJoin('ActivityContact AS activity_contact', 'LEFT')
-        ->addJoin('Contact AS contact', 'LEFT')
-        ->addWhere('source_contact_id', '=', $params['contactId'])
-        ->addWhere('activity_type_id:name', '=', 'Material Contribution')
-        ->addWhere('activity_contact.record_type_id', '=', self::ACTIVITY_SOURCE_RECORD_TYPE_ID)
-        ->addOrderBy('created_date', 'DESC')
-        ->setLimit(1)
-        ->execute();
+      ->addSelect('*', 'contact.display_name', 'Material_Contribution.Delivered_By', 'Material_Contribution.Delivered_By_Contact')
+      ->addJoin('ActivityContact AS activity_contact', 'LEFT')
+      ->addJoin('Contact AS contact', 'LEFT')
+      ->addWhere('source_contact_id', '=', $params['contactId'])
+      ->addWhere('activity_type_id:name', '=', 'Material Contribution')
+      ->addWhere('activity_contact.record_type_id', '=', self::ACTIVITY_SOURCE_RECORD_TYPE_ID)
+      ->addOrderBy('created_date', 'DESC')
+      ->setLimit(1)
+      ->execute();
 
     $contribution = $activities->first();
 
     $contactData = civicrm_api4('Contact', 'get', [
-        'select' => [
-            'email_primary.email',
-            'phone_primary.phone',
-        ],
-        'where' => [
+      'select' => [
+        'email_primary.email',
+        'phone_primary.phone',
+      ],
+      'where' => [
             ['id', '=', $params['contactId']],
-        ],
-        'limit' => 1,
+      ],
+      'limit' => 1,
     ]);
 
     $activityData = civicrm_api4('Activity', 'get', [
-        'select' => [
-            'Material_Contribution.Collection_Camp',
-        ],
-        'where' => [
+      'select' => [
+        'Material_Contribution.Collection_Camp',
+      ],
+      'where' => [
             ['id', '=', $contribution['id']],
-        ],
-        'limit' => 1,
+      ],
+      'limit' => 1,
     ]);
 
     $activity = $activityData[0] ?? [];
 
     $collectionCampData = civicrm_api4('Eck_Collection_Camp', 'get', [
-        'select' => [
-            'Collection_Camp_Intent_Details.Location_Area_of_camp',
-        ],
-        'where' => [
+      'select' => [
+        'Collection_Camp_Intent_Details.Location_Area_of_camp',
+      ],
+      'where' => [
             ['id', '=', $activity['Material_Contribution.Collection_Camp']],
-        ],
-        'limit' => 1,
+      ],
+      'limit' => 1,
     ]);
 
     $collectionCamp = $collectionCampData[0] ?? [];
@@ -89,15 +89,14 @@ class MaterialContributionService extends AutoSubscriber {
     $phone = $contactDataArray['phone_primary.phone'] ?? 'N/A';
 
     if (!$contribution) {
-        return;
+      return;
     }
 
-    // Generate and attach PDF receipt
+    // Generate and attach PDF receipt.
     $html = self::generateContributionReceiptHtml($contribution, $email, $phone, $locationAreaOfCamp);
     $fileName = 'material_contribution_' . $contribution['id'] . '.pdf';
     $params['attachments'][] = \CRM_Utils_Mail::appendPDF($fileName, $html);
-}
-
+  }
 
   /**
    * Generate the HTML for the PDF from the activity data.
@@ -114,15 +113,15 @@ class MaterialContributionService extends AutoSubscriber {
     $baseDir = plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/';
 
     $paths = [
-        'logo' => $baseDir . 'images/goonj-logo.png',
-        'qrCode' => $baseDir . 'images/qr-code.png',
-        'callIcon' => $baseDir . 'Icon/call.png',
-        'domainIcon' => $baseDir . 'Icon/domain.png',
-        'emailIcon' => $baseDir . 'Icon/email.png',
-        'facebookIcon' => $baseDir . 'Icon/facebook.webp',
-        'instagramIcon' => $baseDir . 'Icon/instagram.webp',
-        'twitterIcon' => $baseDir . 'Icon/twitter.webp',
-        'youtubeIcon' => $baseDir . 'Icon/youtube.webp'
+      'logo' => $baseDir . 'images/goonj-logo.png',
+      'qrCode' => $baseDir . 'images/qr-code.png',
+      'callIcon' => $baseDir . 'Icon/call.png',
+      'domainIcon' => $baseDir . 'Icon/domain.png',
+      'emailIcon' => $baseDir . 'Icon/email.png',
+      'facebookIcon' => $baseDir . 'Icon/facebook.webp',
+      'instagramIcon' => $baseDir . 'Icon/instagram.webp',
+      'twitterIcon' => $baseDir . 'Icon/twitter.webp',
+      'youtubeIcon' => $baseDir . 'Icon/youtube.webp',
     ];
 
     $imageData = array_map(fn($path) => base64_encode(file_get_contents($path)), $paths);
@@ -245,6 +244,7 @@ class MaterialContributionService extends AutoSubscriber {
 </body>
 </html>
 HTML;
- return $html;
-}
+    return $html;
+  }
+
 }
