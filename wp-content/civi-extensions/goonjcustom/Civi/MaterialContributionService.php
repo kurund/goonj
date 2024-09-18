@@ -31,68 +31,75 @@ class MaterialContributionService extends AutoSubscriber {
     $reminderId = (int) $params['entity_id'];
 
     if ($context !== 'singleEmail' || $reminderId !== self::CONTRIBUTION_RECEIPT_REMINDER_ID) {
-      return;
+        return;
     }
 
-    // Hack: Retrieve the most recent "Material Contribution" activity for this contact.
     $activities = Activity::get(TRUE)
-      ->addSelect('*', 'contact.display_name', 'Material_Contribution.Delivered_By', 'Material_Contribution.Delivered_By_Contact')
-      ->addJoin('ActivityContact AS activity_contact', 'LEFT')
-      ->addJoin('Contact AS contact', 'LEFT')
-      ->addWhere('source_contact_id', '=', $params['contactId'])
-      ->addWhere('activity_type_id:name', '=', 'Material Contribution')
-      ->addWhere('activity_contact.record_type_id', '=', self::ACTIVITY_SOURCE_RECORD_TYPE_ID)
-      ->addOrderBy('created_date', 'DESC')
-      ->setLimit(1)
-      ->execute();
+        ->addSelect('*', 'contact.display_name', 'Material_Contribution.Delivered_By', 'Material_Contribution.Delivered_By_Contact')
+        ->addJoin('ActivityContact AS activity_contact', 'LEFT')
+        ->addJoin('Contact AS contact', 'LEFT')
+        ->addWhere('source_contact_id', '=', $params['contactId'])
+        ->addWhere('activity_type_id:name', '=', 'Material Contribution')
+        ->addWhere('activity_contact.record_type_id', '=', self::ACTIVITY_SOURCE_RECORD_TYPE_ID)
+        ->addOrderBy('created_date', 'DESC')
+        ->setLimit(1)
+        ->execute();
 
     $contribution = $activities->first();
-    error_log("contributionTarun: " . print_r($contribution, TRUE));// Access the first result directly.
-
 
     $contactData = civicrm_api4('Contact', 'get', [
-      'select' => [
-        'email_primary.email',
-        'phone_primary.phone',
-        'address_primary.street_address',
-      ],
-      'where' => [
-        ['id', '=', $params['contactId']],
-      ],
-      'limit' => 1,
-      'checkPermissions' => TRUE,
+        'select' => [
+            'email_primary.email',
+            'phone_primary.phone',
+        ],
+        'where' => [
+            ['id', '=', $params['contactId']],
+        ],
+        'limit' => 1,
     ]);
-    
-    
-    // Fetch data from the Civi\Api4\Generic\Result object using the toArray() method
-    $contactDataArray = $contactData[0];
-    
-    error_log("contactDataArray: " . print_r($contactDataArray, TRUE));// Access the first result directly.
-    
-    if (!empty($contactDataArray)) {
-      // Directly access the fields in $contactDataArray
-      $email = $contactDataArray['email_primary.email'] ?? 'N/A';
-      $phone = $contactDataArray['phone_primary.phone'] ?? 'N/A';
-      $address = $contactDataArray['address_primary.street_address'] ?? 'N/A';
-      
-      error_log("Contact Info - Email: $email, Phone: $phone");
-  } else {
-      // Log error or handle the case when contact data is not found
-      error_log("No contact data found for contactId: " . $params['contactId']);
-      $email = 'N/A';
-      $phone = 'N/A';
-  }
-    
-    
+
+    $activityData = civicrm_api4('Activity', 'get', [
+        'select' => [
+            'Material_Contribution.Collection_Camp',
+        ],
+        'where' => [
+            ['id', '=', $contribution['id']],
+        ],
+        'limit' => 1,
+    ]);
+
+    $activity = $activityData[0] ?? [];
+
+    $collectionCampData = civicrm_api4('Eck_Collection_Camp', 'get', [
+        'select' => [
+            'Collection_Camp_Intent_Details.Location_Area_of_camp',
+        ],
+        'where' => [
+            ['id', '=', $activity['Material_Contribution.Collection_Camp']],
+        ],
+        'limit' => 1,
+    ]);
+
+    $collectionCamp = $collectionCampData[0] ?? [];
+
+    $locationAreaOfCamp = $collectionCamp['Collection_Camp_Intent_Details.Location_Area_of_camp'] ?? 'N/A';
+
+    $contactDataArray = $contactData[0] ?? [];
+    $email = $contactDataArray['email_primary.email'] ?? 'N/A';
+    $phone = $contactDataArray['phone_primary.phone'] ?? 'N/A';
+
+    error_log("Contact Info - Email: $email, Phone: $phone");
 
     if (!$contribution) {
-      return;
+        return;
     }
 
-    $html = self::generateContributionReceiptHtml($contribution, $email, $phone, $address);
+    // Generate and attach PDF receipt
+    $html = self::generateContributionReceiptHtml($contribution, $email, $phone, $locationAreaOfCamp);
     $fileName = 'material_contribution_' . $contribution['id'] . '.pdf';
     $params['attachments'][] = \CRM_Utils_Mail::appendPDF($fileName, $html);
-  }
+}
+
 
   /**
    * Generate the HTML for the PDF from the activity data.
@@ -103,13 +110,11 @@ class MaterialContributionService extends AutoSubscriber {
    * @return string
    *   The generated HTML.
    */
-  private static function generateContributionReceiptHtml($activity, $email, $phone, $address) {
+  private static function generateContributionReceiptHtml($activity, $email, $phone, $locationAreaOfCamp) {
     $activityDate = date("F j, Y", strtotime($activity['activity_date_time']));
 
-    // Define the base directory for theme assets
     $baseDir = plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/';
 
-    // Collect file paths
     $paths = [
         'logo' => $baseDir . 'images/goonj-logo.png',
         'qrCode' => $baseDir . 'images/qr-code.png',
@@ -131,7 +136,6 @@ class MaterialContributionService extends AutoSubscriber {
         <img src="data:image/png;base64,{$imageData['logo']}" alt="Goonj Logo" style="width: 80px; height: 60px;">
     </div>
     
-    <!-- Justified content: Material Receipt and Address -->
     <div style="width: 100%; font-size: 14px;">
     <div style="float: left; text-align: left;">
         Material Receipt# {$activity['id']}
@@ -161,7 +165,7 @@ class MaterialContributionService extends AutoSubscriber {
     </tr>
     <tr>
         <td style="background-color: #f2f2f2;">Address</td>
-        <td>{$address}</td>
+        <td>{$locationAreaOfCamp}</td>
     </tr>
     <tr>
         <td style="background-color: #f2f2f2;">Email</td>
@@ -197,25 +201,19 @@ class MaterialContributionService extends AutoSubscriber {
     <div style="clear: both; margin-top: 20px;"></div>
 
     <div style="width: 100%; margin-top: 15px; background-color: #f2f2f2; padding: 20px;">
-    <!-- Address and Phone -->
     <div style="font-size: 14px; margin-bottom: 20px;">
-    <div style="font-size: 16px; color: #333; margin-bottom: 8px;">
+    <div style="position: relative; height: 24px;">
+        <div style="font-size: 14px; color: #666; float: left; display: flex; align-items: center;">
         Goonj, C-544, 1st Floor, C-Pocket,<br>
         Sarita Vihar, New Delhi-110076
     </div>
-    <div style="position: relative;">
-        <div style="font-size: 14px; color: #666; float: left; display: flex; align-items: center;">
+    <div style="font-size: 14px; color: #666; float: right; display: flex; align-items: center;">
             <img src="data:image/png;base64,{$imageData['callIcon']}" alt="Phone" style="width:16px; height:16px; margin-right: 5px;">
             011-26972351/41401216
-        </div>
-        <div style="font-size: 14px; color: #666; position: absolute; right: 0; top: 0;">
-            <!-- Optionally include email icon here -->
         </div>
     </div>
 </div>
 
-
-    <!-- Website and Email -->
     <div style="font-size: 14px; margin-bottom: 20px;">
     <div style="position: relative; height: 24px;">
         <div style="font-size: 14px; color: #666; float: left; display: flex; align-items: center;">
@@ -223,7 +221,7 @@ class MaterialContributionService extends AutoSubscriber {
             www.goonj.org
         </div>
         <div style="font-size: 14px; color: #666; float: right; display: flex; align-items: center;">
-            <!-- <img src="data:image/png;base64,{$imageData['emailIcon']}" alt="Email" style="width:16px; height:16px; margin-right: 5px;"> -->
+            <img src="data:image/png;base64,{$imageData['emailIcon']}" alt="Email" style="width:16px; height:16px; margin-right: 5px;">
             mail@goonj.org
         </div>
     </div>
@@ -238,12 +236,9 @@ class MaterialContributionService extends AutoSubscriber {
     </div>
 </div>
 
-
 </body>
 </html>
 HTML;
-
-    return $html;
+ return $html;
 }
-
 }
