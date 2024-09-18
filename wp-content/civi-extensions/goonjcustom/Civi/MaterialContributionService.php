@@ -132,30 +132,51 @@ class MaterialContributionService extends AutoSubscriber {
     </div>
     
     <!-- Justified content: Material Receipt and Address -->
-    <div style="display: flex; justify-content: space-between; font-size: 14px;">
-    <div style="text-align: left;">
+    <div style="width: 100%; font-size: 14px;">
+    <div style="float: left; text-align: left;">
         Material Receipt# {$activity['id']}
     </div>
-    <div style="text-align: right;">
+    <div style="float: right; text-align: right;">
         Goonj, C-544, Pocket C, Sarita Vihar, Delhi, India
     </div>
 </div>
 
-
     <br><br>
-    <div style="text-align: center; font-weight: bold; font-style: italic; margin-bottom: 20px;">
+    <div style="font-weight: bold; font-style: italic; margin-bottom: 20px;">
         "We appreciate your contribution of pre-used/new material. Goonj makes sure that the material reaches people with dignity and care."
     </div>
-    <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; border-collapse: collapse;">
-        <!-- Table rows for each item -->
-        <tr><td>Description of Material</td><td>{$activity['subject']}</td></tr>
-        <tr><td>Received On</td><td>{$activityDate}</td></tr>
-        <tr><td>From</td><td>{$activity['contact.display_name']}</td></tr>
-        <tr><td>Address</td><td>{$address}</td></tr>
-        <tr><td>Email</td><td>{$email}</td></tr>
-        <tr><td>Phone</td><td>{$phone}</td></tr>
-        <tr><td>Delivered by (Name & contact no.)</td><td>{$activity['Material_Contribution.Delivered_By']} & {$activity['Material_Contribution.Delivered_By_Contact']}</td></tr>
-    </table>
+    <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; text-align: center; border-collapse: collapse;">
+    <!-- Table rows for each item -->
+    <tr>
+        <td style="background-color: #f2f2f2;">Description of Material</td>
+        <td>{$activity['subject']}</td>
+    </tr>
+    <tr>
+        <td style="background-color: #f2f2f2;">Received On</td>
+        <td>{$activityDate}</td>
+    </tr>
+    <tr>
+        <td style="background-color: #f2f2f2;">From</td>
+        <td>{$activity['contact.display_name']}</td>
+    </tr>
+    <tr>
+        <td style="background-color: #f2f2f2;">Address</td>
+        <td>{$address}</td>
+    </tr>
+    <tr>
+        <td style="background-color: #f2f2f2;">Email</td>
+        <td>{$email}</td>
+    </tr>
+    <tr>
+        <td style="background-color: #f2f2f2;">Phone</td>
+        <td>{$phone}</td>
+    </tr>
+    <tr>
+        <td style="background-color: #f2f2f2;">Delivered by (Name & contact no.)</td>
+        <td>{$activity['Material_Contribution.Delivered_By']} & {$activity['Material_Contribution.Delivered_By_Contact']}</td>
+    </tr>
+</table>
+
     <div style="text-align: right; margin-top: 20px;">
         Team Goonj
     </div>
@@ -163,7 +184,9 @@ class MaterialContributionService extends AutoSubscriber {
         <div style="float: left; width: 60%; font-size: 14px;">
             <ul>
                 <li>Join us, by encouraging your friends, relatives, colleagues, and neighbours to join the journey as all of us have a lot to give.</li>
-                <li><strong>With Material Money Matter!</strong> Your monetary contribution is needed too for sorting, packing, transportation to implementation.<br>(Financial contributions are tax-exempted u/s 80G of IT Act)</li>
+                <li style="margin-top: 8px;">
+                <strong>With Material Money Matter!</strong> Your monetary contribution is needed too for sorting, packing, transportation to implementation.<br>(Financial contributions are tax-exempted u/s 80G of IT Act)
+              </li>
             </ul>
         </div>
         <div style="float: right; width: 40%; text-align: right; font-size: 14px; font-style: italic;">
@@ -173,29 +196,38 @@ class MaterialContributionService extends AutoSubscriber {
     </div>
     <div style="clear: both; margin-top: 20px;"></div>
 
-    <div style="display: flex; width: 100%; margin-top: 15px; background-color: #f2f2f2; padding: 20px;">
+    <div style="width: 100%; margin-top: 15px; background-color: #f2f2f2; padding: 20px;">
     <!-- Address and Phone -->
-    <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 20px;">
-        <div style="font-size: 16px; color: #333;">
-            Goonj, C-544, 1st Floor, C-Pocket, Sarita Vihar, New Delhi-110076
-        </div>
-        <div style="display: flex; align-items: center;">
+    <div style="font-size: 14px; margin-bottom: 20px;">
+    <div style="font-size: 16px; color: #333; margin-bottom: 8px;">
+        Goonj, C-544, 1st Floor, C-Pocket,<br>
+        Sarita Vihar, New Delhi-110076
+    </div>
+    <div style="position: relative;">
+        <div style="font-size: 14px; color: #666; float: left; display: flex; align-items: center;">
             <img src="data:image/png;base64,{$imageData['callIcon']}" alt="Phone" style="width:16px; height:16px; margin-right: 5px;">
-            <div style="font-size: 14px; color: #666;">011-26972351/41401216</div>
+            011-26972351/41401216
+        </div>
+        <div style="font-size: 14px; color: #666; position: absolute; right: 0; top: 0;">
+            <!-- Optionally include email icon here -->
         </div>
     </div>
+</div>
+
 
     <!-- Website and Email -->
-    <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 20px;">
-        <div style="display: flex; align-items: center;">
+    <div style="font-size: 14px; margin-bottom: 20px;">
+    <div style="position: relative; height: 24px;">
+        <div style="font-size: 14px; color: #666; float: left; display: flex; align-items: center;">
             <img src="data:image/png;base64,{$imageData['domainIcon']}" alt="Website" style="width:16px; height:16px; margin-right: 5px;">
-            <div style="font-size: 14px; color: #666;">www.goonj.org</div>
+            www.goonj.org
         </div>
-        <div style="display: flex; align-items: center;">
-            <img src="data:image/png;base64,{$imageData['emailIcon']}" alt="Email" style="width:16px; height:16px; margin-right: 5px;">
-            <div style="font-size: 14px; color: #666;">mail@goonj.org</div>
+        <div style="font-size: 14px; color: #666; float: right; display: flex; align-items: center;">
+            <!-- <img src="data:image/png;base64,{$imageData['emailIcon']}" alt="Email" style="width:16px; height:16px; margin-right: 5px;"> -->
+            mail@goonj.org
         </div>
     </div>
+</div>
 
     <!-- Social Media Icons -->
     <div style="text-align: center; width: 100%; margin-top: 20px;">
@@ -205,6 +237,7 @@ class MaterialContributionService extends AutoSubscriber {
         <a href="https://www.youtube.com/channel/UCCq8iYlmjT7rrgPI1VHzIHg" target="_blank"><img src="data:image/webp;base64,{$imageData['youtubeIcon']}" alt="YouTube" style="width: 24px; height: 24px; margin-right: 10px;"></a>
     </div>
 </div>
+
 
 </body>
 </html>
