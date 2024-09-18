@@ -88,8 +88,6 @@ class MaterialContributionService extends AutoSubscriber {
     $email = $contactDataArray['email_primary.email'] ?? 'N/A';
     $phone = $contactDataArray['phone_primary.phone'] ?? 'N/A';
 
-    error_log("Contact Info - Email: $email, Phone: $phone");
-
     if (!$contribution) {
         return;
     }
@@ -132,7 +130,7 @@ class MaterialContributionService extends AutoSubscriber {
     $html = <<<HTML
 <html>
 <body style="font-family: Arial, sans-serif;">
-    <div style="text-align: center; margin-bottom: 10px;">
+    <div style="text-align: center; margin-bottom: 16px;">
         <img src="data:image/png;base64,{$imageData['logo']}" alt="Goonj Logo" style="width: 80px; height: 60px;">
     </div>
     
@@ -146,7 +144,7 @@ class MaterialContributionService extends AutoSubscriber {
 </div>
 
     <br><br>
-    <div style="font-weight: bold; font-style: italic; margin-bottom: 20px;">
+    <div style="font-weight: bold; font-style: italic; margin-top: 22px; margin-bottom: 22px;">
         "We appreciate your contribution of pre-used/new material. Goonj makes sure that the material reaches people with dignity and care."
     </div>
     <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; text-align: center; border-collapse: collapse;">
@@ -200,7 +198,7 @@ class MaterialContributionService extends AutoSubscriber {
     </div>
     <div style="clear: both; margin-top: 20px;"></div>
 
-    <div style="width: 100%; margin-top: 15px; background-color: #f2f2f2; padding: 20px;">
+    <div style="width: 100%; margin-top: 15px; background-color: #f2f2f2; padding: 20px; font-weight: 500;">
     <div style="font-size: 14px; margin-bottom: 20px;">
     <div style="position: relative; height: 24px;">
         <div style="font-size: 14px; color: #666; float: left; display: flex; align-items: center;">
@@ -216,13 +214,13 @@ class MaterialContributionService extends AutoSubscriber {
 
     <div style="font-size: 14px; margin-bottom: 20px;">
     <div style="position: relative; height: 24px;">
-        <div style="font-size: 14px; color: #666; float: left; display: flex; align-items: center;">
-            <img src="data:image/png;base64,{$imageData['domainIcon']}" alt="Website" style="width:16px; height:16px; margin-right: 5px;">
-            www.goonj.org
-        </div>
-        <div style="font-size: 14px; color: #666; float: right; display: flex; align-items: center;">
-            <img src="data:image/png;base64,{$imageData['emailIcon']}" alt="Email" style="width:16px; height:16px; margin-right: 5px;">
-            mail@goonj.org
+    <div style="font-size: 14px; ">
+    <img src="data:image/png;base64,{$imageData['emailIcon']}" alt="Email" style="width: 16px; height: 16px; vertical-align: middle; display: inline;">
+    <span style="display: inline; margin-left: 0;">mail@goonj.org</span>
+</div>
+        <div style="font-size: 14px; color: #666; float: right;">
+        <img src="data:image/png;base64,{$imageData['domainIcon']}" alt="Website" style="width:16px; height:16px; margin-right: 5px; display: inline">
+        <span style="display: inline; margin-left: 0;">www.goonj.org</span> 
         </div>
     </div>
 </div>
