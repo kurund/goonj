@@ -315,7 +315,10 @@ class CollectionCampService extends AutoSubscriber {
       return;
     }
 
+	error_log("Testing -1");
     $newStatus = $objectRef['Collection_Camp_Core_Details.Status'] ?? '';
+
+	error_log("newStatus: " . print_r($newStatus, TRUE));
 
     if (!$newStatus) {
       return;
@@ -330,6 +333,10 @@ class CollectionCampService extends AutoSubscriber {
     $currentStatus = $currentCollectionCamp['Collection_Camp_Core_Details.Status'];
     $collectionCampId = $currentCollectionCamp['id'];
 
+	error_log("currentCollectionCamp: " . print_r($currentCollectionCamp, TRUE));
+	error_log("collectionCampId: " . print_r($collectionCampId, TRUE));
+
+
     // Check for status change.
     if ($currentStatus !== $newStatus) {
       if ($newStatus === 'authorized') {
@@ -342,6 +349,8 @@ class CollectionCampService extends AutoSubscriber {
    *
    */
   public static function generateQrCode($collectionCampId) {
+
+	error_log("Testing -2");
     try {
       $baseUrl = \CRM_Core_Config::singleton()->userFrameworkBaseURL;
       $url = "{$baseUrl}actions/collection-camp/{$collectionCampId}";
@@ -382,12 +391,19 @@ class CollectionCampService extends AutoSubscriber {
 
       $qrField = $customFields->first();
 
+	error_log("qrField: " . print_r($qrField, TRUE));
+
       if (!$qrField) {
         \CRM_Core_Error::debug_log_message('No field to save QR Code for collection camp ID ' . $collectionCampId);
         return FALSE;
       }
 
       $qrFieldId = 'custom_' . $qrField['id'];
+	error_log("qrFieldId: " . print_r($qrFieldId, TRUE));
+	error_log("collectionCampId: " . print_r($collectionCampId, TRUE));
+	error_log("fileName: " . print_r($fileName, TRUE));
+	error_log("tempFilePath: " . print_r($tempFilePath, TRUE));
+
 
       // Save the QR code as an attachment linked to the collection camp.
       $params = [
@@ -401,6 +417,7 @@ class CollectionCampService extends AutoSubscriber {
       ];
 
       $result = civicrm_api3('Attachment', 'create', $params);
+	error_log("result: " . print_r($result, TRUE));
 
       if (empty($result['id'])) {
         \CRM_Core_Error::debug_log_message('Failed to create attachment for collection camp ID ' . $collectionCampId);
@@ -408,6 +425,8 @@ class CollectionCampService extends AutoSubscriber {
       }
 
       $attachment = $result['values'][$result['id']];
+	error_log("attachment: " . print_r($attachment, TRUE));
+
       $attachmentUrl = $attachment['url'];
     }
     catch (\CiviCRM_API3_Exception $e) {
