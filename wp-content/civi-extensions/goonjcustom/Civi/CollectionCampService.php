@@ -444,20 +444,13 @@ class CollectionCampService extends AutoSubscriber {
       ->execute()->single();
 
     $status = $collectionCamp['Collection_Camp_Core_Details.Status'];
-
-    if ($status !== 'authorized') {
-      return;
-    }
-
     $collectionCampQr = $collectionCamp['Collection_Camp_QR_Code.QR_Code'];
 
-    if ($collectionCampQr !== NULL) {
+    if ($status !== 'authorized' || $collectionCampQr !== NULL) {
       return;
     }
 
-    if ($status === 'authorized') {
-      self::generateQrCode($collectionCampId);
-    }
+    self::generateQrCode($collectionCampId);
 
   }
 
