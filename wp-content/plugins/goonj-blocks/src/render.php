@@ -60,9 +60,6 @@ if ( in_array( $target, array( 'collection-camp', 'dropping-center' ) ) ) :
 		<a href="<?php echo esc_url( $material_contribution_link ); ?>" class="wp-block-gb-action-button">
 			<?php esc_html_e( 'Material Contribution', 'goonj-blocks' ); ?>
 		</a>
-		<a href="" class="wp-block-gb-action-button">
-			<?php esc_html_e( 'Donate', 'goonj-blocks' ); ?>
-		</a>
 	</div>
 	<?php elseif ( 'processing-center' === $target ) : ?>
 		<table class="wp-block-gb-table">
@@ -79,9 +76,6 @@ if ( in_array( $target, array( 'collection-camp', 'dropping-center' ) ) ) :
 			</a>
 			<a href="<?php echo esc_url( $pu_material_contribution_check_link ); ?>" class="wp-block-gb-action-button">
 				<?php esc_html_e( 'Material Contribution', 'goonj-blocks' ); ?>
-			</a>
-			<a href="" class="wp-block-gb-action-button">
-				<?php esc_html_e( 'Donate', 'goonj-blocks' ); ?>
 			</a>
 		</div>
 <?php endif;
