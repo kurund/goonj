@@ -433,7 +433,7 @@ class CollectionCampService extends AutoSubscriber {
    */
   public static function reGenerateCollectionCampQr(string $op, string $objectName, int $objectId, &$objectRef) {
     // Check if the object name is 'Eck_Collection_Camp'.
-    if ($objectName !== 'Eck_Collection_Camp') {
+    if ($objectName !== 'Eck_Collection_Camp' || !$objectRef->id) {
       return;
     }
 
