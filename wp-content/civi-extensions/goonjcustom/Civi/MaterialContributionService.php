@@ -129,7 +129,7 @@ class MaterialContributionService extends AutoSubscriber {
     <html>
       <body style="font-family: Arial, sans-serif;">
         <div style="text-align: center; margin-bottom: 16px;">
-          <img src="data:image/png;base64,{$imageData['logo']}" alt="Goonj Logo" style="width: 80px; height: 60px;">
+          <img src="data:image/png;base64,{$imageData['logo']}" alt="Goonj Logo" style="width: 100px; height: 90px;">
         </div>
         
         <div style="width: 100%; font-size: 14px;">
@@ -202,14 +202,14 @@ class MaterialContributionService extends AutoSubscriber {
         </div>
         <div style="clear: both; margin-top: 20px;"></div>
     
-        <div style="width: 100%; margin-top: 15px; background-color: #f2f2f2; padding: 20px; font-weight: 500;">
+        <div style="width: 100%; margin-top: 15px; background-color: #f2f2f2; padding: 20px; font-weight: 300; color: #000000">
           <div style="font-size: 14px; margin-bottom: 20px;">
             <div style="position: relative; height: 24px;">
-              <div style="font-size: 14px; color: #666; float: left; display: flex; align-items: center;">
+              <div style="font-size: 14px; float: left; color:">
                 Goonj, C-544, 1st Floor, C-Pocket, Sarita Vihar, New<br>
                 Delhi-110076
               </div>
-              <div style="font-size: 14px; color: #666; float: right; display: flex; align-items: center;">
+              <div style="font-size: 14px; float: right;">
                 <img src="data:image/png;base64,{$imageData['callIcon']}" alt="Phone" style="width: 16px; height: 16px; margin-right: 5px;">
                 011-26972351/41401216
               </div>
@@ -219,18 +219,18 @@ class MaterialContributionService extends AutoSubscriber {
           <div style="font-size: 14px; margin-bottom: 20px;">
             <div style="position: relative; height: 24px;">
               <div style="font-size: 14px;">
-                <img src="data:image/png;base64,{$imageData['emailIcon']}" alt="Email" style="width: 16px; height: 16px; vertical-align: middle; display: inline;">
+                <img src="data:image/png;base64,{$imageData['emailIcon']}" alt="Email" style="width: 16px; height: 16px; float: left; display: inline;">
                 <span style="display: inline; margin-left: 0;">mail@goonj.org</span>
               </div>
-              <div style="font-size: 14px; color: #666; float: right;">
-                <img src="data:image/png;base64,{$imageData['domainIcon']}" alt="Website" style="width: 16px; height: 16px; margin-right: 5px; display: inline;">
+              <div style="font-size: 14px; float: right;">
+                <img src="data:image/png;base64,{$imageData['domainIcon']}" alt="Website" style="width: 16px; height: 16px; margin-right: 5px;">
                 <span style="display: inline; margin-left: 0;">www.goonj.org</span>
               </div>
             </div>
           </div>
     
           <!-- Social Media Icons -->
-          <div style="text-align: center; width: 100%; margin-top: 20px;">
+          <div style="text-align: center; width: 100%; margin-top: 28px;">
             <a href="https://www.facebook.com/goonj.org" target="_blank"><img src="data:image/webp;base64,{$imageData['facebookIcon']}" alt="Facebook" style="width: 24px; height: 24px; margin-right: 10px;"></a>
             <a href="https://www.instagram.com/goonj/" target="_blank"><img src="data:image/webp;base64,{$imageData['instagramIcon']}" alt="Instagram" style="width: 24px; height: 24px; margin-right: 10px;"></a>
             <a href="https://x.com/goonj" target="_blank"><img src="data:image/webp;base64,{$imageData['twitterIcon']}" alt="Twitter" style="width: 24px; height: 24px; margin-right: 10px;"></a>
