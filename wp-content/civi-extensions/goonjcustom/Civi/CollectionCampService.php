@@ -170,7 +170,6 @@ class CollectionCampService extends AutoSubscriber {
         // Fetch the state abbreviation.
         $stateProvince = StateProvince::get(FALSE)
           ->addWhere('id', '=', $stateId)
-          ->setLimit(1)
           ->execute()->single();
 
         if (empty($stateProvince)) {
