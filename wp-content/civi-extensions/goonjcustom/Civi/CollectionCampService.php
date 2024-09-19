@@ -443,7 +443,10 @@ class CollectionCampService extends AutoSubscriber {
       ->addWhere('id', '=', $collectionCampId)
       ->execute()->single();
 
-    $status = $collectionCamp['Collection_Camp_Core_Details.Status'] ?? NULL;
+    $status = $collectionCamp['Collection_Camp_Core_Details.Status'];
+    if ($status !== 'authorized') {
+      return;
+    }
     $collectionCampQr = $collectionCamp['Collection_Camp_QR_Code.QR_Code'];
 
     if ($collectionCampQr !== NULL) {
