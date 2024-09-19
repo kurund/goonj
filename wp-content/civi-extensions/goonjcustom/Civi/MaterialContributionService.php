@@ -191,7 +191,7 @@ class MaterialContributionService extends AutoSubscriber {
             <ul>
               <li>Join us, by encouraging your friends, relatives, colleagues, and neighbours to join the journey as all of us have a lot to give.</li>
               <li style="margin-top: 8px;">
-                <strong>With Material Money Matter!</strong> Your monetary contribution is needed too for sorting, packing, transportation to implementation.<br>(Financial contributions are tax-exempted u/s 80G of IT Act)
+                <strong>With Material Money Matter!</strong> Your monetary contribution is needed too for sorting, packing, transportation to implementation.(Financial contributions are tax-exempted u/s 80G of IT Act)
               </li>
             </ul>
           </div>
@@ -217,7 +217,6 @@ class MaterialContributionService extends AutoSubscriber {
           </div>
     
           <div style="font-size: 14px; margin-bottom: 20px;">
-            <div style="position: relative; height: 24px;">
               <div style="font-size: 14px;">
                 <img src="data:image/png;base64,{$imageData['emailIcon']}" alt="Email" style="width: 16px; height: 16px; float: left; display: inline;">
                 <span style="display: inline; margin-left: 0;">mail@goonj.org</span>
@@ -226,7 +225,6 @@ class MaterialContributionService extends AutoSubscriber {
                 <img src="data:image/png;base64,{$imageData['domainIcon']}" alt="Website" style="width: 16px; height: 16px; margin-right: 5px;">
                 <span style="display: inline; margin-left: 0;">www.goonj.org</span>
               </div>
-            </div>
           </div>
     
           <!-- Social Media Icons -->
