@@ -34,6 +34,7 @@ class CollectionCampService extends AutoSubscriber {
       '&hook_civicrm_post' => [
         ['individualCreated'],
         ['assignChapterGroupToIndividual'],
+        ['reGenerateCollectionCampQr'],
       ],
       '&hook_civicrm_pre' => [
         ['generateCollectionCampQr'],
@@ -419,6 +420,41 @@ class CollectionCampService extends AutoSubscriber {
     }
 
     return TRUE;
+  }
+
+  /**
+   * This hook is called after a db write on entities.
+   *
+   * @param string $op
+   *   The type of operation being performed.
+   * @param string $objectName
+   *   The name of the object.
+   * @param int $objectId
+   *   The unique identifier for the object.
+   * @param object $objectRef
+   *   The reference to the object.
+   */
+  public static function reGenerateCollectionCampQr(string $op, string $objectName, int $objectId, &$objectRef) {
+    // Check if the object name is 'Eck_Collection_Camp'.
+    if ($objectName !== 'Eck_Collection_Camp' || !$objectRef->id) {
+      return;
+    }
+
+    $collectionCampId = $objectRef->id ?? NULL;
+    $collectionCamp = EckEntity::get('Collection_Camp', TRUE)
+      ->addSelect('Collection_Camp_Core_Details.Status', 'Collection_Camp_QR_Code.QR_Code')
+      ->addWhere('id', '=', $collectionCampId)
+      ->execute()->single();
+
+    $status = $collectionCamp['Collection_Camp_Core_Details.Status'];
+    $collectionCampQr = $collectionCamp['Collection_Camp_QR_Code.QR_Code'];
+
+    if ($status !== 'authorized' || $collectionCampQr !== NULL) {
+      return;
+    }
+
+    self::generateQrCode($collectionCampId);
+
   }
 
   /**
