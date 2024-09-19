@@ -155,10 +155,6 @@ class CollectionCampService extends AutoSubscriber {
           ->setLimit(1)
           ->execute()->single();
 
-        if (empty($collectionCamp)) {
-          return;
-        }
-
         $collectionCampsCreatedDate = $collectionCamp['created_date'] ?? NULL;
 
         // Get the year.
