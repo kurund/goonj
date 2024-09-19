@@ -15,8 +15,8 @@ $headings = array(
 $heading_text = $headings[ $target ];
 
 $register_link = sprintf(
-	'/individual-registration-with-volunteer-option/#?Source_Tracking.Event=%s',
-	$action_target['id'],
+	'/individual-registration-with-volunteer-option/#?source=%s',
+	$action_target['title'],
 );
 
 $material_contribution_link = sprintf(
