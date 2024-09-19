@@ -230,9 +230,15 @@ class CollectionCampService extends AutoSubscriber {
    *
    */
   public static function getStateIdForSubtype(array $objectRef, int $subtypeId): ?int {
-    error_log("campId: " . print_r($campId, TRUE));
+    $optionValue = OptionValue::get(TRUE)
+      ->addSelect('value')
+      ->addWhere('option_group_id:name', '=', 'eck_sub_types')
+      ->addWhere('grouping', '=', 'Collection_Camp')
+      ->addWhere('name', '=', 'Dropping_Center')
+      ->execute()->single();
+
     // Subtype for 'Dropping Centre'.
-    if ($subtypeId === 5) {
+    if ($subtypeId === $optionValue['value']) {
       return $objectRef['Dropping_Centre.State'] ?? NULL;
     }
     return $objectRef['Collection_Camp_Intent_Details.State'] ?? NULL;
