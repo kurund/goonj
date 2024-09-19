@@ -438,13 +438,13 @@ class CollectionCampService extends AutoSubscriber {
     }
 
     $collectionCampId = $objectRef->id ?? NULL;
-    $collectionCampData = EckEntity::get('Collection_Camp', TRUE)
+    $collectionCamp = EckEntity::get('Collection_Camp', TRUE)
       ->addSelect('Collection_Camp_Core_Details.Status', 'Collection_Camp_QR_Code.QR_Code')
       ->addWhere('id', '=', $collectionCampId)
       ->execute()->single();
 
-    $status = $collectionCampData['Collection_Camp_Core_Details.Status'] ?? NULL;
-    $collectionCampQr = $collectionCampData['Collection_Camp_QR_Code.QR_Code'];
+    $status = $collectionCamp['Collection_Camp_Core_Details.Status'] ?? NULL;
+    $collectionCampQr = $collectionCamp['Collection_Camp_QR_Code.QR_Code'];
 
     if ($collectionCampQr !== NULL) {
       return;
