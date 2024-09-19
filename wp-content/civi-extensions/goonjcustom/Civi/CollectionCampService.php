@@ -451,7 +451,6 @@ class CollectionCampService extends AutoSubscriber {
     foreach ($collectionCampEntries as $entry) {
       $collectionCampData = $entry['fields'] ?? NULL;
 
-      // Access the status of the camp.
       $status = $collectionCampData['Collection_Camp_Core_Details.Status'] ?? NULL;
       $collectionCampId = $collectionCampData['id'] ?? NULL;
 
