@@ -432,44 +432,28 @@ class CollectionCampService extends AutoSubscriber {
    *   The reference to the object.
    */
   public static function reGenerateCollectionCampQr(string $op, string $objectName, int $objectId, &$objectRef) {
-    // Check if the object name is 'AfformSubmission'.
-    if ($objectName !== 'AfformSubmission') {
+    // Check if the object name is 'Eck_Collection_Camp'.
+    if ($objectName !== 'Eck_Collection_Camp') {
       return;
     }
 
-    // Extract the 'data' field.
-    $data = $objectRef->data;
-    $decodedData = json_decode($data, TRUE);
+    $collectionCampId = $objectRef->id ?? NULL;
+    $collectionCampData = EckEntity::get('Collection_Camp', TRUE)
+      ->addSelect('Collection_Camp_Core_Details.Status', 'Collection_Camp_QR_Code.QR_Code')
+      ->addWhere('id', '=', $collectionCampId)
+      ->execute()->single();
 
-    // Check if 'Eck_Collection_Camp1' exists.
-    $collectionCampEntries = $decodedData['Eck_Collection_Camp1'] ?? [];
+    $status = $collectionCampData['Collection_Camp_Core_Details.Status'] ?? NULL;
+    $collectionCampQr = $collectionCampData['Collection_Camp_QR_Code.QR_Code'];
 
-    if (empty($collectionCampEntries)) {
+    if ($collectionCampQr !== NULL) {
       return;
     }
 
-    foreach ($collectionCampEntries as $entry) {
-      $collectionCampData = $entry['fields'] ?? NULL;
-
-      $status = $collectionCampData['Collection_Camp_Core_Details.Status'] ?? NULL;
-      $collectionCampId = $collectionCampData['id'] ?? NULL;
-
-      $collectionCamp = EckEntity::get('Collection_Camp', TRUE)
-        ->addSelect('Collection_Camp_QR_Code.QR_Code')
-        ->addWhere('id', '=', $collectionCampId)
-        ->execute()->single();
-
-      $collectionCampQr = $collectionCamp['Collection_Camp_QR_Code.QR_Code'];
-
-      if ($collectionCampQr !== NULL) {
-        continue;
-      }
-
-      if ($status === 'authorized') {
-        self::generateQrCode($collectionCampId);
-      }
-
+    if ($status === 'authorized') {
+      self::generateQrCode($collectionCampId);
     }
+
   }
 
   /**
