@@ -152,7 +152,6 @@ class CollectionCampService extends AutoSubscriber {
         // Fetch the collection camp details.
         $collectionCamp = EckEntity::get('Collection_Camp', FALSE)
           ->addWhere('id', '=', $campId)
-          ->setLimit(1)
           ->execute()->single();
 
         $collectionCampsCreatedDate = $collectionCamp['created_date'] ?? NULL;
