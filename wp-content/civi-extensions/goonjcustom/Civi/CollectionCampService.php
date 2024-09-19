@@ -150,16 +150,16 @@ class CollectionCampService extends AutoSubscriber {
         }
 
         // Fetch the collection camp details.
-        $collectionCamps = EckEntity::get('Collection_Camp', FALSE)
+        $collectionCamp = EckEntity::get('Collection_Camp', FALSE)
           ->addWhere('id', '=', $campId)
           ->setLimit(1)
           ->execute()->single();
 
-        if (empty($collectionCamps)) {
+        if (empty($collectionCamp)) {
           return;
         }
 
-        $collectionCampsCreatedDate = $collectionCamps['created_date'] ?? NULL;
+        $collectionCampsCreatedDate = $collectionCamp['created_date'] ?? NULL;
 
         // Get the year.
         $year = date('Y', strtotime($collectionCampsCreatedDate));
