@@ -118,7 +118,7 @@ class MaterialContributionService extends AutoSubscriber {
       'domainIcon' => $baseDir . 'Icon/domain.png',
       'emailIcon' => $baseDir . 'Icon/email.png',
       'facebookIcon' => $baseDir . 'Icon/facebook.webp',
-      'instagramIcon' => $baseDir . 'Icon/instagram.webp',
+      'instagramIcon' => $baseDir . 'Icon/instagram.png',
       'twitterIcon' => $baseDir . 'Icon/twitter.webp',
       'youtubeIcon' => $baseDir . 'Icon/youtube.webp',
     ];
