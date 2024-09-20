@@ -124,7 +124,7 @@ class CollectionCampService extends AutoSubscriber {
 
     $newStatus = $objectRef['Collection_Camp_Core_Details.Status'] ?? '';
 
-    if (!$newStatus) {
+    if (!$newStatus || !$objectId) {
       return;
     }
 
@@ -458,7 +458,7 @@ class CollectionCampService extends AutoSubscriber {
     }
 
     $collectionCampId = $objectRef->id ?? NULL;
-    $collectionCamp = EckEntity::get('Collection_Camp', TRUE)
+    $collectionCamp = EckEntity::get('Collection_Camp', FALSE)
       ->addSelect('Collection_Camp_Core_Details.Status', 'Collection_Camp_QR_Code.QR_Code')
       ->addWhere('id', '=', $collectionCampId)
       ->execute()->single();
