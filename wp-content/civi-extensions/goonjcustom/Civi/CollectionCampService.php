@@ -385,7 +385,7 @@ class CollectionCampService extends AutoSubscriber {
         return FALSE;
       }
 
-      $customFields = CustomField::get(TRUE)
+      $customFields = CustomField::get(FALSE)
         ->addSelect('id')
         ->addWhere('custom_group_id:name', '=', 'Collection_Camp_QR_Code')
         ->addWhere('name', '=', 'QR_Code')
