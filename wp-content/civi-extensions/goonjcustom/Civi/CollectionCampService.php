@@ -457,20 +457,25 @@ class CollectionCampService extends AutoSubscriber {
       return;
     }
 
-    $collectionCampId = $objectRef->id ?? NULL;
-    $collectionCamp = EckEntity::get('Collection_Camp', FALSE)
-      ->addSelect('Collection_Camp_Core_Details.Status', 'Collection_Camp_QR_Code.QR_Code')
-      ->addWhere('id', '=', $collectionCampId)
-      ->execute()->single();
+    try {
+      $collectionCamp = EckEntity::get('Collection_Camp', TRUE)
+        ->addSelect('Collection_Camp_Core_Details.Status', 'Collection_Camp_QR_Code.QR_Code')
+        ->addWhere('id', '=', $collectionCampId)
+        ->execute()->single();
 
-    $status = $collectionCamp['Collection_Camp_Core_Details.Status'];
-    $collectionCampQr = $collectionCamp['Collection_Camp_QR_Code.QR_Code'];
+      $status = $collectionCamp['Collection_Camp_Core_Details.Status'];
+      $collectionCampQr = $collectionCamp['Collection_Camp_QR_Code.QR_Code'];
 
-    if ($status !== 'authorized' || $collectionCampQr !== NULL) {
-      return;
+      if ($status !== 'authorized' || $collectionCampQr !== NULL) {
+        return;
+      }
+
+      self::generateQrCode($collectionCampId);
+
     }
-
-    self::generateQrCode($collectionCampId);
+    catch (\Exception $e) {
+      // @ignoreException
+    }
 
   }
 
