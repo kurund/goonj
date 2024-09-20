@@ -54,6 +54,11 @@ class CollectionBaseService extends AutoSubscriber {
       "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fcamp-vehicle-dispatch-data",
     );
 
+    // URL for the camp outcome tab.
+    $campOutcome = \CRM_Utils_System::url(
+      "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fadmin-camp-outcome-form",
+    );    
+
     // Add the Contribution tab.
     $tabs['contribution'] = [
       'title' => ts('Contribution'),
@@ -72,10 +77,19 @@ class CollectionBaseService extends AutoSubscriber {
       'current' => FALSE,
     ];
 
-    // Add the Logistics tab.
+    // Add the vehicle dispatch tab.
     $tabs['vehicleDispatch'] = [
       'title' => ts('Vehicle Dispatch Data'),
       'link' => $vehicleDispatch,
+      'valid' => 1,
+      'active' => 1,
+      'current' => FALSE,
+    ];
+
+    // Add the camp outcome tab.
+    $tabs['campOutcome'] = [
+      'title' => ts('Camp Outcome Data'),
+      'link' => $campOutcome,
       'valid' => 1,
       'active' => 1,
       'current' => FALSE,
