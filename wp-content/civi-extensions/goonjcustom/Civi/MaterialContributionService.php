@@ -27,6 +27,10 @@ class MaterialContributionService extends AutoSubscriber {
    * Attach material contribution receipt to the email.
    */
   public static function attachContributionReceiptToEmail(&$params, $context = NULL) {
+    if (!isset($params['entity_id'])) {
+      return;
+    }
+
     $reminderId = (int) $params['entity_id'];
 
     if ($context !== 'singleEmail' || $reminderId !== self::CONTRIBUTION_RECEIPT_REMINDER_ID) {
@@ -118,7 +122,7 @@ class MaterialContributionService extends AutoSubscriber {
       'domainIcon' => $baseDir . 'Icon/domain.png',
       'emailIcon' => $baseDir . 'Icon/email.png',
       'facebookIcon' => $baseDir . 'Icon/facebook.webp',
-      'instagramIcon' => $baseDir . 'Icon/instagram.webp',
+      'instagramIcon' => $baseDir . 'Icon/instagram.png',
       'twitterIcon' => $baseDir . 'Icon/twitter.webp',
       'youtubeIcon' => $baseDir . 'Icon/youtube.webp',
     ];
@@ -177,8 +181,12 @@ class MaterialContributionService extends AutoSubscriber {
           </tr>
           <tr>
             <td class="table-header">Delivered by (Name & contact no.)</td>
-            <td style="text-align: center;">{$activity['Material_Contribution.Delivered_By']} & {$activity['Material_Contribution.Delivered_By_Contact']}</td>
-          </tr>
+            <td style="text-align: center;">
+            {$activity['Material_Contribution.Delivered_By']}<br>
+            {$activity['Material_Contribution.Delivered_By_Contact']}
+          </td>
+        </tr>
+
         </table>
         <div style="text-align: right; font-size: 14px;">
           Team Goonj
