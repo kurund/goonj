@@ -70,7 +70,7 @@ class CollectionBaseService extends AutoSubscriber {
 
     // Add the Logistics tab.
     $tabs['logistics'] = [
-      'title' => ts('Logistics Coordination'),
+      'title' => ts('Logistics'),
       'link' => $logisticsUrl,
       'valid' => 1,
       'active' => 1,
@@ -79,7 +79,7 @@ class CollectionBaseService extends AutoSubscriber {
 
     // Add the vehicle dispatch tab.
     $tabs['vehicleDispatch'] = [
-      'title' => ts('Vehicle Dispatch Data'),
+      'title' => ts('Dispatch'),
       'link' => $vehicleDispatch,
       'valid' => 1,
       'active' => 1,
@@ -88,7 +88,7 @@ class CollectionBaseService extends AutoSubscriber {
 
     // Add the camp outcome tab.
     $tabs['campOutcome'] = [
-      'title' => ts('Camp Outcome Data'),
+      'title' => ts('Camp Outcome'),
       'link' => $campOutcome,
       'valid' => 1,
       'active' => 1,
