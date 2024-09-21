@@ -19,7 +19,6 @@ use Civi\Api4\Relationship;
 use Civi\Api4\StateProvince;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Service\AutoSubscriber;
-use CRM_Utils_Mail;
 
 /**
  *
@@ -930,6 +929,14 @@ class CollectionCampService extends AutoSubscriber {
     }
 
     $goonjFieldId = $goonjField['value'];
+    $vehicleDispatcheId = $goonjField['entity_id'];
+
+    $collectionSourceVehicleDispatche = EckEntity::get('Collection_Source_Vehicle_Dispatch', TRUE)
+      ->addSelect('Camp_Vehicle_Dispatch.Collection_Camp_Intent_Id')
+      ->addWhere('id', '=', $vehicleDispatcheId)
+      ->execute()->first();
+
+    $collectionCampId = $collectionSourceVehicleDispatche['Camp_Vehicle_Dispatch.Collection_Camp_Intent_Id'];
 
     $coordinators = Relationship::get(FALSE)
       ->addWhere('contact_id_b', '=', $goonjFieldId)
@@ -951,38 +958,35 @@ class CollectionCampService extends AutoSubscriber {
     $mmtEmail = $email['email'];
     $contactName = $email['contact_id.display_name'];
 
-    // error_log("contactName: " . print_r($contactName, TRUE));
-
     // Email to material management team member.
     $mailParams = [
       'subject' => 'New Entry For Matrial Dispatch Notification',
       'from' => 'urban.ops@goonj.org',
       'toEmail' => $mmtEmail,
       'replyTo' => 'urban.ops@goonj.org',
-      'html' => self::goonjcustom_material_management_email_html($mmtId, $contactName),
+      'html' => self::goonjcustom_material_management_email_html($mmtId, $contactName, $collectionCampId),
         // 'messageTemplateID' => 76, // Uncomment if using a message template
     ];
-    // error_log("mailParams: " . print_r($mailParams, TRUE));
-
-    $result = CRM_Utils_Mail::send($mailParams);
-    // error_log("result: " . print_r($result, TRUE));
-
+    // error_log("mailParams: " . print_r($mailParams, TRUE));.
+    $result = \CRM_Utils_Mail::send($mailParams);
   }
 
   /**
    *
    */
-  public static function goonjcustom_material_management_email_html($mmtId, $contactName) {
-    $html = "
-    $materialdispatchUrl = $homeUrl . '/camp-vehicle-dispatch-form/#?Camp_Vehicle_Dispatch.Collection_Camp_Intent_Id=' . $collectionCampId . '&Camp_Vehicle_Dispatch.Filled_by=' . $recipientId . '&Camp_Vehicle_Dispatch.To_which_PU_Center_material_is_being_sent=' . $collectionCampGoonjOffice;
+  public static function goonjcustom_material_management_email_html($mmtId, $contactName, $collectionCampId) {
+    $homeUrl = get_home_url();
+    $materialdispatchUrl = $homeUrl . '/wp-admin/admin.php?page=CiviCRM&q=civicrm%2Feck%2Fentity&reset=1&type=Collection_Camp&id=' . $collectionCampId . '&selectedChild=vehicleDispatch#?intent_id=' . $collectionCampId;
 
-      <p>Dear $contactName,</p>
-      <p>A new entry of camp vehicle dispatch form is submitted..</p>
-      <p>Please acknowledgement the form from CRM</p>
-      <ul>
-        <li><a href=\"$materialdispatchUrl\">Material Dispatch Authorization</a></li>
-      </ul>
-      <p>Warm regards,</p>";
+    $html = "
+    <p>Dear $contactName,</p>
+    <p>A new entry of camp vehicle dispatch form is submitted.</p>
+    <p>Please acknowledge the form from CRM.</p>
+    <ul>
+      <li><a href=\"$materialdispatchUrl\">Material Dispatch Authorization</a></li>
+    </ul>
+    <p>Warm regards,</p>";
+
     return $html;
   }
 
