@@ -945,7 +945,7 @@ class CollectionCampService extends AutoSubscriber {
     $goonjFieldId = $goonjField['value'];
     $vehicleDispatcheId = $goonjField['entity_id'];
 
-    $collectionSourceVehicleDispatche = EckEntity::get('Collection_Source_Vehicle_Dispatch', TRUE)
+    $collectionSourceVehicleDispatche = EckEntity::get('Collection_Source_Vehicle_Dispatch', FALSE)
       ->addSelect('Camp_Vehicle_Dispatch.Collection_Camp_Intent_Id')
       ->addWhere('id', '=', $vehicleDispatcheId)
       ->execute()->first();
@@ -960,16 +960,12 @@ class CollectionCampService extends AutoSubscriber {
 
     $mmtId = $coordinators['contact_id_a'];
 
-    $updatemmtId = EckEntity::update('Collection_Source_Vehicle_Dispatch', FALSE)
-      ->addValue('Acknowledgement_For_Logistics.Filled_by', $mmtId)
-      ->addWhere('Camp_Vehicle_Dispatch.Collection_Camp_Intent_Id', '=', $collectionCampId)
-      ->execute();
 
     if (empty($mmtId)) {
       return;
     }
 
-    $email = Email::get(TRUE)
+    $email = Email::get(FALSE)
       ->addSelect('email', 'contact_id.display_name')
       ->addWhere('contact_id', '=', $mmtId)
       ->execute()->single();
@@ -988,6 +984,12 @@ class CollectionCampService extends AutoSubscriber {
     ];
     error_log("mailParams: " . print_r($mailParams, TRUE));
     $result = \CRM_Utils_Mail::send($mailParams);
+
+    $updatemmtId = EckEntity::update('Collection_Source_Vehicle_Dispatch', FALSE)
+    ->addValue('Acknowledgement_For_Logistics.Filled_by', $mmtId)
+    ->addWhere('Camp_Vehicle_Dispatch.Collection_Camp_Intent_Id', '=', $collectionCampId)
+    ->execute();
+
   }
 
   /**
