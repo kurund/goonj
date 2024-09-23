@@ -976,7 +976,7 @@ class CollectionCampService extends AutoSubscriber {
    */
   public static function goonjcustom_material_management_email_html($mmtId, $contactName, $collectionCampId) {
     $homeUrl = get_home_url();
-    $materialdispatchUrl = $homeUrl . '/wp-admin/admin.php?page=CiviCRM&q=civicrm%2Feck%2Fentity&reset=1&type=Collection_Camp&id=' . $collectionCampId . '&selectedChild=vehicleDispatch#?intent_id=' . $collectionCampId;
+    $materialdispatchUrl = $homeUrl . '/wp-admin/admin.php?page=CiviCRM&q=civicrm%2Feck%2Fentity&reset=1&type=Collection_Camp&id=' . $collectionCampId . '&selectedChild=campOutcome#?intent_id=' . $collectionCampId . '&Camp_Vehicle_Dispatch.Filled_by=' . $mmtId;
 
     $html = "
     <p>Dear $contactName,</p>

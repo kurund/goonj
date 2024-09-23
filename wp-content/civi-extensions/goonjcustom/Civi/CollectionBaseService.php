@@ -55,6 +55,11 @@ class CollectionBaseService extends AutoSubscriber {
       "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fevent-volunteer",
     );
 
+    // URL for the material dispatch authorizationtab.
+    $materialAuthorisation = \CRM_Utils_System::url(
+      "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Facknowledgement-for-logistics-data",
+    );
+
     // Add the event volunteer tab.
     $tabs['eventVolunteers'] = [
       'title' => ts('Event Volunteers'),
