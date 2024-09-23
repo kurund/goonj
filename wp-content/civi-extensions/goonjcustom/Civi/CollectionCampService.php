@@ -981,7 +981,7 @@ class CollectionCampService extends AutoSubscriber {
       'html' => self::goonjcustom_material_management_email_html($mmtId, $contactName, $collectionCampId),
         // 'messageTemplateID' => 76, // Uncomment if using a message template
     ];
-    // error_log("mailParams: " . print_r($mailParams, TRUE));.
+    error_log("mailParams: " . print_r($mailParams, TRUE));
     $result = \CRM_Utils_Mail::send($mailParams);
   }
 
@@ -990,7 +990,7 @@ class CollectionCampService extends AutoSubscriber {
    */
   public static function goonjcustom_material_management_email_html($mmtId, $contactName, $collectionCampId) {
     $homeUrl = get_home_url();
-    $materialdispatchUrl = $homeUrl . '/wp-admin/admin.php?page=CiviCRM&q=civicrm%2Feck%2Fentity&reset=1&type=Collection_Camp&id=' . $collectionCampId . '&selectedChild=campOutcome#?intent_id=' . $collectionCampId . '&Camp_Vehicle_Dispatch.Filled_by=' . $mmtId;
+    $materialdispatchUrl = $homeUrl . '/wp-admin/admin.php?page=CiviCRM&q=civicrm%2Feck%2Fentity&reset=1&type=Collection_Camp&id=' . $collectionCampId . '&selectedChild=materialAuthorisation#?intent_id=' . $collectionCampId . '&Camp_Vehicle_Dispatch.Filled_by=' . $mmtId;
 
     $html = "
     <p>Dear $contactName,</p>
