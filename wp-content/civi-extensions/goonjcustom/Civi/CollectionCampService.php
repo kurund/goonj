@@ -960,7 +960,6 @@ class CollectionCampService extends AutoSubscriber {
 
     $mmtId = $coordinators['contact_id_a'];
 
-
     if (empty($mmtId)) {
       return;
     }
@@ -985,9 +984,9 @@ class CollectionCampService extends AutoSubscriber {
     $result = \CRM_Utils_Mail::send($mailParams);
 
     $updatemmtId = EckEntity::update('Collection_Source_Vehicle_Dispatch', FALSE)
-    ->addValue('Acknowledgement_For_Logistics.Filled_by', $mmtId)
-    ->addWhere('Camp_Vehicle_Dispatch.Collection_Camp_Intent_Id', '=', $collectionCampId)
-    ->execute();
+      ->addValue('Acknowledgement_For_Logistics.Filled_by', $mmtId)
+      ->addWhere('Camp_Vehicle_Dispatch.Collection_Camp_Intent_Id', '=', $collectionCampId)
+      ->execute();
 
   }
 
