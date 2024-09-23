@@ -117,9 +117,6 @@ class CollectionCampService extends AutoSubscriber {
       $event->records[$index]['joins']['Address'][] = self::$collectionCampAddress;
     }
 
-    \Civi::log()->debug('2.', [
-      'records' => $event->records,
-    ]);
   }
 
   /**
