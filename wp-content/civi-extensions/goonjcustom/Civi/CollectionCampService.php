@@ -982,7 +982,6 @@ class CollectionCampService extends AutoSubscriber {
       'html' => self::goonjcustom_material_management_email_html($mmtId, $contactName, $collectionCampId),
         // 'messageTemplateID' => 76, // Uncomment if using a message template
     ];
-    error_log("mailParams: " . print_r($mailParams, TRUE));
     $result = \CRM_Utils_Mail::send($mailParams);
 
     $updatemmtId = EckEntity::update('Collection_Source_Vehicle_Dispatch', FALSE)
