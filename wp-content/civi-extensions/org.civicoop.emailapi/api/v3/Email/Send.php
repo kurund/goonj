@@ -90,7 +90,11 @@ function _civicrm_api3_email_send_spec(&$spec) {
     'title' => 'From Email Address Option value',
     'type' => CRM_Utils_Type::T_INT,
   ];
-
+  $spec['file_id'] = [
+    'title' => 'File Id',
+    'type' => CRM_Utils_Type::T_INT,
+    'api.required' => 1,
+  ];
 }
 
 /**
@@ -192,6 +196,24 @@ function civicrm_api3_email_send($params) {
     $message_params['contact_id'] = $contactId;
     list('messageSubject' => $messageSubject, 'html' => $html, 'text' => $text) = CRM_Emailapi_Utils_Tokens::replaceTokens($contactId, $message, $message_params);
 
+    $attachments = [];
+    \Civi::log()->info('$params', ['$params'=>$params['file_id']]);
+    if (!empty($params['file_id'])) {
+      $file = civicrm_api3('File', 'getsingle', ['id' => $params['file_id']]);
+      if (!empty($file['uri'])) {
+        // Specify the path based on the file URI received
+        $fullPath = '/Users/nishant/goonj/goonj/wp-content/uploads/civicrm/custom/' . $file['uri'];
+        
+        // Add the attachment to the array
+        $attachments[] = [
+          'fullPath' => $fullPath,
+          'mime_type' => 'application/pdf', // Adjust MIME type based on your file type
+          'cleanName' => basename($fullPath), // Extract the file name from the full path
+        ];
+        \Civi::log()->info('attachments', ['mailparams'=>$attachments]);
+      }
+    }
+
     // set up the parameters for CRM_Utils_Mail::send
     $mailParams = [
       'groupName' => 'Email from API',
@@ -281,7 +303,8 @@ function civicrm_api3_email_send($params) {
 
     // Set the ID of the email activity (if we created one)
     $mailParams['emailActivityID'] = $activity['id'] ?? NULL;
-
+    $mailParams['attachments'] = $attachments;
+    \Civi::log()->info('mailparmas', ['mailparams'=>$mailParams]);
     // Try to send the email.
     $result = CRM_Utils_Mail::send($mailParams);
     if (!$result) {
