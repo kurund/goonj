@@ -268,9 +268,10 @@ class CollectionBaseService extends AutoSubscriber {
       ];
 
       // Create or retrieve the queue (no need to check if it already exists)
-      $queue = \CRM_Queue_Service::singleton()->create([
-        'name' => 'send_authorization_email_queue',
+      $queue = \Civi::queue('send_authorization_email_queue', [
         'type' => 'Sql',
+        'error' => 'abort',
+        'runner' => 'task',
       ]);
 
       $queue->createItem(new \CRM_Queue_Task([
