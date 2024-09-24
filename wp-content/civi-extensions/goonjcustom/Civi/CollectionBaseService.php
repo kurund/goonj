@@ -4,6 +4,8 @@ namespace Civi;
 
 use Civi\Api4\CustomField;
 use Civi\Api4\EckEntity;
+use Civi\Api4\Email;
+use Civi\Api4\File;
 use Civi\Api4\Group;
 use Civi\Api4\GroupContact;
 use Civi\Api4\MessageTemplate;
@@ -272,7 +274,7 @@ class CollectionBaseService extends AutoSubscriber {
     try {
       $templateId = self::getMessageTemplateId($subType, $status);
 
-      $emailParams = [
+      $params = [
         'contact_id' => $initiatorId,
         'template_id' => $templateId,
         'collectionCampId' => $collectionCampId,
@@ -287,7 +289,7 @@ class CollectionBaseService extends AutoSubscriber {
 
       $queue->createItem(new \CRM_Queue_Task(
           [self::class, 'processQueuedEmail'],
-          [$emailParams],
+          [$params],
       ), [
         'weight' => 1,
       ]);
@@ -308,29 +310,49 @@ class CollectionBaseService extends AutoSubscriber {
   /**
    *
    */
-  public static function processQueuedEmail($queue, $emailParams) {
-    $campId = $emailParams['collectionCampId'];
-
-    // Fetch the collection camp details, including the poster ID.
-    $collectionCamp = EckEntity::get('Collection_Camp', FALSE)
-      ->addSelect('Collection_Camp_Core_Details.Poster')
-      ->addWhere('id', '=', $campId)
-      ->execute()->single();
-
-    \Civi::log()->info('Poster details fetched', $collectionCamp);
+  public static function processQueuedEmail($queue, $params) {
+    $collectionSourceId = $params['collectionCampId'];
+    $contactId = $params['contact_id'];
+    $templateId = $params['template_id'];
 
     try {
-      $posterFileId = $collectionCamp['Collection_Camp_Core_Details.Poster'];
-      civicrm_api3('Email', 'send', [
-        'contact_id' => $emailParams['contact_id'],
-        'template_id' => $emailParams['template_id'],
-      // Attach the poster.
-        'file_id' => $posterFileId,
-      ]);
+      $collectionSource = EckEntity::get('Collection_Camp', FALSE)
+        ->addSelect('Collection_Camp_Core_Details.Poster')
+        ->addWhere('id', '=', $collectionSourceId)
+        ->execute()->single();
 
+      $posterFileId = $collectionSource['Collection_Camp_Core_Details.Poster'];
+
+      $file = File::get(FALSE)
+        ->addWhere('id', '=', $posterFileId)
+        ->execute()->single();
+
+      $toEmail = Email::get(FALSE)
+        ->addWhere('contact_id', '=', $contactId)
+        ->addWhere('is_primary', '=', TRUE)
+        ->execute()->single();
+
+      $config = \CRM_Core_Config::singleton();
+      $filePath = $config->customFileUploadDir . $file['uri'];
+
+      $emailParams = [
+        'contact_id' => $contactId,
+        'to_email' => $toEmail['email'],
+        'from' => "xyz@gmail.com",
+        'id' => $templateId,
+        'attachments' => [
+          [
+            'fullPath' => $filePath,
+            'mime_type' => $file['mime_type'],
+            'cleanName' => $file['uri'],
+          ],
+        ],
+      ];
+
+      civicrm_api3('MessageTemplate', 'send', $emailParams);
     }
     catch (\Exception $ex) {
-      \Civi::log()->error('Failed to process queued authorization email.', ['error' => $ex->getMessage(), 'params' => $emailParams]);
+      \Civi::log()->error('Failed to send email.', ['error' => $ex->getMessage(), 'params' => $emailParams]);
     }
   }
 
