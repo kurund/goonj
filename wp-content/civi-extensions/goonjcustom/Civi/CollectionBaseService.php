@@ -20,6 +20,8 @@ class CollectionBaseService extends AutoSubscriber {
 
   private static $stateCustomFieldDbDetails = [];
   private static $collectionAuthorized = NULL;
+  private static $collectionAuthorizedStatus = NULL;
+  private static $authorizationEmailQueued = NULL;
 
   /**
    *
@@ -229,9 +231,14 @@ class CollectionBaseService extends AutoSubscriber {
     $currentStatus = $currentCollectionCamp['Collection_Camp_Core_Details.Status'];
     $initiatorId = $currentCollectionCamp['Collection_Camp_Core_Details.Contact_Id'];
 
+    if (!in_array($newStatus, ['authorized', 'unauthorized'])) {
+      return;
+    }
+
     // Check for status change.
     if ($currentStatus !== $newStatus) {
       self::$collectionAuthorized = $objectId;
+      self::$collectionAuthorizedStatus = $newStatus;
     }
   }
 
@@ -239,7 +246,7 @@ class CollectionBaseService extends AutoSubscriber {
    *
    */
   public static function handleAuthorizationEmailsPost(string $op, string $objectName, $objectId, &$objectRef) {
-    if ($objectName != 'Eck_Collection_Camp' || !$objectId || $objectId !== self::$collectionAuthorized) {
+    if ($objectName != 'Eck_Collection_Camp' || $op !== 'edit' || !$objectId || $objectId !== self::$collectionAuthorized) {
       return;
     }
 
@@ -248,11 +255,12 @@ class CollectionBaseService extends AutoSubscriber {
       ->addWhere('id', '=', $objectRef->id)
       ->execute()->single();
 
-    $status = $collectionCamp['Collection_Camp_Core_Details.Status'];
     $initiator = $collectionCamp['Collection_Camp_Core_Details.Contact_Id'];
     $subType = $collectionCamp['subtype'];
 
-    self::queueAuthorizationEmail($initiator, $subType, $status);
+    if (!self::$authorizationEmailQueued) {
+      self::queueAuthorizationEmail($initiator, $subType, self::$collectionAuthorizedStatus);
+    }
   }
 
   /**
@@ -278,6 +286,8 @@ class CollectionBaseService extends AutoSubscriber {
           ['CRM_Extension_CollectionBaseService', 'processQueuedEmail'],
           [$emailParams],
       ]));
+
+      self::$authorizationEmailQueued = TRUE;
 
     }
     catch (\Exception $ex) {
