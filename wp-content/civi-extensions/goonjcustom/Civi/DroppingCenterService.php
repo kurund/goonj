@@ -58,7 +58,7 @@ class DroppingCenterService extends AutoSubscriber {
 
     // Add the Visit Details tab.
     $tabs['visit details'] = [
-      'title' => ts('visit details'),
+      'title' => ts('Visit Details'),
       'link' => $visitDetails,
       'valid' => 1,
       'active' => 1,
