@@ -270,7 +270,6 @@ class CollectionBaseService extends AutoSubscriber {
    */
   private static function queueAuthorizationEmail($initiatorId, $subType, $status, $collectionCampId) {
     try {
-      \Civi::log()->info('subtype2', ['subtype2'=>$subType, $status]);
       $templateId = self::getMessageTemplateId($subType, $status);
 
       $emailParams = [
@@ -322,45 +321,13 @@ class CollectionBaseService extends AutoSubscriber {
     \Civi::log()->info('Poster details fetched', $collectionCamp);
   
     try {
-      // Retrieve the poster file ID from the collection camp
       $posterFileId = $collectionCamp['Collection_Camp_Core_Details.Poster'];
-      
-      // // If poster file ID exists, fetch the file path and add it as an attachment
-      // $attachments = [];
-      // if (!empty($posterFileId)) {
-      //   $fileDetails = civicrm_api3('File', 'getsingle', [
-      //     'id' => $posterFileId,
-      //   ]);
-  
-      //   // Get the full path of the uploaded file
-      //   $filePath = \Civi::settings()->get('customFileUploadDir') . $fileDetails['uri'];
-      //   $fileName = 'Collection Camp' . $collectionCamp['id'] . '.pdf';
-  
-      //   // Log the full file path and check if the file exists
-      //   \Civi::log()->info('Full file path for poster', ['filePath' => $filePath]);
-        
-      //   if (file_exists($filePath)) {
-      //     \Civi::log()->info('File exists, proceeding to attach it.', ['filePath' => $filePath]);
-          
-      //     // Add file to attachments
-      //     $attachments[] = [
-      //       'uri' => $filePath, // Full path to the file
-      //       'mime_type' => $fileDetails['mime_type'],
-      //       'name' => $fileName,
-      //     ];
-      //   } else {
-      //     \Civi::log()->error('File does not exist at the provided path', ['filePath' => $filePath]);
-      //   }
-      // }
-  
-      // Send the email with the poster as an attachment
       civicrm_api3('Email', 'send', [
         'contact_id' => $emailParams['contact_id'],
         'template_id' => $emailParams['template_id'],
         'file_id' => $posterFileId, // Attach the poster
       ]);
-  
-      // \Civi::log()->info('Successfully sent queued authorization email with poster.', ['params' => $emailParams, 'attachments' => $attachments]);
+
     }
     catch (\Exception $ex) {
       \Civi::log()->error('Failed to process queued authorization email.', ['error' => $ex->getMessage(), 'params' => $emailParams]);
@@ -373,12 +340,12 @@ class CollectionBaseService extends AutoSubscriber {
    *
    */
   public static function getMessageTemplateId($collectionCampSubtype, $status) {
-    \Civi::log()->info('subtype3', ['subtype3'=>$collectionCampSubtype, $status]);
+
     $collectionCampSubtypes = OptionValue::get(FALSE)
       ->addWhere('option_group_id:name', '=', 'eck_sub_types')
       ->addWhere('grouping', '=', 'Collection_Camp')
       ->execute();
-    \Civi::log()->info('collectionCampSubtypes', ['collectionCampSubtypes'=>$collectionCampSubtypes]);
+
     foreach ($collectionCampSubtypes as $subtype) {
       $subtypeValue = $subtype['value'];
       $subtypeName = $subtype['name'];
@@ -389,7 +356,7 @@ class CollectionBaseService extends AutoSubscriber {
     }
 
     $msgTitleStartsWith = $mapper[$collectionCampSubtype][$status] . '%';
-    \Civi::log()->info('msgTitleStartsWith', ['msgTitleStartsWith'=>$msgTitleStartsWith]); 
+
 
     $messageTemplates = MessageTemplate::get(FALSE)
       ->addSelect('id')
@@ -402,30 +369,4 @@ class CollectionBaseService extends AutoSubscriber {
     return $messageTemplate['id'];
   }
 
-  public static function sendEmail(){
-    [$defaultFromName, $defaultFromEmail] = CRM_Core_BAO_Domain::getNameAndEmail();
-    $from = "\"$defaultFromName\" <$defaultFromEmail>";
-    $params = [
-      'from' => $from,
-      'toName' => 'Recipient Name',
-      'toEmail' => 'recipient@example.com',
-      'subject' => 'Test Email with Attachment',
-      'text' => 'This is a plain text version of the email.',
-      'html' => '<p>This is an HTML version of the email.</p>',
-      'attachments' => [
-          [
-              'fullPath' => '/Users/nishant/goonj/goonj/wp-content/uploads/civicrm/custom/sample_518d41e49f177fcdac6cab6c45874b37.pdf',
-              'mime_type' => 'application/pdf',
-              'cleanName' => 'file.pdf',
-          ],
-      ],
-  ];
-
-  $sent = CRM_Utils_Mail::send($params);
-  if ($sent) {
-      echo "Email sent successfully!";
-  } else {
-      echo "Failed to send email.";
-  }
-  }
 }
