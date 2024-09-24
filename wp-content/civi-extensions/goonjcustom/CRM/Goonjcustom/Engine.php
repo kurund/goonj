@@ -30,13 +30,33 @@ class CRM_Goonjcustom_Engine {
     // Loop to process the queue items.
     while (time() < $maxRunTime && $continue) {
       $result = $runner->runNext(FALSE);
+
       if (!$result['is_continue']) {
         $continue = FALSE;
       }
+
       $returnValues[] = $result;
     }
 
     return civicrm_api3_create_success($returnValues, $params, 'SendAuthorizationQueue', 'Run');
+  }
+
+  /**
+   *
+   */
+  public static function processQueuedEmail($queue, $emailParams) {
+    \Civi::log()->debug('processQueuedEmail', [
+      'queue' => $queue,
+      'emailParams' => $emailParams,
+    ]);
+    try {
+      civicrm_api3('Email', 'send', $emailParams);
+
+      \Civi::log()->info('Successfully sent queued authorization email.', ['params' => $emailParams]);
+    }
+    catch (\Exception $ex) {
+      \Civi::log()->error('Failed to process queued authorization email.', ['error' => $ex->getMessage(), 'params' => $emailParams]);
+    }
   }
 
 }
