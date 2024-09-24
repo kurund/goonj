@@ -283,6 +283,7 @@ function civicrm_api3_email_send($params) {
     $mailParams['emailActivityID'] = $activity['id'] ?? NULL;
 
     // Try to send the email.
+
     $result = CRM_Utils_Mail::send($mailParams);
     if (!$result) {
       throw new API_Exception('Error sending email to ' . $contact['display_name'] . ' <' . $toEmail . '> ');

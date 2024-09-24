@@ -312,27 +312,62 @@ class CollectionBaseService extends AutoSubscriber {
    */
   public static function processQueuedEmail($queue, $emailParams) {
     $campId = $emailParams['collectionCampId'];
-
+  
+    // Fetch the collection camp details, including the poster ID
     $collectionCamp = EckEntity::get('Collection_Camp', FALSE)
-    ->addSelect('Collection_Camp_Core_Details.Poster')
-    ->addWhere('id', '=', $campId)
-    ->execute()->single();
-
-    \Civi::log()->info('poster', $collectionCamp);
-
-
+      ->addSelect('Collection_Camp_Core_Details.Poster')
+      ->addWhere('id', '=', $campId)
+      ->execute()->single();
+  
+    \Civi::log()->info('Poster details fetched', $collectionCamp);
+  
     try {
-      civicrm_api3('Email', 'send',[
+      // Retrieve the poster file ID from the collection camp
+      $posterFileId = $collectionCamp['Collection_Camp_Core_Details.Poster'];
+      
+      // If poster file ID exists, fetch the file path and add it as an attachment
+      $attachments = [];
+      if (!empty($posterFileId)) {
+        $fileDetails = civicrm_api3('File', 'getsingle', [
+          'id' => $posterFileId,
+        ]);
+  
+        // Get the full path of the uploaded file
+        $filePath = \Civi::settings()->get('customFileUploadDir') . $fileDetails['uri'];
+        $fileName = 'Collection Camp' . $collectionCamp['id'] . '.pdf';
+  
+        // Log the full file path and check if the file exists
+        \Civi::log()->info('Full file path for poster', ['filePath' => $filePath]);
+        
+        if (file_exists($filePath)) {
+          \Civi::log()->info('File exists, proceeding to attach it.', ['filePath' => $filePath]);
+          
+          // Add file to attachments
+          $attachments[] = [
+            'uri' => $filePath, // Full path to the file
+            'mime_type' => $fileDetails['mime_type'],
+            'name' => $fileName,
+          ];
+        } else {
+          \Civi::log()->error('File does not exist at the provided path', ['filePath' => $filePath]);
+        }
+      }
+  
+      // Send the email with the poster as an attachment
+      civicrm_api3('Email', 'send', [
         'contact_id' => $emailParams['contact_id'],
         'template_id' => $emailParams['template_id'],
+        'attachments' => $attachments, // Attach the poster
       ]);
-
-      \Civi::log()->info('Successfully sent queued authorization email.', ['params' => $emailParams]);
+  
+      \Civi::log()->info('Successfully sent queued authorization email with poster.', ['params' => $emailParams, 'attachments' => $attachments]);
     }
     catch (\Exception $ex) {
       \Civi::log()->error('Failed to process queued authorization email.', ['error' => $ex->getMessage(), 'params' => $emailParams]);
     }
   }
+  
+  
 
   /**
    *
