@@ -83,7 +83,6 @@ class CollectionCampService extends AutoSubscriber {
       "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fadmin-camp-outcome-form",
     );
 
-
     // Add the Logistics tab.
     $tabs['logistics'] = [
       'title' => ts('Logistics'),
