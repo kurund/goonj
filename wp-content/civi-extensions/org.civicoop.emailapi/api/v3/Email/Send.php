@@ -1,18 +1,11 @@
 <?php
 
 /**
- * @file
- */
-
-/**
  * Email.Send API specification (optional)
  * This is used for documentation and validation.
  *
- * @param array $spec
- *   description of fields supported by this API call.
- *
+ * @param array $spec description of fields supported by this API call
  * @return void
- *
  * @see http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
  */
 function _civicrm_api3_email_send_spec(&$spec) {
@@ -66,7 +59,7 @@ function _civicrm_api3_email_send_spec(&$spec) {
     'type' => CRM_Utils_Type::T_TEXT,
   ];
 
-  // Copy from MessageTemplate.send API.
+  // Copy from MessageTemplate.send API
   $spec['disable_smarty'] = [
     'description' => 'Disable Smarty. Normal CiviMail tokens are still supported. By default Smarty is enabled if configured by CIVICRM_MAIL_SMARTY.',
     'title' => 'Disable Smarty',
@@ -97,19 +90,15 @@ function _civicrm_api3_email_send_spec(&$spec) {
     'title' => 'From Email Address Option value',
     'type' => CRM_Utils_Type::T_INT,
   ];
-  $spec['file_id'] = [
-    'title' => 'File Id',
-    'type' => CRM_Utils_Type::T_INT,
-  ];
+
 }
 
 /**
- * Email.Send API.
+ * Email.Send API
  *
  * @param array $params
  *
  * @return array API result descriptor
- *
  * @throws \API_Exception
  * @throws \CRM_Core_Exception
  * @throws \CiviCRM_API3_Exception
@@ -203,30 +192,7 @@ function civicrm_api3_email_send($params) {
     $message_params['contact_id'] = $contactId;
     list('messageSubject' => $messageSubject, 'html' => $html, 'text' => $text) = CRM_Emailapi_Utils_Tokens::replaceTokens($contactId, $message, $message_params);
 
-    $attachments = [];
-
-    if (!empty($params['file_id'])) {
-      $file = civicrm_api3('File', 'getsingle', ['id' => $params['file_id']]);
-      if (!empty($file['uri'])) {
-        // Specify the path based on the file URI received
-        // Get the uploads directory.
-        $upload_dir = wp_upload_dir();
-
-        // Construct the full path to the file.
-        $fullPath = $upload_dir['basedir'] . '/civicrm/custom/' . $file['uri'];
-
-        // Add the attachment to the array.
-        $attachments[] = [
-          'fullPath' => $fullPath,
-        // Adjust MIME type based on your file type.
-          'mime_type' => 'application/pdf',
-        // Extract the file name from the full path.
-          'cleanName' => basename($fullPath),
-        ];
-      }
-    }
-
-    // Set up the parameters for CRM_Utils_Mail::send.
+    // set up the parameters for CRM_Utils_Mail::send
     $mailParams = [
       'groupName' => 'Email from API',
       'from' => $from,
@@ -237,7 +203,7 @@ function civicrm_api3_email_send($params) {
       'contactId' => $contactId,
     ];
 
-    // Render the &amp; entities in text mode, so that the links work.
+    // render the &amp; entities in text mode, so that the links work
     $mailParams['text'] = str_replace('&amp;', '&', $text);
     $mailParams['html'] = $html;
     if (!empty($params['cc'])) {
@@ -249,7 +215,7 @@ function civicrm_api3_email_send($params) {
 
     // We are ready to send. Record that we are going to try to send the email.
     if ($params['create_activity']) {
-      // Create activity for sending email.
+      //create activity for sending email.
       $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Email');
 
       switch ($params['activity_details']) {
@@ -315,7 +281,7 @@ function civicrm_api3_email_send($params) {
 
     // Set the ID of the email activity (if we created one)
     $mailParams['emailActivityID'] = $activity['id'] ?? NULL;
-    $mailParams['attachments'] = $attachments;
+
     // Try to send the email.
     $result = CRM_Utils_Mail::send($mailParams);
     if (!$result) {
