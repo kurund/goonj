@@ -17,7 +17,6 @@ class CollectionBaseService extends AutoSubscriber {
 
   const ENTITY_NAME = 'Collection_Camp';
   const INTENT_CUSTOM_GROUP_NAME = 'Collection_Camp_Intent_Details';
-  const ENTITY_SUBTYPE_NAME = 'Collection_Camp';
 
   private static $stateCustomFieldDbDetails = [];
 
@@ -36,28 +35,13 @@ class CollectionBaseService extends AutoSubscriber {
    *
    */
   public static function collectionBaseTabset($tabsetName, &$tabs, $context) {
-    if (!self::isViewingCollectionCamp($tabsetName, $context)) {
+    if ($tabsetName !== 'civicrm/eck/entity' || empty($context) || $context['entity_type']['name'] !== self::ENTITY_NAME) {
       return;
     }
 
     // URL for the Contribution tab.
     $contributionUrl = \CRM_Utils_System::url(
           "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fcollection-camp%2Fmaterial-contributions",
-    );
-
-    // URL for the Logistics tab.
-    $logisticsUrl = \CRM_Utils_System::url(
-      "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Flogistics-coordination#",
-    );
-
-    // URL for the Dispatch tab.
-    $vehicleDispatch = \CRM_Utils_System::url(
-      "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fcamp-vehicle-dispatch-data",
-    );
-
-    // URL for the camp outcome tab.
-    $campOutcome = \CRM_Utils_System::url(
-      "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fadmin-camp-outcome-form",
     );
 
     // URL for the event volunteer tab.
@@ -83,71 +67,6 @@ class CollectionBaseService extends AutoSubscriber {
       'current' => FALSE,
     ];
 
-    // Add the Logistics tab.
-    $tabs['logistics'] = [
-      'title' => ts('Logistics'),
-      'link' => $logisticsUrl,
-      'valid' => 1,
-      'active' => 1,
-      'current' => FALSE,
-    ];
-
-    // Add the vehicle dispatch tab.
-    $tabs['vehicleDispatch'] = [
-      'title' => ts('Dispatch'),
-      'link' => $vehicleDispatch,
-      'valid' => 1,
-      'active' => 1,
-      'current' => FALSE,
-    ];
-
-    // Add the camp outcome tab.
-    $tabs['campOutcome'] = [
-      'title' => ts('Camp Outcome'),
-      'link' => $campOutcome,
-      'valid' => 1,
-      'active' => 1,
-      'current' => FALSE,
-    ];
-  }
-
-  /**
-   *
-   */
-  private static function isViewingCollectionCamp($tabsetName, $context) {
-    if ($tabsetName !== 'civicrm/eck/entity' || empty($context) || $context['entity_type']['name'] !== self::ENTITY_NAME) {
-      return FALSE;
-    }
-
-    $entityId = $context['entity_id'];
-
-    $entityResults = EckEntity::get(self::ENTITY_NAME, TRUE)
-      ->addWhere('id', '=', $entityId)
-      ->execute();
-
-    $entity = $entityResults->first();
-
-    $entitySubtypeValue = $entity['subtype'];
-
-    $subtypeResults = OptionValue::get(TRUE)
-      ->addSelect('name')
-      ->addWhere('grouping', '=', self::ENTITY_NAME)
-      ->addWhere('value', '=', $entitySubtypeValue)
-      ->execute();
-
-    $subtype = $subtypeResults->first();
-
-    if (!$subtype) {
-      return FALSE;
-    }
-
-    $subtypeName = $subtype['name'];
-
-    if ($subtypeName !== self::ENTITY_SUBTYPE_NAME) {
-      return FALSE;
-    }
-
-    return TRUE;
   }
 
   /**
