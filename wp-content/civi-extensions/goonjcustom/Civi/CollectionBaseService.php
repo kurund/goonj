@@ -19,6 +19,7 @@ class CollectionBaseService extends AutoSubscriber {
   const INTENT_CUSTOM_GROUP_NAME = 'Collection_Camp_Intent_Details';
 
   private static $stateCustomFieldDbDetails = [];
+  private static $collectionAuthorized = NULL;
 
   /**
    *
@@ -28,6 +29,7 @@ class CollectionBaseService extends AutoSubscriber {
       '&hook_civicrm_tabset' => 'collectionBaseTabset',
       '&hook_civicrm_selectWhereClause' => 'aclCollectionCamp',
       '&hook_civicrm_pre' => 'handleAuthorizationEmails',
+      '&hook_civicrm_post' => 'handleAuthorizationEmailsPost',
     ];
   }
 
@@ -229,8 +231,22 @@ class CollectionBaseService extends AutoSubscriber {
 
     // Check for status change.
     if ($currentStatus !== $newStatus) {
-      self::sendAuthorizationEmail($initiatorId, $objectRef, $newStatus);
+      self::$collectionAuthorized = $objectId;
     }
+  }
+
+  /**
+   *
+   */
+  public static function handleAuthorizationEmailsPost(string $op, string $objectName, $objectId, &$objectRef) {
+    if ($objectName != 'Eck_Collection_Camp' || !$objectId || $objectId !== self::$collectionAuthorized) {
+      return;
+    }
+
+    $status = $objectRef['Collection_Camp_Core_Details.Status'];
+    $initiator = $objectRef['Collection_Camp_Core_Details.Contact_Id'];
+
+    self::sendAuthorizationEmail($initiator, $objectRef, $newStatus);
   }
 
   /**
