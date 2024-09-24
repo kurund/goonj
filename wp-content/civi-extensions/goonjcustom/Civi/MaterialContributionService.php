@@ -20,7 +20,7 @@ class MaterialContributionService extends AutoSubscriber {
         ->addWhere('name', '=', 'Material_Contribution_Receipt')
         ->execute()->single();
           
-      return (int) $materialContributionReceiptReminder['id'];
+      return $materialContributionReceiptReminder['id'];
     } catch (\Exception $e) {
       \CRM_Core_Error::debug_log_message('Error fetching Contribution Receipt Reminder ID: ' . $e->getMessage());
       return NULL;
