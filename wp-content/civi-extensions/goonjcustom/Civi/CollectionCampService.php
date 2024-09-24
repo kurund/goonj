@@ -26,6 +26,8 @@ class CollectionCampService extends AutoSubscriber {
   const FALLBACK_OFFICE_NAME = 'Delhi';
   const RELATIONSHIP_TYPE_NAME = 'Collection Camp Coordinator of';
   const COLLECTION_CAMP_INTENT_FB_NAME = 'afformCollectionCampIntentDetails';
+  const ENTITY_NAME = 'Collection_Camp';
+  const ENTITY_SUBTYPE_NAME = 'Collection_Camp';
 
   private static $individualId = NULL;
   private static $collectionCampAddress = NULL;
@@ -54,7 +56,98 @@ class CollectionCampService extends AutoSubscriber {
         ['setCollectionCampAddress', 9],
         ['setEventVolunteersAddress', 8],
       ],
+      '&hook_civicrm_tabset' => 'collectionCampTabset',
     ];
+  }
+
+  /**
+   *
+   */
+  public static function collectionCampTabset($tabsetName, &$tabs, $context) {
+    if (!self::isViewingCollectionCamp($tabsetName, $context)) {
+      return;
+    }
+
+    // URL for the Logistics tab.
+    $logisticsUrl = \CRM_Utils_System::url(
+      "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Flogistics-coordination#",
+    );
+
+    // URL for the Dispatch tab.
+    $vehicleDispatch = \CRM_Utils_System::url(
+      "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fcamp-vehicle-dispatch-data",
+    );
+
+    // URL for the camp outcome tab.
+    $campOutcome = \CRM_Utils_System::url(
+      "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fadmin-camp-outcome-form",
+    );
+
+    // Add the Logistics tab.
+    $tabs['logistics'] = [
+      'title' => ts('Logistics'),
+      'link' => $logisticsUrl,
+      'valid' => 1,
+      'active' => 1,
+      'current' => FALSE,
+    ];
+
+    // Add the vehicle dispatch tab.
+    $tabs['vehicleDispatch'] = [
+      'title' => ts('Dispatch'),
+      'link' => $vehicleDispatch,
+      'valid' => 1,
+      'active' => 1,
+      'current' => FALSE,
+    ];
+
+    // Add the camp outcome tab.
+    $tabs['campOutcome'] = [
+      'title' => ts('Camp Outcome'),
+      'link' => $campOutcome,
+      'valid' => 1,
+      'active' => 1,
+      'current' => FALSE,
+    ];
+  }
+
+  /**
+   *
+   */
+  private static function isViewingCollectionCamp($tabsetName, $context) {
+    if ($tabsetName !== 'civicrm/eck/entity' || empty($context) || $context['entity_type']['name'] !== self::ENTITY_NAME) {
+      return FALSE;
+    }
+
+    $entityId = $context['entity_id'];
+
+    $entityResults = EckEntity::get(self::ENTITY_NAME, TRUE)
+      ->addWhere('id', '=', $entityId)
+      ->execute();
+
+    $entity = $entityResults->first();
+
+    $entitySubtypeValue = $entity['subtype'];
+
+    $subtypeResults = OptionValue::get(TRUE)
+      ->addSelect('name')
+      ->addWhere('grouping', '=', self::ENTITY_NAME)
+      ->addWhere('value', '=', $entitySubtypeValue)
+      ->execute();
+
+    $subtype = $subtypeResults->first();
+
+    if (!$subtype) {
+      return FALSE;
+    }
+
+    $subtypeName = $subtype['name'];
+
+    if ($subtypeName !== self::ENTITY_SUBTYPE_NAME) {
+      return FALSE;
+    }
+
+    return TRUE;
   }
 
   /**
