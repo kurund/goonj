@@ -217,26 +217,25 @@ class CollectionBaseService extends AutoSubscriber {
       ->execute()->single();
 
     $initiator = $collectionCamp['Collection_Camp_Core_Details.Contact_Id'];
-    $subType = $collectionCamp['subtype'];
+    $subtype = $collectionCamp['subtype'];
 
-    $collectionCampId = $collectionCamp['id'];
+    $collectionSourceId = $collectionCamp['id'];
 
     if (!self::$authorizationEmailQueued) {
-      self::queueAuthorizationEmail($initiator, $subType, self::$collectionAuthorizedStatus, $collectionCampId);
+      self::queueAuthorizationEmail($initiator, $subtype, self::$collectionAuthorizedStatus, $collectionSourceId);
     }
   }
 
   /**
    * Send Authorization Email to contact.
    */
-  private static function queueAuthorizationEmail($initiatorId, $subType, $status, $collectionCampId) {
+  private static function queueAuthorizationEmail($initiatorId, $subtype, $status, $collectionSourceId) {
     try {
-      $templateId = self::getMessageTemplateId($subType, $status);
-
       $params = [
-        'contact_id' => $initiatorId,
-        'template_id' => $templateId,
-        'collectionCampId' => $collectionCampId,
+        'initiatorId' => $initiatorId,
+        'subtype' => $subtype,
+        'status' => $status,
+        'collectionSourceId' => $collectionSourceId,
       ];
 
       $queue = \Civi::queue(\CRM_Goonjcustom_Engine::QUEUE_NAME, [
@@ -269,49 +268,8 @@ class CollectionBaseService extends AutoSubscriber {
    *
    */
   public static function processQueuedEmail($queue, $params) {
-    $collectionSourceId = $params['collectionCampId'];
-    $contactId = $params['contact_id'];
-    $templateId = $params['template_id'];
-
     try {
-      $collectionSource = EckEntity::get('Collection_Camp', FALSE)
-        ->addSelect('Collection_Camp_Core_Details.Poster')
-        ->addWhere('id', '=', $collectionSourceId)
-        ->execute()->single();
-
-      $posterFileId = $collectionSource['Collection_Camp_Core_Details.Poster'];
-
-      $file = File::get(FALSE)
-        ->addWhere('id', '=', $posterFileId)
-        ->execute()->single();
-
-      $toEmail = Email::get(FALSE)
-        ->addWhere('contact_id', '=', $contactId)
-        ->addWhere('is_primary', '=', TRUE)
-        ->execute()->single();
-
-      $fromEmail = OptionValue::get(TRUE)
-        ->addSelect('label')
-        ->addWhere('option_group_id:name', '=', 'from_email_address')
-        ->addWhere('is_default', '=', TRUE)
-        ->execute()->single();
-
-      $config = \CRM_Core_Config::singleton();
-      $filePath = $config->customFileUploadDir . $file['uri'];
-
-      $emailParams = [
-        'contact_id' => $contactId,
-        'to_email' => $toEmail['email'],
-        'from' => $fromEmail['label'],
-        'id' => $templateId,
-        'attachments' => [
-          [
-            'fullPath' => $filePath,
-            'mime_type' => $file['mime_type'],
-            'cleanName' => $file['uri'],
-          ],
-        ],
-      ];
+      $emailParams = self::getAuthorizationEmailParams($params);
 
       civicrm_api3('MessageTemplate', 'send', $emailParams);
     }
@@ -323,7 +281,12 @@ class CollectionBaseService extends AutoSubscriber {
   /**
    *
    */
-  public static function getMessageTemplateId($collectionCampSubtype, $status) {
+  private static function getAuthorizationEmailParams($params) {
+    $collectionSourceId = $params['collectionSourceId'];
+    $collectionSourceType = $params['subtype'];
+    $status = $params['status'];
+    $initiatorId = $params['initiatorId'];
+
     $collectionCampSubtypes = OptionValue::get(FALSE)
       ->addWhere('option_group_id:name', '=', 'eck_sub_types')
       ->addWhere('grouping', '=', 'Collection_Camp')
@@ -337,7 +300,7 @@ class CollectionBaseService extends AutoSubscriber {
       $mapper[$subtypeValue]['unauthorized'] = $subtypeName . ' unauthorized';
     }
 
-    $msgTitleStartsWith = $mapper[$collectionCampSubtype][$status] . '%';
+    $msgTitleStartsWith = $mapper[$collectionSourceType][$status] . '%';
 
     $messageTemplates = MessageTemplate::get(FALSE)
       ->addSelect('id')
@@ -346,8 +309,48 @@ class CollectionBaseService extends AutoSubscriber {
       ->execute();
 
     $messageTemplate = $messageTemplates->first();
+    $messageTemplateId = $messageTemplate['id'];
 
-    return $messageTemplate['id'];
+    $toEmail = Email::get(FALSE)
+      ->addWhere('contact_id', '=', $initiatorId)
+      ->addWhere('is_primary', '=', TRUE)
+      ->execute()->single();
+
+    $fromEmail = OptionValue::get(FALSE)
+      ->addSelect('label')
+      ->addWhere('option_group_id:name', '=', 'from_email_address')
+      ->addWhere('is_default', '=', TRUE)
+      ->execute()->single();
+
+    $emailParams = [
+      'contact_id' => $initiatorId,
+      'to_email' => $toEmail['email'],
+      'from' => $fromEmail['label'],
+      'id' => $messageTemplateId,
+    ];
+
+    if ($status === 'authorized') {
+      $collectionSource = EckEntity::get('Collection_Camp', FALSE)
+        ->addSelect('Collection_Camp_Core_Details.Poster')
+        ->addWhere('id', '=', $collectionSourceId)
+        ->execute()->single();
+
+      $posterFileId = $collectionSource['Collection_Camp_Core_Details.Poster'];
+
+      $file = File::get(FALSE)
+        ->addWhere('id', '=', $posterFileId)
+        ->execute()->single();
+
+      $config = \CRM_Core_Config::singleton();
+      $filePath = $config->customFileUploadDir . $file['uri'];
+      $emailParams['attachments'][] = [
+        'fullPath' => $filePath,
+        'mime_type' => $file['mime_type'],
+        'cleanName' => $file['uri'],
+      ];
+    }
+
+    return $emailParams;
   }
 
 }

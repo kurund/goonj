@@ -2,6 +2,7 @@
 
 namespace Civi;
 
+use Civi\Api4\ActionSchedule;
 use Civi\Api4\Activity;
 use Civi\Core\Service\AutoSubscriber;
 
@@ -16,12 +17,13 @@ class MaterialContributionService extends AutoSubscriber {
    */
   public static function getContributionReceiptReminderId() {
     try {
-      $materialContributionReceiptReminder = \Civi\Api4\ActionSchedule::get(TRUE)
+      $materialContributionReceiptReminder = ActionSchedule::get(TRUE)
         ->addWhere('name', '=', 'Material_Contribution_Receipt')
         ->execute()->single();
-          
+
       return $materialContributionReceiptReminder['id'];
-    } catch (\Exception $e) {
+    }
+    catch (\Exception $e) {
       \CRM_Core_Error::debug_log_message('Error fetching Contribution Receipt Reminder ID: ' . $e->getMessage());
       return NULL;
     }
