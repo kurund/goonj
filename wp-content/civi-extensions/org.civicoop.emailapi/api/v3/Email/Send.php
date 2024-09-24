@@ -130,7 +130,7 @@ function civicrm_api3_email_send($params) {
   $messageTemplates = new CRM_Core_DAO_MessageTemplate();
   $messageTemplates->id = $params['template_id'];
 
-  [$defaultFromName, $defaultFromEmail] = CRM_Core_BAO_Domain::getNameAndEmail();
+  list($defaultFromName, $defaultFromEmail) = CRM_Core_BAO_Domain::getNameAndEmail();
   $from = "\"$defaultFromName\" <$defaultFromEmail>";
   if (!empty($params['from_email']) && !empty($params['from_name'])) {
     // If both an email and a name are provided, use those as the from header.
@@ -201,7 +201,7 @@ function civicrm_api3_email_send($params) {
     $message['html'] = $messageTemplates->msg_html;
     $message_params = $params;
     $message_params['contact_id'] = $contactId;
-    ['messageSubject' => $messageSubject, 'html' => $html, 'text' => $text] = CRM_Emailapi_Utils_Tokens::replaceTokens($contactId, $message, $message_params);
+    list('messageSubject' => $messageSubject, 'html' => $html, 'text' => $text) = CRM_Emailapi_Utils_Tokens::replaceTokens($contactId, $message, $message_params);
 
     $attachments = [];
 
