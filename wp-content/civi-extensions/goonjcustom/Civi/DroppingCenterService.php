@@ -35,10 +35,49 @@ class DroppingCenterService extends AutoSubscriber {
       "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fdropping_center-status",
     );
 
+    $status = \CRM_Utils_System::url(
+      "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fvisit-details%2Fcreate",
+    );
+
+    $donationTrackingUrl = \CRM_Utils_System::url(
+      "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fdonation-box-list",
+    );
+
+    $logisticsCoordinationUrl = \CRM_Utils_System::url(
+      "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fdropping-center%2Flogistics-coordination",
+    );
+
     // Add the Status tab.
     $tabs['status'] = [
       'title' => ts('Status'),
       'link' => $status,
+      'valid' => 1,
+      'active' => 1,
+      'current' => FALSE,
+    ];
+
+    // Add the Visit Details tab.
+    $tabs['visit details'] = [
+      'title' => ts('visit details'),
+      'link' => $visitDetails,
+      'valid' => 1,
+      'active' => 1,
+      'current' => FALSE,
+    ];
+
+     // Add the Donation Box/Register Tracking tab.
+    $tabs['donation tracking'] = [
+      'title' => ts('Donation Tracking'),
+      'link' => $donationTrackingUrl,
+      'valid' => 1,
+      'active' => 1,
+      'current' => FALSE,
+    ];
+
+    // Add the Logistics Coordination tab.
+    $tabs['logistics coordination'] = [
+      'title' => ts('Logistics Coordination'),
+      'link' => $logisticsCoordinationUrl,
       'valid' => 1,
       'active' => 1,
       'current' => FALSE,
