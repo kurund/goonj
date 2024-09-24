@@ -252,7 +252,7 @@ class CollectionBaseService extends AutoSubscriber {
     $initiator = $collectionCamp['Collection_Camp_Core_Details.Contact_Id'];
     $subType = $collectionCamp['subtype'];
 
-    self::queueAuthorizationEmail($initiator, $subType, $newStatus);
+    self::queueAuthorizationEmail($initiator, $subType, $status);
   }
 
   /**
@@ -267,20 +267,16 @@ class CollectionBaseService extends AutoSubscriber {
         'template_id' => $templateId,
       ];
 
-      $queueParams = [
-        'api' => 'Email.send',
-        'parameters' => $emailParams,
-        'trigger_action' => 'collection_camp_authorization_status_change_notification',
-        'recipient_id' => $initiatorId,
-      ];
-
-      civicrm_api3('Job', 'create', [
-        'name' => 'Send authorization email',
-        'api_entity' => 'Email',
-        'api_action' => 'send',
-        'params' => json_encode($emailParams),
-        'run_frequency' => 'Always',
+      // Create or retrieve the queue (no need to check if it already exists)
+      $queue = \CRM_Queue_Service::singleton()->create([
+        'name' => 'send_authorization_email_queue',
+        'type' => 'Sql',
       ]);
+
+      $queue->createItem(new \CRM_Queue_Task([
+          ['CRM_Extension_CollectionBaseService', 'processQueuedEmail'],
+          [$emailParams],
+      ]));
 
     }
     catch (\Exception $ex) {
@@ -290,6 +286,20 @@ class CollectionBaseService extends AutoSubscriber {
         'entityId' => $objectRef['id'],
         'error' => $ex->getMessage(),
       ]);
+    }
+  }
+
+  /**
+   *
+   */
+  public static function processQueuedEmail($queue, $emailParams) {
+    try {
+      civicrm_api3('Email', 'send', $emailParams);
+
+      \Civi::log()->info('Successfully sent queued authorization email.', ['params' => $emailParams]);
+    }
+    catch (\Exception $ex) {
+      \Civi::log()->error('Failed to process queued authorization email.', ['error' => $ex->getMessage(), 'params' => $emailParams]);
     }
   }
 
