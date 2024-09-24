@@ -260,7 +260,7 @@ class CollectionBaseService extends AutoSubscriber {
    */
   private static function sendAuthorizationEmail($initiatorId, $subType, $status) {
     try {
-      $templateId = self::getMessageTemplateId($subtype, $status);
+      $templateId = self::getMessageTemplateId($subType, $status);
 
       $emailParams = [
         'contact_id' => $initiatorId,
