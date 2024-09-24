@@ -251,8 +251,8 @@ class CollectionBaseService extends AutoSubscriber {
       $status = $collectionCamp['Collection_Camp_Core_Details.Status'];
       $initiator = $collectionCamp['Collection_Camp_Core_Details.Contact_Id'];
       $subType = $collectionCamp['subtype'];
-
-      self::sendAuthorizationEmail($initiator, $subType, $newStatus);
+      \Civi::log()->info('subtype', ['subtype'=>$subType]);
+      self::sendAuthorizationEmail($initiator, $subType, $status);
   }
 
   /**
@@ -260,6 +260,7 @@ class CollectionBaseService extends AutoSubscriber {
    */
   private static function sendAuthorizationEmail($initiatorId, $subType, $status) {
     try {
+      \Civi::log()->info('subtype2', ['subtype2'=>$subType, $status]);
       $templateId = self::getMessageTemplateId($subType, $status);
 
       $emailParams = [
@@ -284,20 +285,23 @@ class CollectionBaseService extends AutoSubscriber {
    *
    */
   public static function getMessageTemplateId($collectionCampSubtype, $status) {
+    \Civi::log()->info('subtype3', ['subtype3'=>$collectionCampSubtype, $status]);
     $collectionCampSubtypes = OptionValue::get(FALSE)
       ->addWhere('option_group_id:name', '=', 'eck_sub_types')
       ->addWhere('grouping', '=', 'Collection_Camp')
       ->execute();
-
+    \Civi::log()->info('collectionCampSubtypes', ['collectionCampSubtypes'=>$collectionCampSubtypes]);
     foreach ($collectionCampSubtypes as $subtype) {
       $subtypeValue = $subtype['value'];
       $subtypeName = $subtype['name'];
 
       $mapper[$subtypeValue]['authorized'] = $subtypeName . ' authorized';
       $mapper[$subtypeValue]['unauthorized'] = $subtypeName . ' unauthorized';
+      \Civi::log()->info('mapper', ['mapper'=>$mapper]);    
     }
 
     $msgTitleStartsWith = $mapper[$collectionCampSubtype][$status] . '%';
+    \Civi::log()->info('msgTitleStartsWith', ['msgTitleStartsWith'=>$msgTitleStartsWith]); 
 
     $messageTemplates = MessageTemplate::get(FALSE)
       ->addSelect('id')
