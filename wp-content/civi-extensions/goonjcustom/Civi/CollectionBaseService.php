@@ -242,23 +242,23 @@ class CollectionBaseService extends AutoSubscriber {
     if ($objectName != 'Eck_Collection_Camp' || !$objectId || $objectId !== self::$collectionAuthorized) {
       return;
     }
-   
+
     $collectionCamp = EckEntity::get('Collection_Camp', FALSE)
       ->addSelect('Collection_Camp_Core_Details.Status', 'Collection_Camp_Core_Details.Contact_Id', 'subtype')
       ->addWhere('id', '=', $objectRef->id)
       ->execute()->single();
 
-      $status = $collectionCamp['Collection_Camp_Core_Details.Status'];
-      $initiator = $collectionCamp['Collection_Camp_Core_Details.Contact_Id'];
-      $subType = $collectionCamp['subtype'];
-      \Civi::log()->info('subtype', ['subtype'=>$subType]);
-      self::sendAuthorizationEmail($initiator, $subType, $status);
+    $status = $collectionCamp['Collection_Camp_Core_Details.Status'];
+    $initiator = $collectionCamp['Collection_Camp_Core_Details.Contact_Id'];
+    $subType = $collectionCamp['subtype'];
+
+    self::queueAuthorizationEmail($initiator, $subType, $status);
   }
 
   /**
    * Send Authorization Email to contact.
    */
-  private static function sendAuthorizationEmail($initiatorId, $subType, $status) {
+  private static function queueAuthorizationEmail($initiatorId, $subType, $status) {
     try {
       \Civi::log()->info('subtype2', ['subtype2'=>$subType, $status]);
       $templateId = self::getMessageTemplateId($subType, $status);
@@ -268,16 +268,39 @@ class CollectionBaseService extends AutoSubscriber {
         'template_id' => $templateId,
       ];
 
-      $result = civicrm_api3('Email', 'send', $emailParams);
+      // Create or retrieve the queue (no need to check if it already exists)
+      $queue = \CRM_Queue_Service::singleton()->create([
+        'name' => 'send_authorization_email_queue',
+        'type' => 'Sql',
+      ]);
+
+      $queue->createItem(new \CRM_Queue_Task([
+          ['CRM_Extension_CollectionBaseService', 'processQueuedEmail'],
+          [$emailParams],
+      ]));
 
     }
     catch (\Exception $ex) {
-      \Civi::log()->debug('Cannot send authorization email to initiator.', [
+      \Civi::log()->debug('Cannot queue authorization email for initiator.', [
         'initiatorId' => $initiatorId,
         'status' => $status,
         'entityId' => $objectRef['id'],
         'error' => $ex->getMessage(),
       ]);
+    }
+  }
+
+  /**
+   *
+   */
+  public static function processQueuedEmail($queue, $emailParams) {
+    try {
+      civicrm_api3('Email', 'send', $emailParams);
+
+      \Civi::log()->info('Successfully sent queued authorization email.', ['params' => $emailParams]);
+    }
+    catch (\Exception $ex) {
+      \Civi::log()->error('Failed to process queued authorization email.', ['error' => $ex->getMessage(), 'params' => $emailParams]);
     }
   }
 
