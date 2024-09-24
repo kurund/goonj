@@ -82,7 +82,7 @@ function civicrm_api3_goonjcustom_collection_camp_cron($params) {
       ->addWhere('id', '=', $collectionCampContactId)
       ->execute()->single();
 
-    $organisingContactName = $contactData['display_name'];
+    $organizingContactName = $contactData['display_name'];
 
     $email = Email::get(TRUE)
       ->addWhere('contact_id', '=', $recipientId)
@@ -103,7 +103,7 @@ function civicrm_api3_goonjcustom_collection_camp_cron($params) {
         'from' => 'urban.ops@goonj.org',
         'toEmail' => $contactEmailId,
         'replyTo' => 'urban.ops@goonj.org',
-        'html' => goonjcustom_collection_camp_volunteer_feedback_email_html($organisingContactName, $collectionCampId),
+        'html' => goonjcustom_collection_camp_volunteer_feedback_email_html($organizingContactName, $collectionCampId),
         // 'messageTemplateID' => 76, // Uncomment if using a message template
       ];
       $result = CRM_Utils_Mail::send($mailParams);
@@ -148,12 +148,12 @@ function goonjcustom_collection_camp_email_html($contactName, $collectionCampId,
 /**
  *
  */
-function goonjcustom_collection_camp_volunteer_feedback_email_html($organisingContactName, $collectionCampId) {
+function goonjcustom_collection_camp_volunteer_feedback_email_html($organizingContactName, $collectionCampId) {
   $homeUrl = get_home_url();
   // URL for the volunteer feedback form.
   $campVolunteerFeedback = $homeUrl . '/volunteer-camp-feedback/#?Eck_Collection_Camp1=' . $collectionCampId;
   $html = "
-      <p>Dear $organisingContactName,</p>
+      <p>Dear $organizingContactName,</p>
       <p>Thank you for successfully completing your Collection Camp.</p>
       <p>We would appreciate your feedback. Please use the link below to fill out the Volunteer Camp Feedback Form:</p>
       <ul>
