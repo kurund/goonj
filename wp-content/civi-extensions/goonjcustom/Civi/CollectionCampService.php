@@ -56,14 +56,14 @@ class CollectionCampService extends AutoSubscriber {
         ['setCollectionCampAddress', 9],
         ['setEventVolunteersAddress', 8],
       ],
-      '&hook_civicrm_tabset' => 'collectionBaseTabset',
+      '&hook_civicrm_tabset' => 'collectionCampTabset',
     ];
   }
 
   /**
    *
    */
-  public static function collectionBaseTabset($tabsetName, &$tabs, $context) {
+  public static function collectionCampTabset($tabsetName, &$tabs, $context) {
     if (!self::isViewingCollectionCamp($tabsetName, $context)) {
       return;
     }
