@@ -4,6 +4,8 @@ namespace Civi;
 
 use Civi\Api4\CustomField;
 use Civi\Api4\EckEntity;
+use Civi\Api4\Email;
+use Civi\Api4\File;
 use Civi\Api4\Group;
 use Civi\Api4\GroupContact;
 use Civi\Api4\MessageTemplate;
@@ -19,6 +21,9 @@ class CollectionBaseService extends AutoSubscriber {
   const INTENT_CUSTOM_GROUP_NAME = 'Collection_Camp_Intent_Details';
 
   private static $stateCustomFieldDbDetails = [];
+  private static $collectionAuthorized = NULL;
+  private static $collectionAuthorizedStatus = NULL;
+  private static $authorizationEmailQueued = NULL;
 
   /**
    *
@@ -28,6 +33,7 @@ class CollectionBaseService extends AutoSubscriber {
       '&hook_civicrm_tabset' => 'collectionBaseTabset',
       '&hook_civicrm_selectWhereClause' => 'aclCollectionCamp',
       '&hook_civicrm_pre' => 'handleAuthorizationEmails',
+      '&hook_civicrm_post' => 'handleAuthorizationEmailsPost',
     ];
   }
 
@@ -186,36 +192,131 @@ class CollectionBaseService extends AutoSubscriber {
     $currentStatus = $currentCollectionCamp['Collection_Camp_Core_Details.Status'];
     $initiatorId = $currentCollectionCamp['Collection_Camp_Core_Details.Contact_Id'];
 
+    if (!in_array($newStatus, ['authorized', 'unauthorized'])) {
+      return;
+    }
+
     // Check for status change.
     if ($currentStatus !== $newStatus) {
-      self::sendAuthorizationEmail($initiatorId, $objectRef, $newStatus);
+      self::$collectionAuthorized = $objectId;
+      self::$collectionAuthorizedStatus = $newStatus;
+    }
+  }
+
+  /**
+   *
+   */
+  public static function handleAuthorizationEmailsPost(string $op, string $objectName, $objectId, &$objectRef) {
+    if ($objectName != 'Eck_Collection_Camp' || $op !== 'edit' || !$objectId || $objectId !== self::$collectionAuthorized) {
+      return;
+    }
+
+    $collectionCamp = EckEntity::get('Collection_Camp', FALSE)
+      ->addSelect('Collection_Camp_Core_Details.Status', 'Collection_Camp_Core_Details.Contact_Id', 'subtype')
+      ->addWhere('id', '=', $objectRef->id)
+      ->execute()->single();
+
+    $initiator = $collectionCamp['Collection_Camp_Core_Details.Contact_Id'];
+    $subType = $collectionCamp['subtype'];
+
+    $collectionCampId = $collectionCamp['id'];
+
+    if (!self::$authorizationEmailQueued) {
+      self::queueAuthorizationEmail($initiator, $subType, self::$collectionAuthorizedStatus, $collectionCampId);
     }
   }
 
   /**
    * Send Authorization Email to contact.
    */
-  private static function sendAuthorizationEmail($initiatorId, $collectionCampPre, $status) {
+  private static function queueAuthorizationEmail($initiatorId, $subType, $status, $collectionCampId) {
     try {
-      $subtype = $collectionCampPre['subtype'];
+      $templateId = self::getMessageTemplateId($subType, $status);
 
-      $templateId = self::getMessageTemplateId($subtype, $status);
-
-      $emailParams = [
+      $params = [
         'contact_id' => $initiatorId,
         'template_id' => $templateId,
+        'collectionCampId' => $collectionCampId,
       ];
 
-      $result = civicrm_api3('Email', 'send', $emailParams);
+      $queue = \Civi::queue(\CRM_Goonjcustom_Engine::QUEUE_NAME, [
+        'type' => 'Sql',
+        'error' => 'abort',
+        'runner' => 'task',
+      ]);
+
+      $queue->createItem(new \CRM_Queue_Task(
+          [self::class, 'processQueuedEmail'],
+          [$params],
+      ), [
+        'weight' => 1,
+      ]);
+
+      self::$authorizationEmailQueued = TRUE;
 
     }
     catch (\Exception $ex) {
-      \Civi::log()->debug('Cannot send authorization email to initiator.', [
+      \Civi::log()->debug('Cannot queue authorization email for initiator.', [
         'initiatorId' => $initiatorId,
         'status' => $status,
         'entityId' => $objectRef['id'],
         'error' => $ex->getMessage(),
       ]);
+    }
+  }
+
+  /**
+   *
+   */
+  public static function processQueuedEmail($queue, $params) {
+    $collectionSourceId = $params['collectionCampId'];
+    $contactId = $params['contact_id'];
+    $templateId = $params['template_id'];
+
+    try {
+      $collectionSource = EckEntity::get('Collection_Camp', FALSE)
+        ->addSelect('Collection_Camp_Core_Details.Poster')
+        ->addWhere('id', '=', $collectionSourceId)
+        ->execute()->single();
+
+      $posterFileId = $collectionSource['Collection_Camp_Core_Details.Poster'];
+
+      $file = File::get(FALSE)
+        ->addWhere('id', '=', $posterFileId)
+        ->execute()->single();
+
+      $toEmail = Email::get(FALSE)
+        ->addWhere('contact_id', '=', $contactId)
+        ->addWhere('is_primary', '=', TRUE)
+        ->execute()->single();
+
+      $fromEmail = OptionValue::get(TRUE)
+        ->addSelect('label')
+        ->addWhere('option_group_id:name', '=', 'from_email_address')
+        ->addWhere('is_default', '=', TRUE)
+        ->execute()->single();
+
+      $config = \CRM_Core_Config::singleton();
+      $filePath = $config->customFileUploadDir . $file['uri'];
+
+      $emailParams = [
+        'contact_id' => $contactId,
+        'to_email' => $toEmail['email'],
+        'from' => $fromEmail['label'],
+        'id' => $templateId,
+        'attachments' => [
+          [
+            'fullPath' => $filePath,
+            'mime_type' => $file['mime_type'],
+            'cleanName' => $file['uri'],
+          ],
+        ],
+      ];
+
+      civicrm_api3('MessageTemplate', 'send', $emailParams);
+    }
+    catch (\Exception $ex) {
+      \Civi::log()->error('Failed to send email.', ['error' => $ex->getMessage(), 'params' => $emailParams]);
     }
   }
 
