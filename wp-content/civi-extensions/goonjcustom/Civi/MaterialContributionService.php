@@ -10,7 +10,7 @@ use Civi\Core\Service\AutoSubscriber;
  */
 class MaterialContributionService extends AutoSubscriber {
   const ACTIVITY_SOURCE_RECORD_TYPE_ID = 2;
-  
+
   /**
    * Fetch the Material Contribution Receipt Reminder ID.
    */
@@ -50,6 +50,7 @@ class MaterialContributionService extends AutoSubscriber {
     if ($context !== 'singleEmail' || $reminderId !== $contributionReceiptReminderId) {
       return;
     }
+
     // Hack: Retrieve the most recent "Material Contribution" activity for this contact.
     $activities = Activity::get(TRUE)
       ->addSelect('*', 'contact.display_name', 'Material_Contribution.Delivered_By', 'Material_Contribution.Delivered_By_Contact')
