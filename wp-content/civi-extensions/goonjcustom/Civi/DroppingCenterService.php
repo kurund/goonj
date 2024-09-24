@@ -35,7 +35,7 @@ class DroppingCenterService extends AutoSubscriber {
       "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fdropping_center-status",
     );
 
-    $status = \CRM_Utils_System::url(
+    $visitDetails = \CRM_Utils_System::url(
       "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fvisit-details%2Fcreate",
     );
 
