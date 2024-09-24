@@ -20,6 +20,8 @@ class CollectionBaseService extends AutoSubscriber {
 
   private static $stateCustomFieldDbDetails = [];
   private static $collectionAuthorized = NULL;
+  private static $collectionAuthorizedStatus = NULL;
+  private static $authorizationEmailQueued = NULL;
 
   /**
    *
@@ -229,9 +231,14 @@ class CollectionBaseService extends AutoSubscriber {
     $currentStatus = $currentCollectionCamp['Collection_Camp_Core_Details.Status'];
     $initiatorId = $currentCollectionCamp['Collection_Camp_Core_Details.Contact_Id'];
 
+    if (!in_array($newStatus, ['authorized', 'unauthorized'])) {
+      return;
+    }
+
     // Check for status change.
     if ($currentStatus !== $newStatus) {
       self::$collectionAuthorized = $objectId;
+      self::$collectionAuthorizedStatus = $newStatus;
     }
   }
 
@@ -239,7 +246,7 @@ class CollectionBaseService extends AutoSubscriber {
    *
    */
   public static function handleAuthorizationEmailsPost(string $op, string $objectName, $objectId, &$objectRef) {
-    if ($objectName != 'Eck_Collection_Camp' || !$objectId || $objectId !== self::$collectionAuthorized) {
+    if ($objectName != 'Eck_Collection_Camp' || $op !== 'edit' || !$objectId || $objectId !== self::$collectionAuthorized) {
       return;
     }
 
@@ -248,17 +255,20 @@ class CollectionBaseService extends AutoSubscriber {
       ->addWhere('id', '=', $objectRef->id)
       ->execute()->single();
 
-    $status = $collectionCamp['Collection_Camp_Core_Details.Status'];
     $initiator = $collectionCamp['Collection_Camp_Core_Details.Contact_Id'];
     $subType = $collectionCamp['subtype'];
 
-    self::queueAuthorizationEmail($initiator, $subType, $status);
+    $collectionCampId = $collectionCamp['id'];
+
+    if (!self::$authorizationEmailQueued) {
+      self::queueAuthorizationEmail($initiator, $subType, self::$collectionAuthorizedStatus, $collectionCampId);
+    }
   }
 
   /**
    * Send Authorization Email to contact.
    */
-  private static function queueAuthorizationEmail($initiatorId, $subType, $status) {
+  private static function queueAuthorizationEmail($initiatorId, $subType, $status, $collectionCampId) {
     try {
       \Civi::log()->info('subtype2', ['subtype2'=>$subType, $status]);
       $templateId = self::getMessageTemplateId($subType, $status);
@@ -266,18 +276,24 @@ class CollectionBaseService extends AutoSubscriber {
       $emailParams = [
         'contact_id' => $initiatorId,
         'template_id' => $templateId,
+        'collectionCampId' => $collectionCampId,
       ];
 
       // Create or retrieve the queue (no need to check if it already exists)
-      $queue = \CRM_Queue_Service::singleton()->create([
-        'name' => 'send_authorization_email_queue',
+      $queue = \Civi::queue(\CRM_Goonjcustom_Engine::QUEUE_NAME, [
         'type' => 'Sql',
+        'error' => 'abort',
+        'runner' => 'task',
       ]);
 
-      $queue->createItem(new \CRM_Queue_Task([
-          ['CRM_Extension_CollectionBaseService', 'processQueuedEmail'],
+      $queue->createItem(new \CRM_Queue_Task(
+          [self::class, 'processQueuedEmail'],
           [$emailParams],
-      ]));
+      ), [
+        'weight' => 1,
+      ]);
+
+      self::$authorizationEmailQueued = TRUE;
 
     }
     catch (\Exception $ex) {
@@ -290,12 +306,26 @@ class CollectionBaseService extends AutoSubscriber {
     }
   }
 
+
   /**
    *
    */
   public static function processQueuedEmail($queue, $emailParams) {
+    $campId = $emailParams['collectionCampId'];
+
+    $collectionCamp = EckEntity::get('Collection_Camp', FALSE)
+    ->addSelect('Collection_Camp_Core_Details.Poster')
+    ->addWhere('id', '=', $campId)
+    ->execute()->single();
+
+    \Civi::log()->info('poster', $collectionCamp);
+
+
     try {
-      civicrm_api3('Email', 'send', $emailParams);
+      civicrm_api3('Email', 'send',[
+        'contact_id' => $emailParams['contact_id'],
+        'template_id' => $emailParams['template_id'],
+      ]);
 
       \Civi::log()->info('Successfully sent queued authorization email.', ['params' => $emailParams]);
     }
