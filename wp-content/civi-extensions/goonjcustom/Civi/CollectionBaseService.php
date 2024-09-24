@@ -242,20 +242,24 @@ class CollectionBaseService extends AutoSubscriber {
     if ($objectName != 'Eck_Collection_Camp' || !$objectId || $objectId !== self::$collectionAuthorized) {
       return;
     }
+   
+    $collectionCamp = EckEntity::get('Collection_Camp', FALSE)
+      ->addSelect('Collection_Camp_Core_Details.Status', 'Collection_Camp_Core_Details.Contact_Id', 'subtype')
+      ->addWhere('id', '=', $objectRef->id)
+      ->execute()->single();
 
-    $status = $objectRef['Collection_Camp_Core_Details.Status'];
-    $initiator = $objectRef['Collection_Camp_Core_Details.Contact_Id'];
+      $status = $collectionCamp['Collection_Camp_Core_Details.Status'];
+      $initiator = $collectionCamp['Collection_Camp_Core_Details.Contact_Id'];
+      $subType = $collectionCamp['subtype'];
 
-    self::sendAuthorizationEmail($initiator, $objectRef, $newStatus);
+      self::sendAuthorizationEmail($initiator, $subType, $newStatus);
   }
 
   /**
    * Send Authorization Email to contact.
    */
-  private static function sendAuthorizationEmail($initiatorId, $collectionCampPre, $status) {
+  private static function sendAuthorizationEmail($initiatorId, $subType, $status) {
     try {
-      $subtype = $collectionCampPre['subtype'];
-
       $templateId = self::getMessageTemplateId($subtype, $status);
 
       $emailParams = [
