@@ -276,7 +276,7 @@ class CollectionBaseService extends AutoSubscriber {
       ];
 
       // Create or retrieve the queue (no need to check if it already exists)
-      $queue = \Civi::queue('send_authorization_email_queue', [
+      $queue = \Civi::queue(\CRM_Goonjcustom_Engine::QUEUE_NAME, [
         'type' => 'Sql',
         'error' => 'abort',
         'runner' => 'task',
