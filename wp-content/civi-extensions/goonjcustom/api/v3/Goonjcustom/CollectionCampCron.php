@@ -66,10 +66,24 @@ function civicrm_api3_goonjcustom_collection_camp_cron($params) {
     $collectionCampId = $camp['id'];
     $endDateFormatted = $endDate->format('Y-m-d');
     $collectionCamp = EckEntity::get('Collection_Camp', TRUE)
-      ->addSelect('Collection_Camp_Intent_Details.Goonj_Office')
+      ->addSelect('Collection_Camp_Intent_Details.Goonj_Office', 'Collection_Camp_Core_Details.Contact_Id')
       ->addWhere('id', '=', $collectionCampId)
       ->execute()->single();
     $collectionCampGoonjOffice = $collectionCamp['Collection_Camp_Intent_Details.Goonj_Office'];
+    $collectionCampContactId = $collectionCamp['Collection_Camp_Core_Details.Contact_Id'];
+
+    $contactEmail = Email::get(TRUE)
+    ->addWhere('contact_id', '=', $collectionCampContactId)
+    ->execute()->single();
+
+    $contactEmailId = $contactEmail['email'];
+
+    $contactData = Contact::get(TRUE)
+    ->addWhere('id', '=', $collectionCampContactId)
+    ->execute()->single();
+
+    $organisingContactName = $contactData['display_name'];
+
 
     $email = Email::get(TRUE)
       ->addWhere('contact_id', '=', $recipientId)
@@ -84,6 +98,19 @@ function civicrm_api3_goonjcustom_collection_camp_cron($params) {
     $contactName = $contact['display_name'];
 
     // Only send the email if the end date is exactly today.
+    if ($endDateFormatted === $todayFormatted) {
+      $mailParams = [
+        'subject' => 'Volunteer Feedback Form',
+        'from' => 'urban.ops@goonj.org',
+        'toEmail' => $contactEmailId,
+        'replyTo' => 'urban.ops@goonj.org',
+        'html' => goonjcustom_collection_camp_volunteer_feedback_email_html($organisingContactName, $collectionCampId),
+        // 'messageTemplateID' => 76, // Uncomment if using a message template
+      ];
+      $result = CRM_Utils_Mail::send($mailParams);
+    }
+
+    // Only send the email if the end date is lower than today.
     if ($endDateFormatted <= $todayFormatted) {
       $mailParams = [
         'subject' => 'Collections Completion Notification',
@@ -118,3 +145,22 @@ function goonjcustom_collection_camp_email_html($contactName, $collectionCampId,
       <p>Warm regards,</p>";
   return $html;
 }
+
+/**
+ *
+ */
+function goonjcustom_collection_camp_volunteer_feedback_email_html($organisingContactName, $collectionCampId) {
+  $homeUrl = get_home_url();
+  // URL for the volunteer feedback form.
+  $campVolunteerFeedback = $homeUrl . '/volunteer-camp-feedback/#?Eck_Collection_Camp1=' . $collectionCampId;
+  $html = "
+      <p>Dear $organisingContactName,</p>
+      <p>Thank you for successfully completing your Collection Camp.</p>
+      <p>We would appreciate your feedback. Please use the link below to fill out the Volunteer Camp Feedback Form:</p>
+      <ul>
+        <li><a href=\"$campVolunteerFeedback\">Volunteer Camp Feedback Form</a></li>
+      </ul>
+      <p>Warm regards,</p>";
+  return $html;
+}
+
