@@ -305,27 +305,27 @@ class CollectionBaseService extends AutoSubscriber {
     }
   }
 
-
   /**
    *
    */
   public static function processQueuedEmail($queue, $emailParams) {
     $campId = $emailParams['collectionCampId'];
-  
-    // Fetch the collection camp details, including the poster ID
+
+    // Fetch the collection camp details, including the poster ID.
     $collectionCamp = EckEntity::get('Collection_Camp', FALSE)
       ->addSelect('Collection_Camp_Core_Details.Poster')
       ->addWhere('id', '=', $campId)
       ->execute()->single();
-  
+
     \Civi::log()->info('Poster details fetched', $collectionCamp);
-  
+
     try {
       $posterFileId = $collectionCamp['Collection_Camp_Core_Details.Poster'];
       civicrm_api3('Email', 'send', [
         'contact_id' => $emailParams['contact_id'],
         'template_id' => $emailParams['template_id'],
-        'file_id' => $posterFileId, // Attach the poster
+      // Attach the poster.
+        'file_id' => $posterFileId,
       ]);
 
     }
@@ -333,8 +333,6 @@ class CollectionBaseService extends AutoSubscriber {
       \Civi::log()->error('Failed to process queued authorization email.', ['error' => $ex->getMessage(), 'params' => $emailParams]);
     }
   }
-  
-  
 
   /**
    *
@@ -352,11 +350,9 @@ class CollectionBaseService extends AutoSubscriber {
 
       $mapper[$subtypeValue]['authorized'] = $subtypeName . ' authorized';
       $mapper[$subtypeValue]['unauthorized'] = $subtypeName . ' unauthorized';
-      \Civi::log()->info('mapper', ['mapper'=>$mapper]);    
     }
 
     $msgTitleStartsWith = $mapper[$collectionCampSubtype][$status] . '%';
-
 
     $messageTemplates = MessageTemplate::get(FALSE)
       ->addSelect('id')
