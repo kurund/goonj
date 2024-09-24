@@ -17,6 +17,7 @@ class CollectionBaseService extends AutoSubscriber {
 
   const ENTITY_NAME = 'Collection_Camp';
   const INTENT_CUSTOM_GROUP_NAME = 'Collection_Camp_Intent_Details';
+  const ENTITY_SUBTYPE_NAME = 'Collection_Camp';
 
   private static $stateCustomFieldDbDetails = [];
 
@@ -35,7 +36,7 @@ class CollectionBaseService extends AutoSubscriber {
    *
    */
   public static function collectionBaseTabset($tabsetName, &$tabs, $context) {
-    if ($tabsetName !== 'civicrm/eck/entity' || empty($context) || $context['entity_type']['name'] !== self::ENTITY_NAME) {
+    if (!self::isViewingCollectionCamp($tabsetName, $context)) {
       return;
     }
 
@@ -108,6 +109,45 @@ class CollectionBaseService extends AutoSubscriber {
       'active' => 1,
       'current' => FALSE,
     ];
+  }
+
+  /**
+   *
+   */
+  private static function isViewingCollectionCamp($tabsetName, $context) {
+    if ($tabsetName !== 'civicrm/eck/entity' || empty($context) || $context['entity_type']['name'] !== self::ENTITY_NAME) {
+      return FALSE;
+    }
+
+    $entityId = $context['entity_id'];
+
+    $entityResults = EckEntity::get(self::ENTITY_NAME, TRUE)
+      ->addWhere('id', '=', $entityId)
+      ->execute();
+
+    $entity = $entityResults->first();
+
+    $entitySubtypeValue = $entity['subtype'];
+
+    $subtypeResults = OptionValue::get(TRUE)
+      ->addSelect('name')
+      ->addWhere('grouping', '=', self::ENTITY_NAME)
+      ->addWhere('value', '=', $entitySubtypeValue)
+      ->execute();
+
+    $subtype = $subtypeResults->first();
+
+    if (!$subtype) {
+      return FALSE;
+    }
+
+    $subtypeName = $subtype['name'];
+
+    if ($subtypeName !== self::ENTITY_SUBTYPE_NAME) {
+      return FALSE;
+    }
+
+    return TRUE;
   }
 
   /**
