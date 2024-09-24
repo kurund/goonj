@@ -280,7 +280,6 @@ class CollectionBaseService extends AutoSubscriber {
         'collectionCampId' => $collectionCampId,
       ];
 
-      // Create or retrieve the queue (no need to check if it already exists)
       $queue = \Civi::queue(\CRM_Goonjcustom_Engine::QUEUE_NAME, [
         'type' => 'Sql',
         'error' => 'abort',
@@ -332,13 +331,19 @@ class CollectionBaseService extends AutoSubscriber {
         ->addWhere('is_primary', '=', TRUE)
         ->execute()->single();
 
+      $fromEmail = OptionValue::get(TRUE)
+        ->addSelect('label')
+        ->addWhere('option_group_id:name', '=', 'from_email_address')
+        ->addWhere('is_default', '=', TRUE)
+        ->execute()->single();
+
       $config = \CRM_Core_Config::singleton();
       $filePath = $config->customFileUploadDir . $file['uri'];
 
       $emailParams = [
         'contact_id' => $contactId,
         'to_email' => $toEmail['email'],
-        'from' => "xyz@gmail.com",
+        'from' => $fromEmail['label'],
         'id' => $templateId,
         'attachments' => [
           [
@@ -360,7 +365,6 @@ class CollectionBaseService extends AutoSubscriber {
    *
    */
   public static function getMessageTemplateId($collectionCampSubtype, $status) {
-
     $collectionCampSubtypes = OptionValue::get(FALSE)
       ->addWhere('option_group_id:name', '=', 'eck_sub_types')
       ->addWhere('grouping', '=', 'Collection_Camp')
