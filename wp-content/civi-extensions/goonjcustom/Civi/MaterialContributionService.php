@@ -46,11 +46,10 @@ class MaterialContributionService extends AutoSubscriber {
 
     $reminderId = (int) $params['entity_id'];
     $contributionReceiptReminderId = self::getContributionReceiptReminderId();
-    
+
     if ($context !== 'singleEmail' || $reminderId !== $contributionReceiptReminderId) {
       return;
     }
-
     // Hack: Retrieve the most recent "Material Contribution" activity for this contact.
     $activities = Activity::get(TRUE)
       ->addSelect('*', 'contact.display_name', 'Material_Contribution.Delivered_By', 'Material_Contribution.Delivered_By_Contact')
