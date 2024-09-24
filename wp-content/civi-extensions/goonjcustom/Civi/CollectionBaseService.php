@@ -258,21 +258,24 @@ class CollectionBaseService extends AutoSubscriber {
     $initiator = $collectionCamp['Collection_Camp_Core_Details.Contact_Id'];
     $subType = $collectionCamp['subtype'];
 
+    $collectionCampId = $collectionCamp['id'];
+
     if (!self::$authorizationEmailQueued) {
-      self::queueAuthorizationEmail($initiator, $subType, self::$collectionAuthorizedStatus);
+      self::queueAuthorizationEmail($initiator, $subType, self::$collectionAuthorizedStatus, $collectionCampId);
     }
   }
 
   /**
    * Send Authorization Email to contact.
    */
-  private static function queueAuthorizationEmail($initiatorId, $subType, $status) {
+  private static function queueAuthorizationEmail($initiatorId, $subType, $status, $collectionCampId) {
     try {
       $templateId = self::getMessageTemplateId($subType, $status);
 
       $emailParams = [
         'contact_id' => $initiatorId,
         'template_id' => $templateId,
+        'collectionCampId' => $collectionCampId,
       ];
 
       // Create or retrieve the queue (no need to check if it already exists)
@@ -283,7 +286,7 @@ class CollectionBaseService extends AutoSubscriber {
       ]);
 
       $queue->createItem(new \CRM_Queue_Task(
-          ['CRM_Goonjcustom_Engine', 'processQueuedEmail'],
+          [self::class, 'processQueuedEmail'],
           [$emailParams],
       ), [
         'weight' => 1,
@@ -299,6 +302,34 @@ class CollectionBaseService extends AutoSubscriber {
         'entityId' => $objectRef['id'],
         'error' => $ex->getMessage(),
       ]);
+    }
+  }
+
+
+  /**
+   *
+   */
+  public static function processQueuedEmail($queue, $emailParams) {
+    $campId = $emailParams['collectionCampId'];
+
+    $collectionCamp = EckEntity::get('Collection_Camp', FALSE)
+    ->addSelect('Collection_Camp_Core_Details.Poster')
+    ->addWhere('id', '=', $campId)
+    ->execute()->single();
+
+    \Civi::log()->info('poster', $collectionCamp);
+
+
+    try {
+      civicrm_api3('Email', 'send',[
+        'contact_id' => $emailParams['contact_id'],
+        'template_id' => $emailParams['template_id'],
+      ]);
+
+      \Civi::log()->info('Successfully sent queued authorization email.', ['params' => $emailParams]);
+    }
+    catch (\Exception $ex) {
+      \Civi::log()->error('Failed to process queued authorization email.', ['error' => $ex->getMessage(), 'params' => $emailParams]);
     }
   }
 
