@@ -52,7 +52,7 @@ class CollectionCampService extends AutoSubscriber {
       '&hook_civicrm_custom' => [
         ['setOfficeDetails'],
         ['linkInductionWithCollectionCamp'],
-        ['mailNotificationToMMT'],
+        ['mailNotificationToMmt'],
 
       ],
       '&hook_civicrm_fieldOptions' => 'setIndianStateOptions',
@@ -88,7 +88,7 @@ class CollectionCampService extends AutoSubscriber {
     );
 
     // URL for the material dispatch authorizationtab.
-    $materialAuthorisation = \CRM_Utils_System::url(
+    $materialAuthorization = \CRM_Utils_System::url(
       "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Facknowledgement-for-logistics-data",
     );
 
@@ -120,9 +120,9 @@ class CollectionCampService extends AutoSubscriber {
     ];
 
     // Add the material dispatch authorization tab.
-    $tabs['materialAuthorisation'] = [
+    $tabs['materialAuthorization'] = [
       'title' => ts('Material Authorization'),
-      'link' => $materialAuthorisation,
+      'link' => $materialAuthorization,
       'valid' => 1,
       'active' => 1,
       'current' => FALSE,
@@ -933,7 +933,7 @@ class CollectionCampService extends AutoSubscriber {
    * @param object $objectRef
    *   The parameters that were sent into the calling function.
    */
-  public static function mailNotificationToMMT($op, $groupID, $entityID, &$params) {
+  public static function mailNotificationToMmt($op, $groupID, $entityID, &$params) {
     if ($op !== 'create') {
       return;
     }
@@ -943,14 +943,14 @@ class CollectionCampService extends AutoSubscriber {
     }
 
     $goonjFieldId = $goonjField['value'];
-    $vehicleDispatcheId = $goonjField['entity_id'];
+    $vehicleDispatchId = $goonjField['entity_id'];
 
-    $collectionSourceVehicleDispatche = EckEntity::get('Collection_Source_Vehicle_Dispatch', FALSE)
+    $collectionSourceVehicleDispatch = EckEntity::get('Collection_Source_Vehicle_Dispatch', FALSE)
       ->addSelect('Camp_Vehicle_Dispatch.Collection_Camp_Intent_Id')
-      ->addWhere('id', '=', $vehicleDispatcheId)
+      ->addWhere('id', '=', $vehicleDispatchId)
       ->execute()->first();
 
-    $collectionCampId = $collectionSourceVehicleDispatche['Camp_Vehicle_Dispatch.Collection_Camp_Intent_Id'];
+    $collectionCampId = $collectionSourceVehicleDispatch['Camp_Vehicle_Dispatch.Collection_Camp_Intent_Id'];
 
     $coordinators = Relationship::get(FALSE)
       ->addWhere('contact_id_b', '=', $goonjFieldId)
@@ -983,7 +983,7 @@ class CollectionCampService extends AutoSubscriber {
     ];
     $result = \CRM_Utils_Mail::send($mailParams);
 
-    $updatemmtId = EckEntity::update('Collection_Source_Vehicle_Dispatch', FALSE)
+    $updateMmtId = EckEntity::update('Collection_Source_Vehicle_Dispatch', FALSE)
       ->addValue('Acknowledgement_For_Logistics.Filled_by', $mmtId)
       ->addWhere('Camp_Vehicle_Dispatch.Collection_Camp_Intent_Id', '=', $collectionCampId)
       ->execute();
