@@ -972,12 +972,18 @@ class CollectionCampService extends AutoSubscriber {
     $mmtEmail = $email['email'];
     $contactName = $email['contact_id.display_name'];
 
+    $fromEmail = OptionValue::get(FALSE)
+    ->addSelect('label')
+    ->addWhere('option_group_id:name', '=', 'from_email_address')
+    ->addWhere('is_default', '=', TRUE)
+    ->execute()->single();
+
     // Email to material management team member.
     $mailParams = [
       'subject' => 'New Entry For Matrial Dispatch Notification',
-      'from' => 'urban.ops@goonj.org',
+      'from' => $fromEmail['label'],
       'toEmail' => $mmtEmail,
-      'replyTo' => 'urban.ops@goonj.org',
+      'replyTo' => $fromEmail['label'],
       'html' => self::goonjcustom_material_management_email_html($mmtId, $contactName, $collectionCampId),
         // 'messageTemplateID' => 76, // Uncomment if using a message template
     ];
