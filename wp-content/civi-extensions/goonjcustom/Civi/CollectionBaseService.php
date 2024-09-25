@@ -72,7 +72,6 @@ class CollectionBaseService extends AutoSubscriber {
       'active' => 1,
       'current' => FALSE,
     ];
-
   }
 
   /**
