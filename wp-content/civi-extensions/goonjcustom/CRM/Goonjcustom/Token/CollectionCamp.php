@@ -4,6 +4,8 @@
  *
  */
 
+use Civi\Api4\Activity;
+use Civi\Api4\Contact;
 use Civi\Api4\EckEntity;
 use Civi\Token\AbstractTokenSubscriber;
 use Civi\Token\TokenProcessor;
@@ -13,6 +15,8 @@ use Civi\Token\TokenRow;
  *
  */
 class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
+
+  const ACTIVITY_TARGET_RECORD_TYPE_ID = 3;
 
   public function __construct() {
     parent::__construct('collection_camp', [
@@ -48,7 +52,7 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
     }
 
     $collectionSource = EckEntity::get('Collection_Camp', FALSE)
-      ->addSelect('title', 'Collection_Camp_Intent_Details.*')
+      ->addSelect('title', 'Collection_Camp_Intent_Details.*', 'Collection_Camp_Core_Details.Contact_Id')
       ->addWhere('id', '=', $row->context['collectionSourceId'])
       ->execute()->single();
 
@@ -65,7 +69,7 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
         break;
 
       case 'volunteers':
-        $value = 'volunteers of collection camp';
+        $value = $this->formatVolunteers($collectionSource);
         break;
 
       case 'goonj_team':
@@ -107,6 +111,35 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
     $endTime = $end->format('h:i A');
 
     return "$startTime to $endTime";
+  }
+
+  /**
+   *
+   */
+  private function formatVolunteers($collectionSource) {
+    $initiatorId = $collectionSource['Collection_Camp_Core_Details.Contact_Id'];
+    $volunteeringActivities = Activity::get(FALSE)
+      ->addSelect('activity_contact.contact_id')
+      ->addJoin('ActivityContact AS activity_contact', 'LEFT')
+      ->addWhere('activity_type_id:name', '=', 'Volunteering')
+      ->addWhere('Volunteering_Activity.Collection_Camp', '=', $collectionSource['id'])
+      ->addWhere('activity_contact.record_type_id', '=', self::ACTIVITY_TARGET_RECORD_TYPE_ID)
+      ->execute();
+
+    $volunteerIds = array_merge([$initiatorId], $volunteeringActivities->column('activity_contact.contact_id'));
+
+    $volunteers = Contact::get(FALSE)
+      ->addSelect('phone.phone', 'display_name')
+      ->addJoin('Phone AS phone', 'LEFT')
+      ->addWhere('phone.is_primary', '=', FALSE)
+      ->addWhere('id', 'IN', $volunteerIds)
+      ->execute();
+
+    $volunteersWithPhone = array_map(
+        fn ($volunteer) => sprintf('%1$s (%2$s)', $volunteer['display_name'], $volunteer['phone.phone']), $volunteers->jsonSerialize()
+    );
+
+    return join(',', $volunteersWithPhone);
   }
 
 }
