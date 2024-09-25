@@ -11,6 +11,7 @@ use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\EckEntity;
+use Civi\Api4\Email;
 use Civi\Api4\Group;
 use Civi\Api4\GroupContact;
 use Civi\Api4\OptionValue;
@@ -18,6 +19,7 @@ use Civi\Api4\Relationship;
 use Civi\Api4\StateProvince;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Service\AutoSubscriber;
+use CRM_Utils_Mail;
 
 /**
  *
@@ -28,6 +30,7 @@ class CollectionCampService extends AutoSubscriber {
   const COLLECTION_CAMP_INTENT_FB_NAME = 'afformCollectionCampIntentDetails';
   const ENTITY_NAME = 'Collection_Camp';
   const ENTITY_SUBTYPE_NAME = 'Collection_Camp';
+  const MATERIAL_RELATIONSHIP_TYPE_NAME = 'Material Management Team of';
 
   private static $individualId = NULL;
   private static $collectionCampAddress = NULL;
@@ -50,6 +53,8 @@ class CollectionCampService extends AutoSubscriber {
       '&hook_civicrm_custom' => [
         ['setOfficeDetails'],
         ['linkInductionWithCollectionCamp'],
+            ['mailNotificationToMMT'],
+
       ],
       '&hook_civicrm_fieldOptions' => 'setIndianStateOptions',
       'civi.afform.submit' => [
@@ -901,6 +906,116 @@ class CollectionCampService extends AutoSubscriber {
 
     $options = $stateOptions;
 
+  }
+
+  /**
+   * This hook is called after the database write on a custom table.
+   *
+   * @param string $op
+   *   The type of operation being performed.
+   * @param string $objectName
+   *   The custom group ID.
+   * @param int $objectId
+   *   The entityID of the row in the custom table.
+   * @param object $objectRef
+   *   The parameters that were sent into the calling function.
+   */
+  public static function mailNotificationToMMT($op, $groupID, $entityID, &$params) {
+    if ($op !== 'create') {
+      return;
+    }
+
+    if (!($goonjField = self::findOfficeId($params))) {
+      return;
+    }
+
+    $goonjFieldId = $goonjField['value'];
+
+    $coordinators = Relationship::get(FALSE)
+      ->addWhere('contact_id_b', '=', $goonjFieldId)
+      ->addWhere('relationship_type_id:name', '=', self::MATERIAL_RELATIONSHIP_TYPE_NAME)
+      ->addWhere('is_current', '=', TRUE)
+      ->execute()->first();
+
+    $mmtId = $coordinators['contact_id_a'];
+
+    if (empty($mmtId)) {
+      return;
+    }
+
+    $email = Email::get(TRUE)
+      ->addSelect('email', 'contact_id.display_name')
+      ->addWhere('contact_id', '=', $mmtId)
+      ->execute()->single();
+
+    $mmtEmail = $email['email'];
+    $contactName = $email['contact_id.display_name'];
+
+    // error_log("contactName: " . print_r($contactName, TRUE));
+
+    // Email to material management team member.
+    $mailParams = [
+      'subject' => 'New Entry For Matrial Dispatch Notification',
+      'from' => 'urban.ops@goonj.org',
+      'toEmail' => $mmtEmail,
+      'replyTo' => 'urban.ops@goonj.org',
+      'html' => self::goonjcustom_material_management_email_html($mmtId, $contactName),
+        // 'messageTemplateID' => 76, // Uncomment if using a message template
+    ];
+    // error_log("mailParams: " . print_r($mailParams, TRUE));
+
+    $result = CRM_Utils_Mail::send($mailParams);
+    // error_log("result: " . print_r($result, TRUE));
+
+  }
+
+  /**
+   *
+   */
+  public static function goonjcustom_material_management_email_html($mmtId, $contactName) {
+    $html = "
+    $materialdispatchUrl = $homeUrl . '/camp-vehicle-dispatch-form/#?Camp_Vehicle_Dispatch.Collection_Camp_Intent_Id=' . $collectionCampId . '&Camp_Vehicle_Dispatch.Filled_by=' . $recipientId . '&Camp_Vehicle_Dispatch.To_which_PU_Center_material_is_being_sent=' . $collectionCampGoonjOffice;
+
+      <p>Dear $contactName,</p>
+      <p>A new entry of camp vehicle dispatch form is submitted..</p>
+      <p>Please acknowledgement the form from CRM</p>
+      <ul>
+        <li><a href=\"$materialdispatchUrl\">Material Dispatch Authorization</a></li>
+      </ul>
+      <p>Warm regards,</p>";
+    return $html;
+  }
+
+  /**
+   *
+   */
+  private static function findOfficeId(array $array) {
+    $filteredItems = array_filter($array, fn($item) => $item['entity_table'] === 'civicrm_eck_collection_source_vehicle_dispatch');
+
+    if (empty($filteredItems)) {
+      return FALSE;
+    }
+
+    $goonjOfficeId = CustomField::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('custom_group_id:name', '=', 'Camp_Vehicle_Dispatch')
+      ->addWhere('name', '=', 'To_which_PU_Center_material_is_being_sent')
+      ->execute()
+      ->first();
+
+    if (!$goonjOfficeId) {
+      return FALSE;
+    }
+
+    $goonjOfficeFieldId = $goonjOfficeId['id'];
+
+    $goonjOfficeIndex = array_search(TRUE, array_map(fn($item) =>
+        $item['entity_table'] === 'civicrm_eck_collection_source_vehicle_dispatch' &&
+        $item['custom_field_id'] == $goonjOfficeFieldId,
+        $filteredItems
+    ));
+
+    return $goonjOfficeIndex !== FALSE ? $filteredItems[$goonjOfficeIndex] : FALSE;
   }
 
 }
