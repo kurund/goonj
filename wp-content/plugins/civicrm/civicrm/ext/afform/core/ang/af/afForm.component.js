@@ -305,39 +305,39 @@
         }
 
     // Collection camp start date and end date validation
-    // var startDateValue = $element.find("af-field[name='Collection_Camp_Intent_Details.Start_Date'] .crm-form-date-wrapper input.crm-form-date").val();
-    // var endDateValue = $element.find("af-field[name='Collection_Camp_Intent_Details.End_Date'] .crm-form-date-wrapper input.crm-form-date").val();
+    var startDateValue = $element.find("af-field[name='Collection_Camp_Intent_Details.Start_Date'] .crm-form-date-wrapper input.crm-form-date").val();
+    var endDateValue = $element.find("af-field[name='Collection_Camp_Intent_Details.End_Date'] .crm-form-date-wrapper input.crm-form-date").val();
     
-    // if (startDateValue && endDateValue) {
-    //     var today = new Date();
-    //     today.setHours(0, 0, 0, 0); 
+    if (startDateValue && endDateValue) {
+        var today = new Date();
+        today.setHours(0, 0, 0, 0); 
         
-    //     var startDateParts = startDateValue.split('/');
-    //     var endDateParts = endDateValue.split('/');
+        var startDateParts = startDateValue.split('/');
+        var endDateParts = endDateValue.split('/');
         
-    //     var startDate = new Date(startDateParts[2], startDateParts[1] - 1, startDateParts[0]);
-    //     var endDate = new Date(endDateParts[2], endDateParts[1] - 1, endDateParts[0]);
+        var startDate = new Date(startDateParts[2], startDateParts[1] - 1, startDateParts[0]);
+        var endDate = new Date(endDateParts[2], endDateParts[1] - 1, endDateParts[0]);
         
-    //     var errorMessage = '';
-    //     var isValid = true;
+        var errorMessage = '';
+        var isValid = true;
 
-    //     // Check if the start date is in the past or today
-    //     if (startDate <= today) {
-    //       errorMessage += `Collections cannot start (${startDateValue}) today or in the past.\n`;
-    //       isValid = false;
-    //     }
-    //     // Check if the end date is in the past, today
-    //     if (endDate <= today) {
-    //       errorMessage += `Collections cannot end ( ${endDateValue}) today or in the past.\n`;
-    //       isValid = false;
-    //       }
+        // Check if the start date is in the past or today
+        if (startDate <= today) {
+          errorMessage += `Collections cannot start (${startDateValue}) today or in the past.\n`;
+          isValid = false;
+        }
+        // Check if the end date is in the past, today
+        if (endDate <= today) {
+          errorMessage += `Collections cannot end ( ${endDateValue}) today or in the past.\n`;
+          isValid = false;
+          }
           
-    //     // Check if End Date is before Start Date
-    //     if (endDate < startDate) {
-    //       errorMessage += `Collections cannot end (${endDateValue}) before start (${startDateValue}).\n`;
-    //       isValid = false;
-    //     }
-    // }
+        // Check if End Date is before Start Date
+        if (endDate < startDate) {
+          errorMessage += `Collections cannot end (${endDateValue}) before start (${startDateValue}).\n`;
+          isValid = false;
+        }
+    }
 
     // Birth date validation
     var birthDateField = $element.find("af-field[name='birth_date'] input[type='text']");
