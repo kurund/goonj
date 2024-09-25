@@ -5,6 +5,7 @@
  */
 
 use Civi\Token\AbstractTokenSubscriber;
+use Civi\Token\TokenProcessor;
 use Civi\Token\TokenRow;
 
 /**
@@ -22,14 +23,15 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
     ]);
   }
 
-  // Public function checkActive(\Civi\Token\TokenProcessor $processor) {
-  //     return !empty($processor->context['campagnodonTransactionId'])
-  //       || !empty($processor->context['campagnodonTransaction'])
-  //       || in_array('campagnodonTransactionId', $processor->context['schema'])
-  //       || in_array('campagnodonTransaction', $processor->context['schema']);.
+  /**
+   *
+   */
+  public function checkActive(TokenProcessor $processor) {
+    return !empty($processor->context['collectionSourceId']);
+  }
 
   /**
-   * }.
+   *
    */
   public function evaluateToken(
     TokenRow $row,
@@ -37,6 +39,17 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
     $field,
     $prefetch = NULL,
   ) {
+
+    if (empty($row->context['collectionSourceId'])) {
+      \Civi::log()->debug(__CLASS__ . '::' . __METHOD__ . ' There is no collectionSourceId in the context, you can\'t use collection_camp tokens.');
+      $row->format('text/plain')->tokens($entity, $field, '');
+      return;
+    }
+
+    $collectionSource = EckEntity::get('Collection_Camp', FALSE)
+      ->addSelect('title', 'Collection_Camp_Intent_Details.*')
+      ->addWhere('id', '=', $row->context['collectionSourceId'])
+      ->execute()->single();
 
     switch ($field) {
       case 'venue':
@@ -64,40 +77,10 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
 
     }
 
-    // If (empty($row->context['campagnodonTransaction'])) {
-    //   Civi::log()->debug(__CLASS__.'::'.__METHOD__ . ' There is no campagnodonTransaction in the context, you cant use campagnodonTransaction tokens.');
-    //   $row->format('text/plain')->tokens($entity, $field, '');
-    //   return;
-    // }.
-    // If ($field === 'payment_url') {
-    //   $url = $row->context['campagnodonTransaction']['payment_url'] ?? '';
-    //   // For text mode, we have to replace &amp; by & (see for example CRM_Utils_Token::getActionTokenReplacement)
-    //   $row->format('text/plain')->tokens($entity, $field, str_replace('&amp;', '&', $url));
-    //   $row->format('text/html')->tokens($entity, $field, $url);
-    //   return;
-    // }.
-    // $value = '';
-    // if (in_array($field, ['email', 'first_name', 'last_name'])) {
-    //   // For these fields, it can have been cleaned from the CampagnodonTransaction.
-    //   // In such cache, we must search on the contact data.
-    //   $value = $row->context['campagnodonTransaction'][$field];
-    //   if (empty($value) && !empty($row->context['contact'])) {
-    //     $value = $row->context['contact'][$field];
-    //   }
-    //   if (empty($value) && !empty($row->context['contactId'])) {
-    //     $contact = \Civi\Api4\Contact::get()
-    //       ->setCheckPermissions(false)
-    //       ->addSelect('*')
-    //       ->addWhere('id', '=', $row->context['contactId'])
-    //       ->execute()
-    //       ->first();
-    //     if ($contact) {
-    //       $value = $contact[$field];
-    //     }
-    //   }
-    // }.
-    $row->format('text/plain')->tokens($entity, $field, $value ?? '');
+    $row->format('text/html')->tokens($entity, $field, $value);
+    $row->format('text/plain')->tokens($entity, $field, $value);
     return;
+
   }
 
 }

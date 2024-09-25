@@ -24,6 +24,7 @@ class CollectionBaseService extends AutoSubscriber {
   private static $collectionAuthorized = NULL;
   private static $collectionAuthorizedStatus = NULL;
   private static $authorizationEmailQueued = NULL;
+  private static $generatePosterRequest = NULL;
 
   /**
    *
@@ -32,9 +33,107 @@ class CollectionBaseService extends AutoSubscriber {
     return [
       '&hook_civicrm_tabset' => 'collectionBaseTabset',
       '&hook_civicrm_selectWhereClause' => 'aclCollectionCamp',
-      '&hook_civicrm_pre' => 'handleAuthorizationEmails',
-      '&hook_civicrm_post' => 'handleAuthorizationEmailsPost',
+      '&hook_civicrm_pre' => [['handleAuthorizationEmails'], ['checkIfPosterNeedsToBeGenerated']],
+      '&hook_civicrm_post' => [['handleAuthorizationEmailsPost'], ['maybeGeneratePoster']],
     ];
+  }
+
+  /**
+   *
+   */
+  public static function checkIfPosterNeedsToBeGenerated($op, $objectName, $id, &$params) {
+    if ($objectName !== 'Eck_Collection_Camp' || $op !== 'edit') {
+      return;
+    }
+
+    if (!($messageTemplateId = $params['Collection_Camp_Core_Details.Poster_Template'])) {
+      return;
+    }
+
+    $currentCollectionSource = EckEntity::get('Collection_Camp', FALSE)
+      ->addSelect('Collection_Camp_Core_Details.Poster',)
+      ->addWhere('id', '=', $id)
+      ->execute()->single();
+
+    $posterExists = !is_null($currentCollectionSource['Collection_Camp_Core_Details.Poster']);
+
+    if ($posterExists) {
+      return;
+    }
+
+    self::$generatePosterRequest = [
+      'collectionSourceId' => $currentCollectionSource['id'],
+      'messageTemplateId' => $messageTemplateId,
+    ];
+
+  }
+
+  /**
+   *
+   */
+  public static function maybeGeneratePoster(string $op, string $objectName, int $objectId, &$objectRef) {
+    if (!self::$generatePosterRequest || $objectName !== 'Eck_Collection_Camp' || $op !== 'edit') {
+      return;
+    }
+
+    $collectionSourceId = self::$generatePosterRequest['collectionSourceId'];
+    $messageTemplateId = self::$generatePosterRequest['messageTemplateId'];
+
+    $messageTemplate = MessageTemplate::get(FALSE)
+      ->addWhere('id', '=', $messageTemplateId)
+      ->execute()->single();
+    $html = $messageTemplate['msg_html'];
+
+    $rendered = \CRM_Core_TokenSmarty::render(
+    ['html' => $html],
+    ['collectionSourceId' => $collectionSourceId],
+    );
+
+    $baseFileName = "poster_{$collectionSourceId}.pdf";
+    $fileName = \CRM_Utils_File::makeFileName($baseFileName);
+    $tempFilePath = \CRM_Utils_File::tempnam($baseFileName);
+
+    $numBytes = file_put_contents(
+      $tempFilePath,
+      \CRM_Utils_PDF_Utils::html2pdf($rendered, $fileName, TRUE)
+    );
+
+    if (!$numBytes) {
+      \CRM_Core_Error::debug_log_message('Failed to write poster PDF to temporary file for collection source ID ' . $collectionSourceId);
+      return FALSE;
+    }
+
+    try {
+      $posterField = CustomField::get(FALSE)
+        ->addSelect('id')
+        ->addWhere('custom_group_id:name', '=', 'Collection_Camp_Core_Details')
+        ->addWhere('name', '=', 'poster')
+        ->execute()->single();
+    }
+    catch (\Exception $ex) {
+      \CRM_Core_Error::debug_log_message('Cannot find field to save poster for collection camp ID ' . $collectionSourceId);
+      return FALSE;
+    }
+
+    $posterFieldId = 'custom_' . $posterField['id'];
+
+    // Save the QR code as an attachment linked to the collection camp.
+    $params = [
+      'entity_id' => $collectionSourceId,
+      'name' => $fileName,
+      'mime_type' => 'application/pdf',
+      'field_name' => $posterFieldId,
+      'options' => [
+        'move-file' => $tempFilePath,
+      ],
+    ];
+
+    $result = civicrm_api3('Attachment', 'create', $params);
+
+    if (empty($result['id'])) {
+      \CRM_Core_Error::debug_log_message('Failed to upload poster PDF for collection camp ID ' . $collectionSourceId);
+      return FALSE;
+    }
   }
 
   /**

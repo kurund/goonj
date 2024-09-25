@@ -69,7 +69,7 @@ class DroppingCenterService extends AutoSubscriber {
       'current' => FALSE,
     ];
 
-     // Add the Donation Box/Register Tracking tab.
+    // Add the Donation Box/Register Tracking tab.
     $tabs['donation tracking'] = [
       'title' => ts('Donation Tracking'),
       'link' => $donationTrackingUrl,
@@ -86,7 +86,7 @@ class DroppingCenterService extends AutoSubscriber {
       'active' => 1,
       'current' => FALSE,
     ];
-    
+
     // Add the outcome tab.
     $tabs['outcome'] = [
       'title' => ts('Outcome'),
