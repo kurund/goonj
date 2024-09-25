@@ -396,7 +396,7 @@ class CollectionCampService extends AutoSubscriber {
       ->execute()->single();
 
     // Subtype for 'Dropping Centre'.
-    if ($subtypeId === $optionValue['value']) {
+    if ($subtypeId == $optionValue['value']) {
       return $objectRef['Dropping_Centre.State'] ?? NULL;
     }
     return $objectRef['Collection_Camp_Intent_Details.State'] ?? NULL;
