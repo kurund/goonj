@@ -4,6 +4,7 @@
  *
  */
 
+use Civi\Api4\EckEntity;
 use Civi\Token\AbstractTokenSubscriber;
 use Civi\Token\TokenProcessor;
 use Civi\Token\TokenRow;
@@ -57,11 +58,10 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
         break;
 
       case 'date':
-        $value = 'date of collection camp';
-        break;
-
       case 'time':
-        $value = 'time of collection camp';
+        $start = new DateTime($collectionSource['Collection_Camp_Intent_Details.Start_Date']);
+        $end = new DateTime($collectionSource['Collection_Camp_Intent_Details.End_Date']);
+        $value = $field === 'date' ? $this->formatDate($start, $end) : $this->formatTime($start, $end);
         break;
 
       case 'volunteers':
@@ -81,6 +81,32 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
     $row->format('text/plain')->tokens($entity, $field, $value);
     return;
 
+  }
+
+  /**
+   *
+   */
+  private function formatDate($start, $end) {
+
+    $startFormatted = $start->format('M jS, Y (l)');
+    $endFormatted = $end->format('M jS, Y (l)');
+
+    if ($start->format('Y-m-d') === $end->format('Y-m-d')) {
+      return $startFormatted;
+    }
+
+    return "$startFormatted - $endFormatted";
+  }
+
+  /**
+   *
+   */
+  private function formatTime($start, $end) {
+
+    $startTime = $start->format('h:i A');
+    $endTime = $end->format('h:i A');
+
+    return "$startTime to $endTime";
   }
 
 }
