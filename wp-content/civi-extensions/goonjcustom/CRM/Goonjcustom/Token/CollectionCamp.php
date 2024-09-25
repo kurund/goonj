@@ -58,7 +58,7 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
 
     switch ($field) {
       case 'venue':
-        $value = 'Venue of the camp';
+        $value = $this->formatVenue($collectionSource);
         break;
 
       case 'date':
@@ -73,7 +73,7 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
         break;
 
       case 'goonj_team':
-        $value = 'goonj team members of collection camp';
+        $value = $this->formatGoonjTeam($collectionSource);
         break;
 
       default:
@@ -140,6 +140,47 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
     );
 
     return join(',', $volunteersWithPhone);
+  }
+
+  /**
+   *
+   */
+  private function formatVenue($collectionSource) {
+    $addressParts = [
+      $collectionSource['Collection_Camp_Intent_Details.Location_Area_of_camp'],
+      $collectionSource['Collection_Camp_Intent_Details.District'],
+      $collectionSource['Collection_Camp_Intent_Details.City'],
+      CRM_Core_PseudoConstant::stateProvince($collectionSource['Collection_Camp_Intent_Details.State']),
+      $collectionSource['Collection_Camp_Intent_Details.Pin_Code'],
+    ];
+
+    return join(', ', array_filter($addressParts));
+
+  }
+
+  /**
+   *
+   */
+  private function formatGoonjTeam($collectionSource) {
+    $urbanPocId = $collectionSource['Collection_Camp_Intent_Details.Coordinating_Urban_POC'];
+
+    $urbanPocPhones = Contact::get(FALSE)
+      ->addSelect('phone.phone', 'display_name')
+      ->addJoin('Phone AS phone', 'LEFT')
+      ->addWhere('id', '=', $urbanPocId)
+      ->execute();
+
+    $first = $urbanPocPhones->first();
+
+    if (!$first) {
+      return '';
+    }
+
+    $displayName = $first['display_name'];
+
+    $phoneNumbers = $urbanPocPhones->column('phone.phone');
+
+    return sprintf('%1$s (%2$s)', $displayName, join(',', $phoneNumbers));
   }
 
 }
