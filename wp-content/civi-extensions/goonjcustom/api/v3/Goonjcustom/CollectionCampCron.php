@@ -72,17 +72,17 @@ function civicrm_api3_goonjcustom_collection_camp_cron($params) {
     $collectionCampGoonjOffice = $collectionCamp['Collection_Camp_Intent_Details.Goonj_Office'];
     $initiatorId = $collectionCamp['Collection_Camp_Core_Details.Contact_Id'];
 
-    $contactEmail = Email::get(TRUE)
+    $initiatorEmail = Email::get(TRUE)
       ->addWhere('contact_id', '=', $initiatorId)
       ->execute()->single();
 
-    $contactEmailId = $contactEmail['email'];
+    $contactEmailId = $initiatorEmail['email'];
 
-    $contactData = Contact::get(TRUE)
+    $initiator = Contact::get(TRUE)
       ->addWhere('id', '=', $initiatorId)
       ->execute()->single();
 
-    $organizingContactName = $contactData['display_name'];
+    $organizingContactName = $initiator['display_name'];
 
     $email = Email::get(TRUE)
       ->addWhere('contact_id', '=', $recipientId)
