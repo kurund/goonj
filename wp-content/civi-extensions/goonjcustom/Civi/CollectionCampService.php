@@ -124,8 +124,8 @@ class CollectionCampService extends AutoSubscriber {
       'current' => FALSE,
     ];
 
-      // Add the material dispatch authorization tab.
-      $tabs['materialAuthorization'] = [
+    // Add the material dispatch authorization tab.
+    $tabs['materialAuthorization'] = [
       'title' => ts('Material Authorization'),
       'link' => $materialAuthorization,
       'valid' => 1,
