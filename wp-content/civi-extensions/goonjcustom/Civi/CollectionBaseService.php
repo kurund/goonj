@@ -55,6 +55,7 @@ class CollectionBaseService extends AutoSubscriber {
       "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fevent-volunteer",
     );
 
+
     // Add the event volunteer tab.
     $tabs['eventVolunteers'] = [
       'title' => ts('Event Volunteers'),

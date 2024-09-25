@@ -73,17 +73,16 @@ function civicrm_api3_goonjcustom_collection_camp_cron($params) {
     $collectionCampContactId = $collectionCamp['Collection_Camp_Core_Details.Contact_Id'];
 
     $contactEmail = Email::get(TRUE)
-    ->addWhere('contact_id', '=', $collectionCampContactId)
-    ->execute()->single();
+      ->addWhere('contact_id', '=', $collectionCampContactId)
+      ->execute()->single();
 
     $contactEmailId = $contactEmail['email'];
 
     $contactData = Contact::get(TRUE)
-    ->addWhere('id', '=', $collectionCampContactId)
-    ->execute()->single();
+      ->addWhere('id', '=', $collectionCampContactId)
+      ->execute()->single();
 
     $organisingContactName = $contactData['display_name'];
-
 
     $email = Email::get(TRUE)
       ->addWhere('contact_id', '=', $recipientId)
@@ -163,4 +162,3 @@ function goonjcustom_collection_camp_volunteer_feedback_email_html($organisingCo
       <p>Warm regards,</p>";
   return $html;
 }
-

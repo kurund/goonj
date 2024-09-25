@@ -90,6 +90,11 @@ class CollectionCampService extends AutoSubscriber {
     // URL for the material dispatch authorizationtab.
     $materialAuthorization = \CRM_Utils_System::url(
       "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Facknowledgement-for-logistics-data",
+    // URL for the camp volunteer feedback tab.
+    );
+
+    $campFeedback = \CRM_Utils_System::url(
+      "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Freview-volunteer-camp-feedback",
     );
 
     // Add the Logistics tab.
@@ -119,10 +124,19 @@ class CollectionCampService extends AutoSubscriber {
       'current' => FALSE,
     ];
 
-    // Add the material dispatch authorization tab.
-    $tabs['materialAuthorization'] = [
+      // Add the material dispatch authorization tab.
+      $tabs['materialAuthorization'] = [
       'title' => ts('Material Authorization'),
       'link' => $materialAuthorization,
+      'valid' => 1,
+      'active' => 1,
+      'current' => FALSE,
+    ];
+
+    // Add the camp volunteer feedback tab.
+    $tabs['campFeedback'] = [
+      'title' => ts('Feedback'),
+      'link' => $campFeedback,
       'valid' => 1,
       'active' => 1,
       'current' => FALSE,
