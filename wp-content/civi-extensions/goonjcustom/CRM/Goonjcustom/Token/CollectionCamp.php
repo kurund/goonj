@@ -8,7 +8,6 @@ use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\EckEntity;
 use Civi\Token\AbstractTokenSubscriber;
-use Civi\Token\TokenProcessor;
 use Civi\Token\TokenRow;
 
 /**
@@ -26,13 +25,6 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
       'volunteers' => \CRM_Goonjcustom_ExtensionUtil::ts('Volunteers'),
       'goonj_team' => \CRM_Goonjcustom_ExtensionUtil::ts('Goonj Team'),
     ]);
-  }
-
-  /**
-   *
-   */
-  public function checkActive(TokenProcessor $processor) {
-    return !empty($processor->context['collectionSourceId']);
   }
 
   /**
