@@ -973,10 +973,10 @@ class CollectionCampService extends AutoSubscriber {
     $contactName = $email['contact_id.display_name'];
 
     $fromEmail = OptionValue::get(FALSE)
-    ->addSelect('label')
-    ->addWhere('option_group_id:name', '=', 'from_email_address')
-    ->addWhere('is_default', '=', TRUE)
-    ->execute()->single();
+      ->addSelect('label')
+      ->addWhere('option_group_id:name', '=', 'from_email_address')
+      ->addWhere('is_default', '=', TRUE)
+      ->execute()->single();
 
     // Email to material management team member.
     $mailParams = [
