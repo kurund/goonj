@@ -103,7 +103,7 @@ function civicrm_api3_goonjcustom_collection_camp_cron($params) {
     ->execute()->single();
 
     // Only send the email if the end date is exactly today.
-    if ($endDateFormatted === $todayFormatted) {
+    if ($endDateFormatted <= $todayFormatted) {
       $mailParams = [
         'subject' => 'Volunteer Feedback Form',
         'from' => $fromEmail['label'],
