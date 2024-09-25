@@ -96,13 +96,19 @@ function civicrm_api3_goonjcustom_collection_camp_cron($params) {
 
     $contactName = $contact['display_name'];
 
+    $fromEmail = OptionValue::get(FALSE)
+    ->addSelect('label')
+    ->addWhere('option_group_id:name', '=', 'from_email_address')
+    ->addWhere('is_default', '=', TRUE)
+    ->execute()->single();
+
     // Only send the email if the end date is exactly today.
     if ($endDateFormatted === $todayFormatted) {
       $mailParams = [
         'subject' => 'Volunteer Feedback Form',
-        'from' => 'urban.ops@goonj.org',
+        'from' => $fromEmail['label'],
         'toEmail' => $contactEmailId,
-        'replyTo' => 'urban.ops@goonj.org',
+        'replyTo' => $fromEmail['label'],
         'html' => goonjcustom_collection_camp_volunteer_feedback_email_html($organizingContactName, $collectionCampId),
         // 'messageTemplateID' => 76, // Uncomment if using a message template
       ];
