@@ -54,6 +54,16 @@ class CollectionBaseService extends AutoSubscriber {
     $eventVolunteersUrl = \CRM_Utils_System::url(
       "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fevent-volunteer",
     );
+    
+     // URL for the Dispatch tab.
+     $vehicleDispatch = \CRM_Utils_System::url(
+      "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fcamp-vehicle-dispatch-data",
+    );
+
+     // URL for the material dispatch authorizationtab.
+     $materialAuthorization = \CRM_Utils_System::url(
+      "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Facknowledgement-for-logistics-data",
+    );
 
     // Add the event volunteer tab.
     $tabs['eventVolunteers'] = [
@@ -68,6 +78,24 @@ class CollectionBaseService extends AutoSubscriber {
     $tabs['contribution'] = [
       'title' => ts('Material Contribution'),
       'link' => $contributionUrl,
+      'valid' => 1,
+      'active' => 1,
+      'current' => FALSE,
+    ];
+
+     // Add the vehicle dispatch tab.
+     $tabs['vehicleDispatch'] = [
+      'title' => ts('Dispatch'),
+      'link' => $vehicleDispatch,
+      'valid' => 1,
+      'active' => 1,
+      'current' => FALSE,
+    ];
+
+     // Add the material dispatch authorization tab.
+     $tabs['materialAuthorization'] = [
+      'title' => ts('Material Authorization'),
+      'link' => $materialAuthorization,
       'valid' => 1,
       'active' => 1,
       'current' => FALSE,
