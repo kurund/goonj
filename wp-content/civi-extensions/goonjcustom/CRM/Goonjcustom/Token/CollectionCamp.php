@@ -7,6 +7,7 @@
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\EckEntity;
+use Civi\Api4\Phone;
 use Civi\Token\AbstractTokenSubscriber;
 use Civi\Token\TokenRow;
 
@@ -23,7 +24,7 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
       'date' => \CRM_Goonjcustom_ExtensionUtil::ts('Date'),
       'time' => \CRM_Goonjcustom_ExtensionUtil::ts('Time'),
       'volunteers' => \CRM_Goonjcustom_ExtensionUtil::ts('Volunteers'),
-      'goonj_team' => \CRM_Goonjcustom_ExtensionUtil::ts('Goonj Team'),
+      'coordinator' => \CRM_Goonjcustom_ExtensionUtil::ts('Coordinator (Goonj)'),
       'remarks' => \CRM_Goonjcustom_ExtensionUtil::ts('Remarks'),
       'type' => \CRM_Goonjcustom_ExtensionUtil::ts('Type (Camp/Drive)'),
     ]);
@@ -67,9 +68,11 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
 
         if ($field === 'type') {
           $value = $start->format('Y-m-d') === $end->format('Y-m-d') ? 'Camp' : 'Drive';
-        } elseif ($field === 'date') {
+        }
+        elseif ($field === 'date') {
           $value = $this->formatDate($start, $end);
-        } else {
+        }
+        else {
           $value = $this->formatTime($start, $end);
         }
         break;
@@ -78,16 +81,17 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
         $value = $this->formatVolunteers($collectionSource);
         break;
 
-      case 'goonj_team':
-        $value = $this->formatGoonjTeam($collectionSource);
-        break;
-
       case 'remarks':
         $value = $collectionSource['Collection_Camp_Core_Details.Remarks'];
         break;
 
+      case 'coordinator':
+        $value = $this->formatCoordinator($collectionSource);
+        break;
+
       default:
         $value = '';
+        break;
 
     }
 
@@ -171,26 +175,17 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
   /**
    *
    */
-  private function formatGoonjTeam($collectionSource) {
-    $urbanPocId = $collectionSource['Collection_Camp_Intent_Details.Coordinating_Urban_POC'];
+  private function formatCoordinator($collectionSource) {
+    $officeId = $collectionSource['Collection_Camp_Intent_Details.Goonj_Office'];
 
-    $urbanPocPhones = Contact::get(FALSE)
-      ->addSelect('phone.phone', 'display_name')
-      ->addJoin('Phone AS phone', 'LEFT')
-      ->addWhere('id', '=', $urbanPocId)
+    $officePhones = Phone::get(FALSE)
+      ->addSelect('phone')
+      ->addWhere('contact_id', '=', $officeId)
       ->execute();
 
-    $first = $urbanPocPhones->first();
+    $phoneNumbers = $officePhones->column('phone');
 
-    if (!$first) {
-      return '';
-    }
-
-    $displayName = $first['display_name'];
-
-    $phoneNumbers = $urbanPocPhones->column('phone.phone');
-
-    return sprintf('%1$s (%2$s)', $displayName, join(',', $phoneNumbers));
+    return sprintf('%1$s (%2$s)', \CRM_Goonjcustom_ExtensionUtil::ts('Team Goonj'), join(', ', $phoneNumbers));
   }
 
 }
