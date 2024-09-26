@@ -1,5 +1,7 @@
 <?php
 
+
+
 namespace Civi;
 
 use Civi\Api4\CustomField;
@@ -105,15 +107,7 @@ class CollectionBaseService extends AutoSubscriber {
     $fileName = \CRM_Utils_File::makeFileName($baseFileName);
     $tempFilePath = \CRM_Utils_File::tempnam($baseFileName);
 
-    $numBytes = file_put_contents(
-      $tempFilePath,
-      \CRM_Utils_PDF_Utils::html2pdf($rendered, $fileName, TRUE)
-    );
-
-    if (!$numBytes) {
-      \CRM_Core_Error::debug_log_message('Failed to write poster PDF to temporary file for collection source ID ' . $collectionSourceId);
-      return FALSE;
-    }
+    self::html2image($rendered['html'], $tempFilePath);
 
     try {
       $posterField = CustomField::get(FALSE)
@@ -129,24 +123,43 @@ class CollectionBaseService extends AutoSubscriber {
 
     $posterFieldId = 'custom_' . $posterField['id'];
 
-    // Save the QR code as an attachment linked to the collection camp.
+    // Save the poster PDF as an attachment linked to the collection camp.
     $params = [
       'entity_id' => $collectionSourceId,
       'name' => $fileName,
-      'mime_type' => 'application/pdf',
+      'mime_type' => 'image/png',
       'field_name' => $posterFieldId,
       'options' => [
         'move-file' => $tempFilePath,
       ],
     ];
 
-    $result = civicrm_api3('Attachment', 'create', $params);
+    // $result = civicrm_api3('Attachment', 'create', $params);
 
-    if (empty($result['id'])) {
-      \CRM_Core_Error::debug_log_message('Failed to upload poster PDF for collection camp ID ' . $collectionSourceId);
-      return FALSE;
-    }
+    // if (empty($result['id'])) {
+    //   \CRM_Core_Error::debug_log_message('Failed to upload poster PDF for collection camp ID ' . $collectionSourceId);
+    //   return FALSE;
+    // }
   }
+
+  /**
+   *
+   */
+  public static function html2image($htmlContent, $outputPath) {
+    $nodePath = NODE_PATH;
+    $puppeteerJsPath = escapeshellarg(\CRM_Goonjcustom_ExtensionUtil::path('/js/puppeteer.js'));
+    $htmlContent = escapeshellarg($htmlContent);
+
+    $command = "$nodePath $puppeteerJsPath $htmlContent $outputPath";
+
+    exec($command, $output, $returnCode);
+
+    if ($returnCode === 0) {
+        \Civi::log()->info("Poster image successfully created at: $outputPath");
+    } else {
+        \Civi::log()->debug("Failed to generate poster image, return code: $returnCode");
+    }
+}
 
   /**
    *
