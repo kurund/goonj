@@ -57,7 +57,7 @@ class CollectionBaseService extends AutoSubscriber {
     }
 
     $currentCollectionSource = EckEntity::get('Collection_Camp', FALSE)
-      ->addSelect('Collection_Camp_Core_Details.Poster',)
+      ->addSelect('custom.*')
       ->addWhere('id', '=', $id)
       ->execute()->single();
 
@@ -70,9 +70,7 @@ class CollectionBaseService extends AutoSubscriber {
     self::$generatePosterRequest = [
       'collectionSourceId' => $currentCollectionSource['id'],
       'messageTemplateId' => $messageTemplateId,
-      'customValues' => [
-        'Collection_Camp_Core_Details.Remarks' => $params['Collection_Camp_Core_Details.Remarks'] ?? '',
-      ]
+      'customData' => $params,
     ];
 
   }
@@ -109,7 +107,7 @@ class CollectionBaseService extends AutoSubscriber {
     ['html' => $modifiedHtml],
     [
       'collectionSourceId' => $collectionSourceId,
-      'collectionSourceCustomValues' => self::$generatePosterRequest['customValues'],
+      'collectionSourceCustomData' => self::$generatePosterRequest['customData'],
     ],
     );
 

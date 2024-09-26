@@ -44,10 +44,14 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
       return;
     }
 
-    $collectionSource = EckEntity::get('Collection_Camp', FALSE)
-      ->addSelect('title', 'Collection_Camp_Intent_Details.*', 'Collection_Camp_Core_Details.*')
+    $newCustomData = $row->context['collectionSourceCustomData'];
+
+    $currentCustomData = EckEntity::get('Collection_Camp', FALSE)
+      ->addSelect('custom.*')
       ->addWhere('id', '=', $row->context['collectionSourceId'])
       ->execute()->single();
+
+    $collectionSource = array_merge($currentCustomData, $newCustomData);
 
     switch ($field) {
       case 'venue':
@@ -70,8 +74,7 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
         break;
 
       case 'remarks':
-        $customValues = $row->context['collectionSourceCustomValues'];
-        $value = $customValues['Collection_Camp_Core_Details.Remarks'];
+        $value = $collectionSource['Collection_Camp_Core_Details.Remarks'];
         break;
 
       default:
