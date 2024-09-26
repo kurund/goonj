@@ -108,7 +108,7 @@ class CollectionBaseService extends AutoSubscriber {
     $posterGenerated = self::html2image($rendered['html'], $tempFilePath);
 
     if (!$posterGenerated) {
-      \Civi::log()->info('There was an error generating the poster!')
+      \Civi::log()->info('There was an error generating the poster!');
       return;
     }
 
@@ -155,10 +155,13 @@ class CollectionBaseService extends AutoSubscriber {
     $command = "$nodePath $puppeteerJsPath $htmlContent $outputPath";
 
     \Civi::log()->debug("Running command: $command");
+
     exec($command, $output, $returnCode);
+
     \Civi::log()->debug('Command result', [
       'output' => $output,
       'returnCode' => $returnCode,
+    ]
     );
 
     if ($returnCode === 0) {
