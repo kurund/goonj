@@ -1107,9 +1107,7 @@ class CollectionCampService extends AutoSubscriber {
     $currentStatus = $collectionCamp['Collection_Camp_Core_Details.Status'];
 
     // Check for status change.
-    // Need to add the !== here, right now for testing i have added the == (Please check the commenet)
     if ($currentStatus !== $newStatus) {
-
       // Access the id within the decoded data.
       $campId = $objectRef['id'];
 
