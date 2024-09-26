@@ -1,7 +1,5 @@
 <?php
 
-
-
 namespace Civi;
 
 use Civi\Api4\CustomField;
@@ -103,7 +101,7 @@ class CollectionBaseService extends AutoSubscriber {
     ['collectionSourceId' => $collectionSourceId],
     );
 
-    $baseFileName = "poster_{$collectionSourceId}.pdf";
+    $baseFileName = "poster_{$collectionSourceId}.png";
     $fileName = \CRM_Utils_File::makeFileName($baseFileName);
     $tempFilePath = \CRM_Utils_File::tempnam($baseFileName);
 
@@ -123,7 +121,7 @@ class CollectionBaseService extends AutoSubscriber {
 
     $posterFieldId = 'custom_' . $posterField['id'];
 
-    // Save the poster PDF as an attachment linked to the collection camp.
+    // Save the poster image as an attachment linked to the collection camp.
     $params = [
       'entity_id' => $collectionSourceId,
       'name' => $fileName,
@@ -134,12 +132,11 @@ class CollectionBaseService extends AutoSubscriber {
       ],
     ];
 
-    // $result = civicrm_api3('Attachment', 'create', $params);
-
-    // if (empty($result['id'])) {
-    //   \CRM_Core_Error::debug_log_message('Failed to upload poster PDF for collection camp ID ' . $collectionSourceId);
-    //   return FALSE;
-    // }
+    $result = civicrm_api3('Attachment', 'create', $params);
+    if (empty($result['id'])) {
+      \CRM_Core_Error::debug_log_message('Failed to upload poster image for collection camp ID ' . $collectionSourceId);
+      return FALSE;
+    }
   }
 
   /**
@@ -155,11 +152,12 @@ class CollectionBaseService extends AutoSubscriber {
     exec($command, $output, $returnCode);
 
     if ($returnCode === 0) {
-        \Civi::log()->info("Poster image successfully created at: $outputPath");
-    } else {
-        \Civi::log()->debug("Failed to generate poster image, return code: $returnCode");
+      \Civi::log()->info("Poster image successfully created at: $outputPath");
     }
-}
+    else {
+      \Civi::log()->debug("Failed to generate poster image, return code: $returnCode");
+    }
+  }
 
   /**
    *
