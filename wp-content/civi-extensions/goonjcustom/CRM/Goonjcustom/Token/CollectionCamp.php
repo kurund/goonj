@@ -25,6 +25,7 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
       'volunteers' => \CRM_Goonjcustom_ExtensionUtil::ts('Volunteers'),
       'goonj_team' => \CRM_Goonjcustom_ExtensionUtil::ts('Goonj Team'),
       'remarks' => \CRM_Goonjcustom_ExtensionUtil::ts('Remarks'),
+      'type' => \CRM_Goonjcustom_ExtensionUtil::ts('Type (Camp/Drive)'),
     ]);
   }
 
@@ -60,9 +61,17 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
 
       case 'date':
       case 'time':
+      case 'type':
         $start = new DateTime($collectionSource['Collection_Camp_Intent_Details.Start_Date']);
         $end = new DateTime($collectionSource['Collection_Camp_Intent_Details.End_Date']);
-        $value = $field === 'date' ? $this->formatDate($start, $end) : $this->formatTime($start, $end);
+
+        if ($field === 'type') {
+          $value = $start->format('Y-m-d') === $end->format('Y-m-d') ? 'Camp' : 'Drive';
+        } elseif ($field === 'date') {
+          $value = $this->formatDate($start, $end);
+        } else {
+          $value = $this->formatTime($start, $end);
+        }
         break;
 
       case 'volunteers':

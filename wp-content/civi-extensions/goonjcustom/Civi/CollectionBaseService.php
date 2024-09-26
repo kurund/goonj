@@ -35,11 +35,11 @@ class CollectionBaseService extends AutoSubscriber {
       '&hook_civicrm_selectWhereClause' => 'aclCollectionCamp',
       '&hook_civicrm_pre' => [
         ['handleAuthorizationEmails'],
-        ['checkIfPosterNeedsToBeGenerated']
+        ['checkIfPosterNeedsToBeGenerated'],
       ],
       '&hook_civicrm_post' => [
         ['handleAuthorizationEmailsPost'],
-        ['maybeGeneratePoster']
+        ['maybeGeneratePoster'],
       ],
     ];
   }
