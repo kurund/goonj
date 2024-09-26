@@ -24,6 +24,7 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
       'time' => \CRM_Goonjcustom_ExtensionUtil::ts('Time'),
       'volunteers' => \CRM_Goonjcustom_ExtensionUtil::ts('Volunteers'),
       'goonj_team' => \CRM_Goonjcustom_ExtensionUtil::ts('Goonj Team'),
+      'remarks' => \CRM_Goonjcustom_ExtensionUtil::ts('Remarks'),
     ]);
   }
 
@@ -44,7 +45,7 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
     }
 
     $collectionSource = EckEntity::get('Collection_Camp', FALSE)
-      ->addSelect('title', 'Collection_Camp_Intent_Details.*', 'Collection_Camp_Core_Details.Contact_Id')
+      ->addSelect('title', 'Collection_Camp_Intent_Details.*', 'Collection_Camp_Core_Details.*')
       ->addWhere('id', '=', $row->context['collectionSourceId'])
       ->execute()->single();
 
@@ -66,6 +67,11 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
 
       case 'goonj_team':
         $value = $this->formatGoonjTeam($collectionSource);
+        break;
+
+      case 'remarks':
+        $customValues = $row->context['collectionSourceCustomValues'];
+        $value = $customValues['Collection_Camp_Core_Details.Remarks'];
         break;
 
       default:
