@@ -1135,9 +1135,16 @@ class CollectionCampService extends AutoSubscriber {
           }
         }
 
+        $optionValue = OptionValue::get(TRUE)
+          ->addSelect('value')
+          ->addWhere('option_group_id:name', '=', 'eck_sub_types')
+          ->addWhere('grouping', '=', 'Collection_Camp_Activity')
+          ->addWhere('name', '=', 'Collection_Camp')
+          ->execute()->single();
+
         $results = EckEntity::create('Collection_Camp_Activity', TRUE)
           ->addValue('title', $activityName)
-          ->addValue('subtype', 2)
+          ->addValue('subtype', $optionValue['value'])
           ->addValue('Collection_Camp_Activity.Collection_Camp_Id', $campId)
           ->addValue('Collection_Camp_Activity.Start_Date', $startDate)
           ->addValue('Collection_Camp_Activity.End_Date', $endDate)
