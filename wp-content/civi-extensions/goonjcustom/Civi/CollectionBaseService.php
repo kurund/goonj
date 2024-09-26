@@ -105,7 +105,12 @@ class CollectionBaseService extends AutoSubscriber {
     $fileName = \CRM_Utils_File::makeFileName($baseFileName);
     $tempFilePath = \CRM_Utils_File::tempnam($baseFileName);
 
-    self::html2image($rendered['html'], $tempFilePath);
+    $posterGenerated = self::html2image($rendered['html'], $tempFilePath);
+
+    if (!$posterGenerated) {
+      \Civi::log()->info('There was an error generating the poster!')
+      return;
+    }
 
     try {
       $posterField = CustomField::get(FALSE)
@@ -149,13 +154,20 @@ class CollectionBaseService extends AutoSubscriber {
 
     $command = "$nodePath $puppeteerJsPath $htmlContent $outputPath";
 
+    \Civi::log()->debug("Running command: $command");
     exec($command, $output, $returnCode);
+    \Civi::log()->debug('Command result', [
+      'output' => $output,
+      'returnCode' => $returnCode,
+    );
 
     if ($returnCode === 0) {
       \Civi::log()->info("Poster image successfully created at: $outputPath");
+      return TRUE;
     }
     else {
       \Civi::log()->debug("Failed to generate poster image, return code: $returnCode");
+      return FALSE;
     }
   }
 
