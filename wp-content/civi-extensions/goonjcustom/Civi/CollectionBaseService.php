@@ -84,8 +84,20 @@ class CollectionBaseService extends AutoSubscriber {
       ->execute()->single();
     $html = $messageTemplate['msg_html'];
 
+    // Regular expression to find <style>...</style> and replace it with {literal}<style>...</style>{/literal}.
+    $pattern = '/<style\b[^>]*>(.*?)<\/style>/is';
+    $replacement = '{literal}<style>$1</style>{/literal}';
+
+    // Perform the replacement.
+    $modifiedHtml = preg_replace($pattern, $replacement, $html);
+
+    $pattern = '/<script\b[^>]*>(.*?)<\/script>/is';
+    $replacement = '{literal}<script>$1</script>{/literal}';
+
+    $modifiedHtml = preg_replace($pattern, $replacement, $modifiedHtml);
+
     $rendered = \CRM_Core_TokenSmarty::render(
-    ['html' => $html],
+    ['html' => $modifiedHtml],
     ['collectionSourceId' => $collectionSourceId],
     );
 
