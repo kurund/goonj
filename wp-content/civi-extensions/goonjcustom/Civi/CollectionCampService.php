@@ -48,6 +48,7 @@ class CollectionCampService extends AutoSubscriber {
         ['generateCollectionCampQr'],
         ['linkCollectionCampToContact'],
         ['generateCollectionCampCode'],
+        ['createActivityForCollectionCamp'],
       ],
       '&hook_civicrm_custom' => [
         ['setOfficeDetails'],
@@ -97,6 +98,19 @@ class CollectionCampService extends AutoSubscriber {
       "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Freview-volunteer-camp-feedback",
     );
 
+    $activities = \CRM_Utils_System::url(
+      "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fcollection-camp-activity-view",
+    );
+
+    // Add the camp activities tab.
+    $tabs['activities'] = [
+      'title' => ts('Activities'),
+      'link' => $activities,
+      'valid' => 1,
+      'active' => 1,
+      'current' => FALSE,
+    ];
+
     // Add the Logistics tab.
     $tabs['logistics'] = [
       'title' => ts('Logistics'),
@@ -141,6 +155,7 @@ class CollectionCampService extends AutoSubscriber {
       'active' => 1,
       'current' => FALSE,
     ];
+
   }
 
   /**
@@ -1059,6 +1074,68 @@ class CollectionCampService extends AutoSubscriber {
     ));
 
     return $goonjOfficeIndex !== FALSE ? $filteredItems[$goonjOfficeIndex] : FALSE;
+  }
+
+  /**
+   * This hook is called after a db write on entities.
+   *
+   * @param string $op
+   *   The type of operation being performed.
+   * @param string $objectName
+   *   The name of the object.
+   * @param int $objectId
+   *   The unique identifier for the object.
+   * @param object $objectRef
+   *   The reference to the object.
+   */
+  public static function createActivityForCollectionCamp(string $op, string $objectName, $objectId, &$objectRef) {
+    if ($objectName != 'Eck_Collection_Camp') {
+      return;
+    }
+
+    $newStatus = $objectRef['Collection_Camp_Core_Details.Status'] ?? '';
+
+    if (!$newStatus || !$objectId) {
+      return;
+    }
+
+    $collectionCamp = EckEntity::get('Collection_Camp', FALSE)
+      ->addSelect('Collection_Camp_Core_Details.Status', 'Collection_Camp_Core_Details.Contact_Id', 'title')
+      ->addWhere('id', '=', $objectId)
+      ->execute()->single();
+
+    $currentStatus = $collectionCamp['Collection_Camp_Core_Details.Status'];
+
+    // Check for status change.
+    // Need to add the !== here, right now for testing i have added the == (Please check the commenet)
+    if ($currentStatus !== $newStatus) {
+
+      // Access the id within the decoded data.
+      $campId = $objectRef['id'];
+
+      if ($campId === NULL) {
+        return;
+      }
+
+      $activities = $objectRef['Collection_Camp_Intent_Details.Here_are_some_activities_to_pick_from_but_feel_free_to_invent_yo'];
+      $startDate = $objectRef['Collection_Camp_Intent_Details.Start_Date'];
+      $endDate = $objectRef['Collection_Camp_Intent_Details.End_Date'];
+      $initiator = $objectRef['Collection_Camp_Core_Details.Contact_Id'];
+
+      foreach ($activities as $activityName) {
+        $results = EckEntity::create('Collection_Camp_Activity', TRUE)
+          ->addValue('title', $activityName)
+          ->addValue('subtype', 2)
+          ->addValue('Collection_Camp_Activity.Collection_Camp_Id', $campId)
+          ->addValue('Collection_Camp_Activity.Start_Date', $startDate)
+          ->addValue('Collection_Camp_Activity.End_Date', $endDate)
+          ->addValue('Collection_Camp_Activity.Organizing_Person', $initiator)
+          ->execute();
+        error_log("results: " . print_r($results, TRUE));
+
+      }
+
+    }
   }
 
 }
