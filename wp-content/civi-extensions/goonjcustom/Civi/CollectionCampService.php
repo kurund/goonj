@@ -1123,6 +1123,18 @@ class CollectionCampService extends AutoSubscriber {
       $initiator = $objectRef['Collection_Camp_Core_Details.Contact_Id'];
 
       foreach ($activities as $activityName) {
+        // Check if the activity is 'Others'.
+        if ($activityName == 'Others') {
+          $otherActivity = $objectRef['Collection_Camp_Intent_Details.Other_activity'] ?? '';
+          if ($otherActivity) {
+            // Use the 'Other_activity' field as the title.
+            $activityName = $otherActivity;
+          }
+          else {
+            continue;
+          }
+        }
+
         $results = EckEntity::create('Collection_Camp_Activity', TRUE)
           ->addValue('title', $activityName)
           ->addValue('subtype', 2)
@@ -1131,7 +1143,6 @@ class CollectionCampService extends AutoSubscriber {
           ->addValue('Collection_Camp_Activity.End_Date', $endDate)
           ->addValue('Collection_Camp_Activity.Organizing_Person', $initiator)
           ->execute();
-        error_log("results: " . print_r($results, TRUE));
 
       }
 
