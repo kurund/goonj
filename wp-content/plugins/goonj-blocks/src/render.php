@@ -36,7 +36,6 @@ $pu_material_contribution_check_link = sprintf(
 );
 
 if ( in_array( $target, array( 'collection-camp', 'dropping-center' ) ) ) :
-	error_log("Collection_Camp_Intent_Details: " . print_r($action_target, TRUE));
 	$start_date = new DateTime( $action_target['Collection_Camp_Intent_Details.Start_Date'] );
 	$end_date   = new DateTime( $action_target['Collection_Camp_Intent_Details.End_Date'] );
 	$address = $action_target['Collection_Camp_Intent_Details.Location_Area_of_camp'];
