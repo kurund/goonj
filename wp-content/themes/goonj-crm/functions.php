@@ -137,14 +137,16 @@ function goonj_handle_user_identification_form() {
 
 	$purpose = $_POST['purpose'] ?? 'collection-camp-intent';
 	$target_id = $_POST['target_id'] ?? '';
+	$source = $_POST['source'] ?? '';
+
 
 	// Retrieve the email and phone number from the POST data
 	$email = $_POST['email'] ?? '';
 	$phone = $_POST['phone'] ?? '';
 
-	$is_material_contribution = $purpose !== 'material-contribution';
+	$is_purpose_requiring_email = !in_array($purpose, ['material-contribution', 'processing-center-office-visit', 'processing-center-material-contribution']);
 
-	if ( empty( $phone ) || ( $is_material_contribution && empty( $email ) ) ) {
+	if ( empty( $phone ) || ( $is_purpose_requiring_email && empty( $email ) ) ) {
 		return;
 	}
 
@@ -168,7 +170,7 @@ function goonj_handle_user_identification_form() {
 		// If the user does not exist in the Goonj database
 		// redirect to the volunteer registration form.
 		$volunteer_registration_form_path = sprintf(
-			'/volunteer-registration/#?email=%s&phone=%s&message=%s&Volunteer_fields.Which_activities_are_you_interested_in_=%s',
+			'/volunteer-registration/form/#?email=%s&phone=%s&message=%s&Volunteer_fields.Which_activities_are_you_interested_in_=%s',
 			$email,
 			$phone,
 			'not-inducted-volunteer',
@@ -183,10 +185,15 @@ function goonj_handle_user_identification_form() {
 		);
 
 		$dropping_center_volunteer_registration_form_path = sprintf(
-			'/volunteer-registration/#?email=%s&phone=%s&message=%s',
+			'/volunteer-registration/form/#?email=%s&phone=%s&message=%s',
 			$email,
 			$phone,
 			'not-inducted-for-dropping-center'
+		);
+		$volunteer_registration_url = sprintf(
+			'/volunteer-registration/form/#?email=%s&phone=%s',
+			$email,
+			$phone,
 		);
 
 		if ( empty( $found_contacts ) ) {
@@ -194,6 +201,12 @@ function goonj_handle_user_identification_form() {
 				// Contact does not exist and the purpose is to do material contribution.
 				// Redirect to individual registration with option for volunteering.
 				case 'material-contribution':
+					$individual_volunteer_registration_form_path = sprintf(
+						'/individual-registration-with-volunteer-option/#?email=%s&phone=%s&source=%s',
+						$email,
+						$phone,
+						$source,
+					);
 					$redirect_url = $individual_volunteer_registration_form_path;
 					break;
 
@@ -209,6 +222,34 @@ function goonj_handle_user_identification_form() {
 					$redirect_url = $individual_registration_form_path;
 					break;
 
+				//Contact does not exist and the purpose is processing center material contribution
+				//redirect to individual registration
+				case 'processing-center-material-contribution':
+					$individual_registration_form_path = sprintf(
+						'/processing-center/material-contribution/individual-registration/#?email=%s&phone=%s&target_id=%s',
+						$email,
+						$phone,
+						$target_id,
+					);
+					$redirect_url = $individual_registration_form_path;
+					break;
+
+				//Contact does not exist and the purpose is processing center office visit
+				//redirect to individual registration
+				case 'processing-center-office-visit':
+					$individual_registration_form_path = sprintf(
+						'/processing-center/office-visit/individual-registration/#?email=%s&phone=%s&target_id=%s',
+						$email,
+						$phone,
+						$target_id,
+					);
+					$redirect_url = $individual_registration_form_path;
+					break;
+
+				// Redirect to volunteer registration.
+				case 'volunteer-registration':
+					$redirect_url = $volunteer_registration_url;
+					break;
 				// Contact does not exist and the purpose is not defined.
 				// Redirect to volunteer registration with collection camp activity selected.
 				default:
@@ -224,10 +265,11 @@ function goonj_handle_user_identification_form() {
 
 		if ( 'material-contribution' === $purpose ) {
 			$material_contribution_form_path = sprintf(
-				'/material-contribution/#?email=%s&phone=%s&Source_Tracking.Event=%s',
+				'/material-contribution/#?email=%s&phone=%s&Material_Contribution.Collection_Camp=%s&source_contact_id=%s',
 				$email,
 				$phone,
 				$target_id,
+				$found_contacts['id']
 			);
 			wp_redirect( $material_contribution_form_path );
 			exit;
@@ -240,6 +282,30 @@ function goonj_handle_user_identification_form() {
 				$phone,
 			);
 			wp_redirect( $institute_registration_form_path );
+			exit;
+		}
+
+		if ( 'processing-center-material-contribution' === $purpose ) {
+			$material_form_path = sprintf(
+				'/processing-center/material-contribution/details/#?email=%s&phone=%s&Material_Contribution.Goonj_Office=%s&source_contact_id=%s',
+				$email,
+				$phone,
+				$target_id,
+				$found_contacts['id']
+			);
+			wp_redirect( $material_form_path );
+			exit;
+		}
+
+		if ( 'processing-center-office-visit' === $purpose ) {
+			$office_visit_form_path = sprintf(
+				'/processing-center/office-visit/details/#?email=%s&phone=%s&Office_Visit.Goonj_Processing_Center=%s&source_contact_id=%s',
+				$email,
+				$phone,
+				$target_id,
+				$found_contacts['id']
+			);
+			wp_redirect( $office_visit_form_path );
 			exit;
 		}
 
@@ -257,9 +323,13 @@ function goonj_handle_user_identification_form() {
 		//   1. Trigger an email for Induction
 		//   2. Change volunteer status to "Waiting for Induction"
 		if ( ! goonj_is_volunteer_inducted( $found_contacts ) ) {
-			$redirect_url = ($purpose === 'dropping-center')
-			? home_url('/dropping-centre-waiting-induction/')
-			: home_url('/collection-camp-waiting-induction/');
+			if ($purpose === 'dropping-center') {
+				$redirect_url = home_url('/dropping-center/waiting-induction/');
+			} elseif ($purpose === 'volunteer-registration') {
+				$redirect_url = home_url('/volunteer-registration/waiting-induction/');
+			} else {
+				$redirect_url = home_url('/collection-camp/waiting-induction/');
+			}
 
 			wp_redirect($redirect_url);
 			exit;
@@ -267,16 +337,28 @@ function goonj_handle_user_identification_form() {
 
 		// If we are here, then it means the user exists as an inducted volunteer.
 		// Fetch the most recent collection camp activity based on the creation date
+		$optionValues = \Civi\Api4\OptionValue::get(FALSE)
+		->addWhere('option_group_id:label', '=', 'ECK Subtypes')
+		->addWhere('label', '=', 'Collection Camp')
+		->execute();
+
+		$collectionCampSubtype = $optionValues->first()['value'];
+
 		$collectionCampResult = \Civi\Api4\EckEntity::get('Collection_Camp', FALSE)
 		->addSelect('*', 'custom.*')
 		->addWhere('Collection_Camp_Core_Details.Contact_Id', '=', $found_contacts['id'])
-		->addWhere('subtype', '=', 4) // Collection Camp subtype
+		->addWhere('subtype', '=', $collectionCampSubtype) // Collection Camp subtype
 		->addOrderBy('created_date', 'DESC')
 		->setLimit(1)
 		->execute();
 
 		if ($purpose === 'dropping-center') {
-			wp_redirect(get_home_url() . "/dropping-center/#?Collection_Camp_Core_Details.Contact_Id=" . $found_contacts['id']);
+			wp_redirect(get_home_url() . "/dropping-center/intent/#?Collection_Camp_Core_Details.Contact_Id=" . $found_contacts['id']);
+			exit;
+		}
+
+		if ($purpose === 'volunteer-registration') {
+			wp_redirect(get_home_url() . "/volunteer-registration/already-inducted/");
 			exit;
 		}
 
@@ -291,10 +373,10 @@ function goonj_handle_user_identification_form() {
 			$_SESSION['displayName'] = $display_name;
 			$_SESSION['contactNumber'] = $phone;
 
-			wp_redirect(get_home_url() . "/collection-camp-in-past/#?Collection_Camp_Core_Details.Contact_Id=" . $found_contacts['id'] . '&message=past-collection-data' );
+			wp_redirect(get_home_url() . "/collection-camp/choose-from-past/#?Collection_Camp_Core_Details.Contact_Id=" . $found_contacts['id'] . '&message=past-collection-data' );
 			exit;
 		} else {
-			$redirect_url = get_home_url() . "/collection-camp-intent/#?Collection_Camp_Core_Details.Contact_Id=" . $found_contacts['id'] . '&message=collection-camp-page&Collection_Camp_Intent_Details.Name=' . $display_name . '&Collection_Camp_Intent_Details.Contact_Number='. $phone;
+			$redirect_url = get_home_url() . "/collection-camp/intent/#?Collection_Camp_Core_Details.Contact_Id=" . $found_contacts['id'] . '&message=collection-camp-page&Collection_Camp_Intent_Details.Name=' . $display_name . '&Collection_Camp_Intent_Details.Contact_Number='. $phone;
 		}
 		wp_redirect($redirect_url);
 		exit;
@@ -305,11 +387,18 @@ function goonj_handle_user_identification_form() {
 }
 
 function goonj_is_volunteer_inducted( $volunteer ) {
+	$optionValue = \Civi\Api4\OptionValue::get(FALSE)
+	->addWhere('option_group_id:name', '=', 'activity_type')
+	->addWhere('label', '=', 'Induction')
+	->execute()->single();
+
+	$activityTypeId = $optionValue['value'];
+
 	$activityResult = \Civi\Api4\Activity::get(FALSE)
 	->addSelect('id')
 	->addWhere('target_contact_id', '=', $volunteer['id'])
-	->addWhere('activity_type_id', '=', 57) // hardcode ID of activity type "Induction"
-	->addWhere('status_id', '=', 2) // hardcode ID of activity status "Completed"
+	->addWhere('activity_type_id', '=', $activityTypeId)
+	->addWhere('status_id:label', 'IN', ['Completed', 'Unknown'])
 	->setLimit(1)
 	->execute();
 
@@ -330,98 +419,10 @@ function goonj_collection_camp_landing_page() {
 }
 add_shortcode( 'goonj_collection_landing_page', 'goonj_collection_camp_landing_page' );
 
-add_action( 'init', 'goonj_custom_rewrite_rules' );
-function goonj_custom_rewrite_rules() {
-	add_rewrite_rule(
-		'^actions/collection-camp/([0-9]+)/?',
-		'index.php?pagename=actions&target=collection-camp&id=$matches[1]',
-		'top'
-	);
-
-	add_rewrite_rule(
-		'^actions/dropping-center/([0-9]+)/?',
-		'index.php?pagename=actions&target=dropping-center&id=$matches[1]',
-		'top'
-	);
-
-	add_rewrite_rule(
-		'^actions/processing-center/([0-9]+)/?',
-		'index.php?pagename=actions&target=processing-center&id=$matches[1]',
-		'top'
-	);
-}
-
 add_filter( 'query_vars', 'goonj_query_vars' );
 function goonj_query_vars( $vars ) {
-	$vars[] = 'target';
-	$vars[] = 'id';
 	$vars[] = 'target_id';
 	return $vars;
-}
-
-add_action( 'template_redirect', 'goonj_check_action_target_exists' );
-function goonj_check_action_target_exists() {
-	global $wp_query;
-
-	if (
-		! is_page( 'actions' ) ||
-		! get_query_var( 'target' ) ||
-		! get_query_var( 'id' )
-	) {
-		return;
-	}
-
-	$target = get_query_var( 'target' );
-	$id = intval( get_query_var( 'id' ) );
-
-	// Load CiviCRM.
-	if ( function_exists( 'civicrm_initialize' ) ) {
-		civicrm_initialize();
-	}
-
-	$is_404 = false;
-
-	$event_fields = array(
-		'id',
-		'title',
-		'summary',
-		'description',
-		'start_date',
-		'end_date',
-	);
-
-	switch ( $target ) {
-		case 'collection-camp':
-			$result = \Civi\Api4\Event::get( false )
-				->selectRowCount()
-				->addSelect( ...$event_fields )
-				->addWhere( 'id', '=', $id )
-				->setLimit( 1 )
-				->execute();
-
-			if ( $result->count() === 0 ) {
-				$is_404 = true;
-			} else {
-				$wp_query->set( 'action_target', $result->first() );
-			}
-			break;
-		case 'dropping-center':
-			// TBA.
-			break;
-		case 'processing-center':
-			// TBA.
-			break;
-		default:
-			$is_404 = true;
-	}
-
-	if ( $is_404 ) {
-		$wp_query->set_404();
-		status_header( 404 );
-		nocache_headers();
-		include get_query_template( '404' );
-		exit;
-	}
 }
 
 add_shortcode( 'goonj_collection_camp_past', 'goonj_collection_camp_past_data' );

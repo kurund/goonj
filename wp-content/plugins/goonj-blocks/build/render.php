@@ -15,19 +15,29 @@ $headings = array(
 $heading_text = $headings[ $target ];
 
 $register_link = sprintf(
-	'/individual-registration-with-volunteer-option/#?Source_Tracking.Event=%s',
-	$action_target['id'],
+	'/individual-registration-with-volunteer-option/#?source=%s',
+	$action_target['title'],
 );
 
 $material_contribution_link = sprintf(
-	'/collection-camp-contribution?target_id=%s',
+	'/collection-camp-contribution?source=%s&target_id=%s',
+	$action_target['title'],
 	$action_target['id'],
 );
 
+$pu_visit_check_link = sprintf(
+	'/processing-center/office-visit/?target_id=%s',
+	$action_target['id']
+);
+
+$pu_material_contribution_check_link = sprintf(
+	'/processing-center/material-contribution/?target_id=%s',
+	$action_target['id']
+);
 
 if ( in_array( $target, array( 'collection-camp', 'dropping-center' ) ) ) :
-	$start_date = new DateTime( $action_target['start_date'] );
-	$end_date   = new DateTime( $action_target['end_date'] );
+	$start_date = new DateTime( $action_target['Collection_Camp_Intent_Details.Start_Date'] );
+	$end_date   = new DateTime( $action_target['Collection_Camp_Intent_Details.End_Date'] );
 	?>
 	<div class="wp-block-gb-heading-wrapper">
 		<h2 class="wp-block-gb-heading"><?php echo esc_html($heading_text); ?></h2>
@@ -51,20 +61,22 @@ if ( in_array( $target, array( 'collection-camp', 'dropping-center' ) ) ) :
 		<a href="<?php echo esc_url( $material_contribution_link ); ?>" class="wp-block-gb-action-button">
 			<?php esc_html_e( 'Material Contribution', 'goonj-blocks' ); ?>
 		</a>
-		<a href="" class="wp-block-gb-action-button">
-			<?php esc_html_e( 'Donate', 'goonj-blocks' ); ?>
-		</a>
 	</div>
 	<?php elseif ( 'processing-center' === $target ) : ?>
+		<table class="wp-block-gb-table">
+			<tbody>
+				<tr class="wp-block-gb-table-row">
+					<td class="wp-block-gb-table-cell wp-block-gb-table-header">Address</td>
+					<td class="wp-block-gb-table-cell"><?php echo CRM_Utils_Address::format( $action_target['address'] ); ?></td>
+				</tr>
+			</tbody>
+		</table>
 		<div <?php echo get_block_wrapper_attributes(); ?>>
-			<a href="" class="wp-block-gb-action-button">
-				<?php esc_html_e( 'Contribution', 'goonj-blocks' ); ?>
+			<a href="<?php echo esc_url( $pu_visit_check_link ); ?>" class="wp-block-gb-action-button">
+				<?php esc_html_e( 'Office Visit', 'goonj-blocks' ); ?>
 			</a>
-			<a href="" class="wp-block-gb-action-button">
-				<?php esc_html_e( 'Contribution Monetary', 'goonj-blocks' ); ?>
-			</a>
-			<a href="" class="wp-block-gb-action-button">
-				<?php esc_html_e( 'Goonj Visit', 'goonj-blocks' ); ?>
+			<a href="<?php echo esc_url( $pu_material_contribution_check_link ); ?>" class="wp-block-gb-action-button">
+				<?php esc_html_e( 'Material Contribution', 'goonj-blocks' ); ?>
 			</a>
 		</div>
 <?php endif;

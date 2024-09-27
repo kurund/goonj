@@ -12,20 +12,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Validate email
     const emailValue = emailInput.value;
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
+    if (emailValue !== "" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
       valid = false;
       showError(emailInput, "The e-mail address entered is invalid.");
     }
 
     // Phone validation code commented out for now. Uncomment when needed.
-    /*
       const phoneValue = phoneInput.value;
       if (!/^\d{10}$/.test(phoneValue)) {
           valid = false;
           showError(phoneInput, "Phone number must be exactly 10 digits.");
       }
-      */
-
+    
     if (!valid) {
       event.preventDefault();
     }
