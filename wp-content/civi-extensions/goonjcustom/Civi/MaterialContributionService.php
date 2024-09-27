@@ -130,13 +130,10 @@ class MaterialContributionService extends AutoSubscriber {
     $activityDate = date("F j, Y", strtotime($activity['activity_date_time']));
 
     $baseDir = plugin_dir_path(__FILE__) . '../../../themes/goonj-crm/';
-    $deliveredBy = isset($activity['Material_Contribution.Delivered_By']) && $activity['Material_Contribution.Delivered_By'] != ''
-        ? $activity['Material_Contribution.Delivered_By']
-        : $activity['contact.display_name'];
+    $deliveredBy = empty($activity['Material_Contribution.Delivered_By']) ? $activity['contact.display_name'] : $activity['Material_Contribution.Delivered_By'];
 
-    $deliveredByContact = isset($activity['Material_Contribution.Delivered_By_Contact']) && $activity['Material_Contribution.Delivered_By_Contact'] != ''
-        ? $activity['Material_Contribution.Delivered_By_Contact']
-        : $phone;
+    $deliveredByContact = empty($activity['Material_Contribution.Delivered_By_Contact']) ? $phone : $activity['Material_Contribution.Delivered_By_Contact'];
+
     $paths = [
       'logo' => $baseDir . 'images/goonj-logo.png',
       'qrCode' => $baseDir . 'images/qr-code.png',
