@@ -137,7 +137,6 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
    */
   private function formatVolunteers($collectionSource) {
     $initiatorId = $collectionSource['Collection_Camp_Core_Details.Contact_Id'];
-    \Civi::log()->debug('formatVolunteers', ['initiatorId' => $initiatorId]);
 
     $volunteeringActivities = Activity::get(FALSE)
       ->addSelect('activity_contact.contact_id')
@@ -147,29 +146,18 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
       ->addWhere('activity_contact.record_type_id', '=', self::ACTIVITY_TARGET_RECORD_TYPE_ID)
       ->execute();
 
-    \Civi::log()->debug('formatVolunteers', ['volunteeringActivities' => $volunteeringActivities]);
-
     $volunteerIds = array_merge([$initiatorId], $volunteeringActivities->column('activity_contact.contact_id'));
-
-    \Civi::log()->debug('formatVolunteers', ['volunteerIds' => $volunteerIds]);
 
     $volunteers = Contact::get(FALSE)
       ->addSelect('phone.phone', 'display_name')
       ->addJoin('Phone AS phone', 'LEFT')
-      ->addWhere('phone.is_primary', '=', FALSE)
+      ->addWhere('phone.is_primary', '=', TRUE)
       ->addWhere('id', 'IN', $volunteerIds)
       ->execute();
-
-    \Civi::log()->debug('formatVolunteers', ['volunteers' => $volunteers]);
 
     $volunteersWithPhone = array_map(
         fn ($volunteer) => sprintf('%1$s (%2$s)', $volunteer['display_name'], $volunteer['phone.phone']), $volunteers->jsonSerialize()
     );
-
-    \Civi::log()->debug('formatVolunteers', [
-      'volunteersWithPhone' => $volunteersWithPhone,
-      'string' => join(',', $volunteersWithPhone),
-    ]);
 
     return join(',', $volunteersWithPhone);
   }
