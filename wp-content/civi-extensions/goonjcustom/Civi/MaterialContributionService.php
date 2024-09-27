@@ -245,8 +245,6 @@ class MaterialContributionService extends AutoSubscriber {
               <div style="font-size: 14px;">
                 <img src="data:image/png;base64,{$imageData['emailIcon']}" alt="Email" style="width: 16px; height: 16px; display: inline;">
                 <span style="display: inline; margin-left: 0;">mail@goonj.org</span>
-              </div>
-              <div style="font-size: 14px; margin-top: 10px;">
                 <img src="data:image/png;base64,{$imageData['domainIcon']}" alt="Website" style="width: 16px; height: 16px; margin-right: 5px;">
                 <span style="display: inline; margin-left: 0;">www.goonj.org</span>
               </div>
