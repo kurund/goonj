@@ -106,7 +106,7 @@ class CollectionCampService extends AutoSubscriber {
 
     // Add the camp volunteer feedback tab.
     $tabs['campFeedback'] = [
-      'title' => ts('Feedback'),
+      'title' => ts('Volunteer Feedback'),
       'link' => $campFeedback,
       'valid' => 1,
       'active' => 1,
