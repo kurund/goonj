@@ -38,8 +38,8 @@ class CollectionBaseService extends AutoSubscriber {
         ['checkIfPosterNeedsToBeGenerated'],
       ],
       '&hook_civicrm_post' => [
-        ['handleAuthorizationEmailsPost'],
-        ['maybeGeneratePoster'],
+        ['maybeGeneratePoster', 20],
+        ['handleAuthorizationEmailsPost', 10],
       ],
     ];
   }
