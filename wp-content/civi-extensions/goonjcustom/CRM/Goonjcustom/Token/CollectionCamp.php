@@ -27,6 +27,7 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
       'coordinator' => \CRM_Goonjcustom_ExtensionUtil::ts('Coordinator (Goonj)'),
       'remarks' => \CRM_Goonjcustom_ExtensionUtil::ts('Remarks'),
       'type' => \CRM_Goonjcustom_ExtensionUtil::ts('Type (Camp/Drive)'),
+      'address_city' => \CRM_Goonjcustom_ExtensionUtil::ts('City'),
     ]);
   }
 
@@ -89,6 +90,10 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
         $value = $this->formatCoordinator($collectionSource);
         break;
 
+      case 'address_city':
+        $value = $collectionSource['Collection_Camp_Intent_Details.City'];
+        break;
+
       default:
         $value = '';
         break;
@@ -132,6 +137,7 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
    */
   private function formatVolunteers($collectionSource) {
     $initiatorId = $collectionSource['Collection_Camp_Core_Details.Contact_Id'];
+
     $volunteeringActivities = Activity::get(FALSE)
       ->addSelect('activity_contact.contact_id')
       ->addJoin('ActivityContact AS activity_contact', 'LEFT')
@@ -145,7 +151,7 @@ class CRM_Goonjcustom_Token_CollectionCamp extends AbstractTokenSubscriber {
     $volunteers = Contact::get(FALSE)
       ->addSelect('phone.phone', 'display_name')
       ->addJoin('Phone AS phone', 'LEFT')
-      ->addWhere('phone.is_primary', '=', FALSE)
+      ->addWhere('phone.is_primary', '=', TRUE)
       ->addWhere('id', 'IN', $volunteerIds)
       ->execute();
 
