@@ -1106,50 +1106,51 @@ class CollectionCampService extends AutoSubscriber {
 
     $currentStatus = $collectionCamp['Collection_Camp_Core_Details.Status'];
 
+    if ($currentStatus === $newStatus || $newStatus !== 'authorized') {
+      return;
+    }
+
     // Check for status change.
-    if ($currentStatus !== $newStatus & $newStatus === 'authorized') {
-      // Access the id within the decoded data.
-      $campId = $objectRef['id'];
+    // Access the id within the decoded data.
+    $campId = $objectRef['id'];
 
-      if ($campId === NULL) {
-        return;
-      }
+    if ($campId === NULL) {
+      return;
+    }
 
-      $activities = $objectRef['Collection_Camp_Intent_Details.Here_are_some_activities_to_pick_from_but_feel_free_to_invent_yo'];
-      $startDate = $objectRef['Collection_Camp_Intent_Details.Start_Date'];
-      $endDate = $objectRef['Collection_Camp_Intent_Details.End_Date'];
-      $initiator = $objectRef['Collection_Camp_Core_Details.Contact_Id'];
+    $activities = $objectRef['Collection_Camp_Intent_Details.Here_are_some_activities_to_pick_from_but_feel_free_to_invent_yo'];
+    $startDate = $objectRef['Collection_Camp_Intent_Details.Start_Date'];
+    $endDate = $objectRef['Collection_Camp_Intent_Details.End_Date'];
+    $initiator = $objectRef['Collection_Camp_Core_Details.Contact_Id'];
 
-      foreach ($activities as $activityName) {
-        // Check if the activity is 'Others'.
-        if ($activityName == 'Others') {
-          $otherActivity = $objectRef['Collection_Camp_Intent_Details.Other_activity'] ?? '';
-          if ($otherActivity) {
-            // Use the 'Other_activity' field as the title.
-            $activityName = $otherActivity;
-          }
-          else {
-            continue;
-          }
+    foreach ($activities as $activityName) {
+      // Check if the activity is 'Others'.
+      if ($activityName == 'Others') {
+        $otherActivity = $objectRef['Collection_Camp_Intent_Details.Other_activity'] ?? '';
+        if ($otherActivity) {
+          // Use the 'Other_activity' field as the title.
+          $activityName = $otherActivity;
         }
-
-        $optionValue = OptionValue::get(TRUE)
-          ->addSelect('value')
-          ->addWhere('option_group_id:name', '=', 'eck_sub_types')
-          ->addWhere('grouping', '=', 'Collection_Camp_Activity')
-          ->addWhere('name', '=', 'Collection_Camp')
-          ->execute()->single();
-
-        $results = EckEntity::create('Collection_Camp_Activity', TRUE)
-          ->addValue('title', $activityName)
-          ->addValue('subtype', $optionValue['value'])
-          ->addValue('Collection_Camp_Activity.Collection_Camp_Id', $campId)
-          ->addValue('Collection_Camp_Activity.Start_Date', $startDate)
-          ->addValue('Collection_Camp_Activity.End_Date', $endDate)
-          ->addValue('Collection_Camp_Activity.Organizing_Person', $initiator)
-          ->execute();
-
+        else {
+          continue;
+        }
       }
+
+      $optionValue = OptionValue::get(TRUE)
+        ->addSelect('value')
+        ->addWhere('option_group_id:name', '=', 'eck_sub_types')
+        ->addWhere('grouping', '=', 'Collection_Camp_Activity')
+        ->addWhere('name', '=', 'Collection_Camp')
+        ->execute()->single();
+
+      $results = EckEntity::create('Collection_Camp_Activity', TRUE)
+        ->addValue('title', $activityName)
+        ->addValue('subtype', $optionValue['value'])
+        ->addValue('Collection_Camp_Activity.Collection_Camp_Id', $campId)
+        ->addValue('Collection_Camp_Activity.Start_Date', $startDate)
+        ->addValue('Collection_Camp_Activity.End_Date', $endDate)
+        ->addValue('Collection_Camp_Activity.Organizing_Person', $initiator)
+        ->execute();
 
     }
   }
