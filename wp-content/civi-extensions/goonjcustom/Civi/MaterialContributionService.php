@@ -160,7 +160,7 @@ class MaterialContributionService extends AutoSubscriber {
         
         <div style="width: 100%; font-size: 14px;">
           <div style="float: left; text-align: left;">
-            Material Receipt# {$activity['id']}
+            Material Acknowledgment# {$activity['id']}
           </div>
           <div style="float: right; text-align: right;">
             Goonj, C-544, Pocket C, Sarita Vihar, Delhi, India
@@ -191,7 +191,7 @@ class MaterialContributionService extends AutoSubscriber {
             <td style="text-align: center;">{$activity['contact.display_name']}</td>
           </tr>
           <tr>
-            <td class="table-header">Address</td>
+            <td class="table-header">City</td>
             <td style="text-align: center;">{$locationAreaOfCamp}</td>
           </tr>
           <tr>
@@ -220,7 +220,7 @@ class MaterialContributionService extends AutoSubscriber {
         <p style="margin-top: 8px;">
         <strong>With Material Money Matters</strong> Your monetary contribution is needed too for sorting, packing, transportation to implementation. (Financial contributions are tax-exempted u/s 80G of IT Act)
       </p>
-      <p style="margin-top: 10px; font-size: 12px; float: left">* The received material holds 'No Commercial Value' for Goonj.</p>
+      <p style="margin-top: 10px; font-size: 12px; float: left">* Received material has 'No Commercial Value' for Goonj.</p>
     </div>
     <div style="float: right; width: 40%; text-align: right; font-size: 12px; font-style: italic;">
     <p>To contribute, please scan the code.</p>
