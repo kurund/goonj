@@ -113,10 +113,9 @@ class CRM_Goonjcustom_Form_CollectionCampLinks extends CRM_Core_Form {
     ]);
 
     $params = "{$params}&_authx={$bearerToken}&_authxSes=1";
-    $url = \CRM_Utils_System::url($path, $params, TRUE, NULL,
-      FALSE,
-      TRUE
-    );
+    // $url = \CRM_Utils_System::url($path, $params, TRUE, NULL, FALSE, TRUE);
+    $config = CRM_Core_Config::singleton();
+    $url = $config->userFrameworkBaseURL . $path . '#?' . $params;
 
     return $url;
   }
