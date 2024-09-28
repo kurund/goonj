@@ -77,11 +77,11 @@ class CRM_Goonjcustom_Form_CollectionCampLinks extends CRM_Core_Form {
     $links = [
         [
           'label' => 'Vehicle Dispatch',
-          'url' => self::createUrl('civicrm/camp-vehicle-dispatch-form', ["Camp_Vehicle_Dispatch.Collection_Camp_Intent_Id" => $this->_collectionCampId, "Camp_Vehicle_Dispatch.To_which_PU_Center_material_is_being_sent" => $this->_processingCenterId], $contactId),
+          'url' => self::createUrl('civicrm/camp-vehicle-dispatch-form', "Camp_Vehicle_Dispatch.Collection_Camp_Intent_Id={$this->_collectionCampId}&Camp_Vehicle_Dispatch.To_which_PU_Center_material_is_being_sent={$this->_processingCenterId}", $contactId),
         ],
         [
           'label' => 'Camp Outcome',
-          'url' => self::createUrl('civicrm/camp-outcome-form', ["Eck_Collection_Camp1" => $this->_collectionCampId], $contactId),
+          'url' => self::createUrl('civicrm/camp-outcome-form', "Eck_Collection_Camp1={$this->_collectionCampId}", $contactId),
         ],
     ];
 
@@ -92,7 +92,7 @@ class CRM_Goonjcustom_Form_CollectionCampLinks extends CRM_Core_Form {
    * Generate an authenticated URL for viewing this form.
    *
    * @param string $path
-   * @param array $params
+   * @param string $params
    * @param int $contactId
    *
    * @return string
@@ -110,12 +110,10 @@ class CRM_Goonjcustom_Form_CollectionCampLinks extends CRM_Core_Form {
       'exp' => $expires,
       'sub' => "cid:" . $contactId,
       'scope' => 'authx',
-    ] + $params);
+    ]);
 
-    $url = \CRM_Utils_System::url($path,
-      ['_authx' => $bearerToken, '_authxSes' => 1],
-      TRUE,
-      NULL,
+    $params = "{$params}&_authx={$bearerToken}&_authxSes=1";
+    $url = \CRM_Utils_System::url($path, $params, TRUE, NULL,
       FALSE,
       TRUE
     );
