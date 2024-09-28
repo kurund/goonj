@@ -189,19 +189,19 @@ class CollectionBaseService extends AutoSubscriber {
     $tabConfigs = [
       'eventVolunteers' => [
         'title' => ts('Event Volunteers'),
-        'url' => "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fevent-volunteer#?Volunteering_Activity.Collection_Camp=" . $entity_id,
+        'url' => "/civicrm/event-volunteer#?cc_id=" . $entity_id,
       ],
       'materialContribution' => [
         'title' => ts('Material Contribution'),
-        'url' => "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fcollection-camp%2Fmaterial-contributions#?Material_Contribution.Collection_Camp=262",
+        'url' => "/civicrm/collection-camp/material-contributions#?cc_id=" . $entity_id,
       ],
       'vehicleDispatch' => [
         'title' => ts('Dispatch'),
-        'url' => "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fcamp-vehicle-dispatch-data#?Camp_Vehicle_Dispatch.Collection_Camp_Intent_Id=" . $entity_id,
+        'url' => "/civicrm/camp-vehicle-dispatch-data#?intent_id=" . $entity_id,
       ],
       'materialAuthorization' => [
         'title' => ts('Material Authorization'),
-        'url' => "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Facknowledgement-for-logistics-data#?Camp_Vehicle_Dispatch.Collection_Camp_Intent_Id=" . $entity_id,
+        'url' => "/civicrm/acknowledgement-for-logistics-data#?intent_id=" . $entity_id,
       ],
     ];
 
