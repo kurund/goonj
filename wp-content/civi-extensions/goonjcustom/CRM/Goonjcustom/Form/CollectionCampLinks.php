@@ -41,6 +41,7 @@ class CRM_Goonjcustom_Form_CollectionCampLinks extends CRM_Core_Form {
     $this->_contactId = CRM_Utils_Request::retrieve('gcid', 'Positive', $this);
     $this->_processingCenterId = CRM_Utils_Request::retrieve('puid', 'Positive', $this);
 
+    $this->setTitle('Collection Camp Links');
     parent::preProcess();
   }
 
