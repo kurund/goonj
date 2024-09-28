@@ -183,7 +183,7 @@ class CollectionBaseService extends AutoSubscriber {
     if ($tabsetName !== 'civicrm/eck/entity' || empty($context) || $context['entity_type']['name'] !== self::ENTITY_NAME) {
       return;
     }
-
+    error_log("context " . print_r($context, TRUE));
     $entity_id = $context['entity_id'];
 
     $tabConfigs = [
@@ -191,9 +191,9 @@ class CollectionBaseService extends AutoSubscriber {
         'title' => ts('Event Volunteers'),
         'url' => "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fevent-volunteer#?Volunteering_Activity.Collection_Camp=" . $entity_id,
       ],
-      'contribution' => [
+      'materialContribution' => [
         'title' => ts('Material Contribution'),
-        'url' => "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fcollection-camp%2Fmaterial-contributions#?Material_Contribution.Collection_Camp=" . $entity_id,
+        'url' => "wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fcollection-camp%2Fmaterial-contributions#?Material_Contribution.Collection_Camp=262",
       ],
       'vehicleDispatch' => [
         'title' => ts('Dispatch'),
