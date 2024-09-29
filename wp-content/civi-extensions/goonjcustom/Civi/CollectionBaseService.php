@@ -183,39 +183,42 @@ class CollectionBaseService extends AutoSubscriber {
     if ($tabsetName !== 'civicrm/eck/entity' || empty($context) || $context['entity_type']['name'] !== self::ENTITY_NAME) {
       return;
     }
-    error_log("context " . print_r($context, TRUE));
-    $entity_id = $context['entity_id'];
 
     $tabConfigs = [
       'eventVolunteers' => [
         'title' => ts('Event Volunteers'),
-        'url' => "/civicrm/event-volunteer#?cc_id=" . $entity_id,
+        'module' => 'afsearchEventVolunteer',
+        'directive' => 'afsearch-event-volunteer',
       ],
       'materialContribution' => [
         'title' => ts('Material Contribution'),
-        'url' => "/civicrm/collection-camp/material-contributions#?cc_id=" . $entity_id,
+        'module' => 'afsearchCollectionCampMaterialContributions',
+        'directive' => 'afsearch-collection-camp-material-contributions',
       ],
       'vehicleDispatch' => [
         'title' => ts('Dispatch'),
-        'url' => "/civicrm/camp-vehicle-dispatch-data#?intent_id=" . $entity_id,
+        'module' => 'afsearchCampVehicleDispatchData',
+        'directive' => 'afsearch-camp-vehicle-dispatch-data',
       ],
       'materialAuthorization' => [
         'title' => ts('Material Authorization'),
-        'url' => "/civicrm/acknowledgement-for-logistics-data#?intent_id=" . $entity_id,
+        'module' => 'afsearchAcknowledgementForLogisticsData',
+        'directive' => 'afsearch-acknowledgement-for-logistics-data',
       ],
     ];
 
     foreach ($tabConfigs as $key => $config) {
-      $url = \CRM_Utils_System::url($config['url']);
-      error_log("{$key}Url: " . print_r($url, TRUE));
-
       $tabs[$key] = [
+        'id' => $key,
         'title' => $config['title'],
-        'link' => $url,
         'valid' => 1,
         'active' => 1,
-        'current' => FALSE,
+        'template' => 'CRM/Goonjcustom/Tabs/CollectionCamp.tpl',
+        'module' => $config['module'],
+        'directive' => $config['directive'],
       ];
+
+      \Civi::service('angularjs.loader')->addModules($config['module']);
     }
   }
 
