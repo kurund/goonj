@@ -211,8 +211,7 @@ class CollectionBaseService extends AutoSubscriber {
       $tabs[$key] = [
         'id' => $key,
         'title' => $config['title'],
-        'valid' => 1,
-        'active' => 1,
+        'is_active' => 1,
         'template' => 'CRM/Goonjcustom/Tabs/CollectionCamp.tpl',
         'module' => $config['module'],
         'directive' => $config['directive'],
